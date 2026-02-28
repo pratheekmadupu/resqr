@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-slate-950 text-white font-sans antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-bold text-white;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-6 py-3 bg-primary text-white rounded-xl font-semibold transition-all hover:bg-red-700 hover:shadow-lg active:scale-95 disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-2;
+  }
+
+  .btn-secondary {
+    @apply px-6 py-3 bg-slate-900 text-white border border-slate-800 rounded-xl font-semibold transition-all hover:bg-slate-800 hover:shadow-lg active:scale-95 disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-2;
+  }
+
+  .btn-outline {
+    @apply px-6 py-3 bg-transparent border-2 border-slate-800 text-white rounded-xl font-semibold transition-all hover:bg-white/5 hover:border-slate-700 active:scale-95 disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-2;
+  }
+
+  .card {
+    @apply bg-slate-900 rounded-2xl shadow-sm border border-slate-800 p-6 text-white;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 bg-slate-900 border border-slate-800 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-slate-500;
+  }
+
+  .label {
+    @apply block text-sm font-medium text-white opacity-80 mb-1.5;
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: .8;
+  }
+}
+
+/* Glassmorphism utility */
+.glass {
+  @apply bg-slate-900/60 backdrop-blur-md border border-slate-800;
+}
