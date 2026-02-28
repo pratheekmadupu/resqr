@@ -10,7 +10,7 @@ export default function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
                     <div className="space-y-4">
                         <Link to="/" className="flex items-center gap-2">
-                            <img src="/logo.png" alt="RESQR Logo" style={{ height: '48px', width: 'auto' }} />
+                            <img src={`${import.meta.env.BASE_URL}logo.png`} alt="RESQR Logo" style={{ height: '48px', width: 'auto' }} />
                         </Link>
                         <p className="text-white text-sm leading-relaxed">
                             Empowering individuals with smart identification solutions for critical moments. Because every second counts.

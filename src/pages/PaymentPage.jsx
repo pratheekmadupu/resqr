@@ -92,7 +92,7 @@ export default function PaymentPage() {
             currency: "INR",
             name: "RESQR",
             description: `Payment for ${selectedProduct.title}`,
-            image: "/logo.png",
+            image: `${import.meta.env.BASE_URL}logo.png`,
             handler: function (response) {
                 // In a production app, you would verify this payment on your backend
                 // with the provide Key Secret: jvT42j5JAg3lmqEeoWVM8bXl

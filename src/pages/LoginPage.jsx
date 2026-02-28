@@ -68,7 +68,7 @@ export default function LoginPage() {
             <div className="w-full max-w-md">
                 <div className="text-center mb-8">
                     <Link to="/" className="inline-flex items-center gap-2 mb-4">
-                        <img src="/logo.png" alt="RESQR Logo" style={{ height: '48px', width: 'auto' }} />
+                        <img src={`${import.meta.env.BASE_URL}logo.png`} alt="RESQR Logo" style={{ height: '48px', width: 'auto' }} />
                     </Link>
                     <h1 className="text-3xl font-bold text-white">
                         {isLogin ? 'Secure Access' : 'Join RESQR'}

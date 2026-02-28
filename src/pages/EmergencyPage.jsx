@@ -81,7 +81,7 @@ export default function EmergencyPage() {
             {/* Urgency Header */}
             <div className="bg-primary p-6 text-white text-center animate-pulse-slow">
                 <div className="flex flex-col items-center justify-center gap-2 mb-2">
-                    <img src="/logo.png" alt="RESQR Logo" style={{ height: '48px', width: 'auto' }} className="mb-2" />
+                    <img src={`${import.meta.env.BASE_URL}logo.png`} alt="RESQR Logo" style={{ height: '48px', width: 'auto' }} className="mb-2" />
                     <p className="font-bold text-lg opacity-90 uppercase tracking-widest text-white">Emergency QR</p>
                 </div>
             </div>
@@ -144,7 +144,7 @@ export default function EmergencyPage() {
 
                 <footer className="text-center py-10 opacity-30">
                     <div className="flex items-center justify-center gap-2 mb-2">
-                        <img src="/logo.png" alt="RESQR Logo" className="h-8 w-auto" />
+                        <img src={`${import.meta.env.BASE_URL}logo.png`} alt="RESQR Logo" className="h-8 w-auto" />
                     </div>
                     <p className="text-xs font-bold uppercase tracking-widest text-white">Powered by Smart ID Technology</p>
                 </footer>

@@ -40,7 +40,7 @@ export default function SuccessPage() {
                     animate={{ scale: 1 }}
                     className="mb-4"
                 >
-                    <img src="/logo.png" alt="RESQR Logo" style={{ height: '48px', width: 'auto' }} className="mx-auto" />
+                    <img src={`${import.meta.env.BASE_URL}logo.png`} alt="RESQR Logo" style={{ height: '48px', width: 'auto' }} className="mx-auto" />
                 </motion.div>
 
                 <p className="text-xl font-bold text-primary mb-12 uppercase tracking-widest">Emergency QR</p>
