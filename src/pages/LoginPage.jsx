@@ -59,7 +59,8 @@ export default function LoginPage() {
             toast.success('Signed in with Google!');
             navigate('/payment');
         } catch (error) {
-            toast.error('Google Sign-in failed');
+            console.error("Google auth error:", error);
+            toast.error(`Google Sign-in failed: ${error.code || error.message}`);
         }
     };
 
