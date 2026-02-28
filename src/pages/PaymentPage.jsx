@@ -34,15 +34,24 @@ export default function PaymentPage() {
             const best = list.find(p => p.best) || list[0];
             setSelectedProduct(best);
             setLoading(false);
+        }, (error) => {
+            console.error("Firebase load error:", error);
+            setProducts(DEFAULT_PRODUCTS);
+            setSelectedProduct(DEFAULT_PRODUCTS[0]);
+            setLoading(false);
         });
-        // Fallback if Firebase is slow or fails
+
+        // Robust fallback if Firebase hangs
         const timer = setTimeout(() => {
-            if (loading) {
-                setProducts(DEFAULT_PRODUCTS);
-                setSelectedProduct(DEFAULT_PRODUCTS.find(p => p.best));
-                setLoading(false);
-            }
-        }, 3000);
+            setLoading(currentLoading => {
+                if (currentLoading) {
+                    setProducts(DEFAULT_PRODUCTS);
+                    setSelectedProduct(DEFAULT_PRODUCTS.find(p => p.best) || DEFAULT_PRODUCTS[0]);
+                    return false;
+                }
+                return currentLoading;
+            });
+        }, 2000);
 
         return () => {
             unsub();
