@@ -96,7 +96,7 @@ export default function LandingPage() {
             </section>
 
             {/* Problem Section */}
-            <section id="features" className="py-20 bg-slate-950 border-y border-slate-900">
+            <section id="how-it-works" className="py-20 bg-slate-950 border-y border-slate-900">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
                         {[
@@ -129,6 +129,42 @@ export default function LandingPage() {
                                 <p className="text-white opacity-70 leading-relaxed">{item.desc}</p>
                             </motion.div>
                         ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* About Section */}
+            <section id="about" className="py-24 bg-slate-900 border-b border-slate-800 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-1/3 h-full bg-primary/5 -skew-x-12 translate-x-1/2"></div>
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                        <div>
+                            <h2 className="text-4xl font-black mb-8 text-white uppercase italic tracking-tighter">About <span className="text-primary italic">RESQR</span></h2>
+                            <div className="space-y-6 text-lg text-white opacity-70 leading-relaxed font-bold">
+                                <p>
+                                    At RESQR, we believe that <span className="text-white opacity-100 italic">information is the best medicine in the first minutes of an accident</span>. Our mission is to bridge the gap between an emergency and life-saving care.
+                                </p>
+                                <p>
+                                    Founded in 2024, our team of safety experts and technology enthusiasts developed the "Smart QR Tag" system — a robust, privacy-first platform that lets first responders access your blood group, allergies, and emergency contacts instantly.
+                                </p>
+                                <p className="text-white opacity-100">
+                                    Trusted by thousands across the country, we are dedicated to making personal safety accessible, affordable, and high-tech.
+                                </p>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            {[
+                                { label: "SAFE & SECURE", icon: <Shield size={24} /> },
+                                { label: "INDIGENOUS TECH", icon: <Zap size={24} /> },
+                                { label: "24/7 SUPPORT", icon: <Activity size={24} /> },
+                                { label: "MADE WITH CARE", icon: <Heart size={24} /> }
+                            ].map((badge, i) => (
+                                <div key={i} className="p-8 bg-slate-950 border border-slate-800 rounded-3xl flex flex-col items-center justify-center text-center group hover:border-primary/50 transition-colors">
+                                    <div className="mb-4 text-primary group-hover:scale-110 transition-transform">{badge.icon}</div>
+                                    <span className="text-xs font-black uppercase tracking-widest">{badge.label}</span>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </section>

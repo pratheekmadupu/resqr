@@ -87,7 +87,7 @@ export default function SuccessPage() {
                             Go to Dashboard <LayoutDashboard size={20} />
                         </Button>
                     </Link>
-                    <Link to="/e/USER123">
+                    <Link to={getQRValue()}>
                         <Button variant="ghost" size="lg">
                             View Public Page <ChevronRight size={20} />
                         </Button>
