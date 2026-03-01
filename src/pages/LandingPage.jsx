@@ -66,7 +66,7 @@ export default function LandingPage() {
                             transition={{ delay: 0.2 }}
                             className="max-w-2xl mx-auto text-xl text-white opacity-80 mb-10 leading-relaxed"
                         >
-                            RESQR provides instant access to your critical medical information when you can't speak for yourself. One scan can save your life.
+                            RESQR (<span className="text-primary font-bold">resqr.co.in</span>) is the official emergency QR identity platform designed to provide instant access to life-saving information during accidents.
                         </motion.p>
 
                         <motion.div
