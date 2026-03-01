@@ -9,6 +9,8 @@ import AdminPanel from './pages/AdminPanel';
 import LoginPage from './pages/LoginPage';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import ContactUs from './pages/ContactUs';
+import LegalPage from './pages/LegalPage';
 
 function App() {
     return (
@@ -24,6 +26,8 @@ function App() {
                     <Route path="/e/:id" element={<EmergencyPage />} />
                     <Route path="/admin" element={<AdminPanel />} />
                     <Route path="/login" element={<LoginPage />} />
+                    <Route path="/contact" element={<ContactUs />} />
+                    <Route path="/legal" element={<LegalPage />} />
                     <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
             </main>

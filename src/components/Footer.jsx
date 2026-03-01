@@ -26,31 +26,31 @@ export default function Footer() {
                     <div>
                         <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-4">Product</h4>
                         <ul className="space-y-2">
-                            <li><Link to="/features" className="text-sm text-white hover:text-primary">Features</Link></li>
-                            <li><Link to="/pricing" className="text-sm text-white hover:text-primary">Pricing</Link></li>
-                            <li><Link to="/enterprise" className="text-sm text-white hover:text-primary">Enterprise</Link></li>
+                            <li><Link to="/#features" className="text-sm text-white hover:text-primary">Features</Link></li>
+                            <li><Link to="/#pricing" className="text-sm text-white hover:text-primary">Pricing</Link></li>
+                            <li><Link to="/contact" className="text-sm text-white hover:text-primary">Enterprise</Link></li>
                         </ul>
                     </div>
 
                     <div>
                         <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-4">Support</h4>
                         <ul className="space-y-2">
-                            <li><Link to="/help" className="text-sm text-white hover:text-primary">Help Center</Link></li>
                             <li><Link to="/contact" className="text-sm text-white hover:text-primary">Contact Us</Link></li>
-                            <li><Link to="/privacy" className="text-sm text-white hover:text-primary">Privacy Policy</Link></li>
+                            <li><Link to="/legal" className="text-sm text-white hover:text-primary">Privacy Policy</Link></li>
+                            <li><Link to="/legal" className="text-sm text-white hover:text-primary">Terms & Conditions</Link></li>
                         </ul>
                     </div>
 
                     <div>
                         <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-4">Newsletter</h4>
-                        <p className="text-sm text-white mb-4">Join 10,000+ people staying safe.</p>
+                        <p className="text-sm text-white mb-4">Join 10,000+ people staying safe with RESQR updates.</p>
                         <div className="flex gap-2">
                             <input
                                 type="email"
                                 placeholder="email@example.com"
                                 className="bg-slate-900 border border-slate-800 px-3 py-2 rounded-lg text-sm w-full focus:outline-none focus:ring-2 focus:ring-primary/20 text-white"
                             />
-                            <button className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold">Join</button>
+                            <button className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold active:scale-95 transition-transform" onClick={() => alert('Thank you for joining!')}>Join</button>
                         </div>
                     </div>
                 </div>

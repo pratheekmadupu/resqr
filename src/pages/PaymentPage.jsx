@@ -87,25 +87,45 @@ export default function PaymentPage() {
         }
 
         const options = {
-            key: "rzp_test_SLGOWC1cclhN5N", // Provided Key ID
+            key: "rzp_live_SLGOWC1cclhN5N", // REPLACE WITH YOUR ACTUAL LIVE KEY
             amount: selectedProduct.price * 100, // Amount in paise
             currency: "INR",
             name: "RESQR",
             description: `Payment for ${selectedProduct.title}`,
             image: `${import.meta.env.BASE_URL}logo.png`,
             handler: function (response) {
-                // In a production app, you would verify this payment on your backend
-                // with the provide Key Secret: jvT42j5JAg3lmqEeoWVM8bXl
+                // In a production app, verify this payment on your backend
+                // Key Secret should ONLY be used on the server-side
+                console.log("Payment Success:", response);
                 toast.success('Payment successful!');
                 navigate('/success');
             },
             prefill: {
                 name: "",
                 email: "",
-                contact: ""
+                contact: "",
+                method: "upi" // Default to UPI as requested
             },
             notes: {
-                address: "RESQR Corporate Office"
+                payment_type: "live_transaction",
+                product_id: selectedProduct.id
+            },
+            config: {
+                display: {
+                    blocks: {
+                        banks: {
+                            name: "All Payment Methods",
+                            instruments: [
+                                { method: "upi" },
+                                { method: "card" },
+                                { method: "netbanking" },
+                                { method: "wallet" }
+                            ]
+                        }
+                    },
+                    sequence: ["block.banks"],
+                    preferences: { show_default_blocks: true }
+                }
             },
             theme: {
                 color: "#e11d48" // matches primary red
