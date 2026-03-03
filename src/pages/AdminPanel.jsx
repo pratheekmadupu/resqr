@@ -29,7 +29,7 @@ export default function AdminPanel() {
 
     // List of allowed admin emails
     const ADMIN_EMAILS = [
-        'pratheekmadupu@gmail.com', // User's email
+        'pratheekmadupu2006@gmail.com', // Your correct email
         'resqr.official@gmail.com'
     ];
 
