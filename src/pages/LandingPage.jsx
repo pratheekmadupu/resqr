@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, ChevronRight, Activity, Smartphone, CreditCard, Heart, Zap, CheckCircle2, Loader2 } from 'lucide-react';
+import { Shield, ChevronRight, Activity, Heart, Zap, CheckCircle2, Loader2, Smartphone, CreditCard } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Link } from 'react-router-dom';
 import { db } from '../lib/firebase';
@@ -9,6 +9,7 @@ import PromotedAd from '../components/PromotedAd';
 
 export default function LandingPage() {
     const [products, setProducts] = useState([]);
+    const [userCount, setUserCount] = useState('...');
     const [loading, setLoading] = useState(true);
 
     const defaultProducts = [
@@ -19,8 +20,21 @@ export default function LandingPage() {
     ];
 
     useEffect(() => {
+        // Fetch User Count
+        const profilesRef = ref(db, 'profiles');
+        const unsubProfiles = onValue(profilesRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                const count = Object.keys(data).length;
+                setUserCount(count.toLocaleString() + '+');
+            } else {
+                setUserCount('0+');
+            }
+        });
+
+        // Fetch Products
         const prodRef = ref(db, 'config/products');
-        const unsub = onValue(prodRef, (snapshot) => {
+        const unsubProducts = onValue(prodRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 const list = Object.entries(data).map(([id, val]) => ({ id, ...val }));
@@ -30,7 +44,11 @@ export default function LandingPage() {
             }
             setLoading(false);
         });
-        return () => unsub();
+
+        return () => {
+            unsubProfiles();
+            unsubProducts();
+        };
     }, []);
 
     const fadeInUp = {
@@ -234,7 +252,7 @@ export default function LandingPage() {
                     </p>
                     <div className="flex justify-center flex-wrap gap-12 pt-6">
                         <div className="flex flex-col items-center gap-2">
-                            <div className="text-4xl font-black text-primary italic">50k+</div>
+                            <div className="text-4xl font-black text-primary italic">{userCount}</div>
                             <div className="text-xs font-bold text-white opacity-50 uppercase tracking-widest">Users Trust Us</div>
                         </div>
                         <div className="w-px h-16 bg-slate-800 hidden sm:block"></div>

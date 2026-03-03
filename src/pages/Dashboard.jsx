@@ -59,16 +59,12 @@ export default function Dashboard() {
     const userContact = profile?.emergencyContactName || '--';
 
     const stats = [
-        { label: 'Total Scans', value: '14', icon: <QrCode size={20} />, color: 'bg-blue-600' },
+        { label: 'Total Scans', value: '0', icon: <QrCode size={20} />, color: 'bg-blue-600' },
         { label: 'Health Status', value: profile ? 'Verified' : 'Incomplete', icon: <User size={20} />, color: 'bg-green-600' },
         { label: 'Safety Index', value: profile ? 'High' : 'Low', icon: <Bell size={20} />, color: 'bg-primary' },
     ];
 
-    const recentScans = [
-        { location: 'Bengaluru, KA', time: '2 hours ago', status: 'Test Scan' },
-        { location: 'Hyderabad, TS', time: 'Yesterday', status: 'Public Scan' },
-        { location: 'Unknown', time: '3 days ago', status: 'System Check' },
-    ];
+    const recentScans = []; // User has no scan history yet
 
     return (
         <div className="min-h-screen bg-slate-950 py-10 px-4 text-white">

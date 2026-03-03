@@ -32,6 +32,12 @@ export default function SuccessPage() {
         return `${window.location.origin}/e/${slug}`;
     };
 
+    const getUserName = () => {
+        const slug = localStorage.getItem('resqr_active_slug');
+        if (!slug) return "Valued User";
+        return slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    };
+
     return (
         <div className="min-h-screen bg-slate-950 py-20 px-4 text-white">
             <div className="max-w-3xl mx-auto text-center">
@@ -63,8 +69,8 @@ export default function SuccessPage() {
                             <span className="text-xs font-bold text-green-500 bg-green-950/30 px-2 py-0.5 rounded-full">ACTIVE</span>
                         </div>
                         <div className="flex items-center justify-between py-2 border-b border-slate-800">
-                            <span className="text-xs font-bold text-white uppercase">Tag ID</span>
-                            <span className="text-sm font-bold text-white">#RQ-88219</span>
+                            <span className="text-xs font-bold text-white uppercase">Identity</span>
+                            <span className="text-sm font-bold text-white uppercase tracking-tighter truncate ml-4">{getUserName()}</span>
                         </div>
                     </div>
                 </Card>
