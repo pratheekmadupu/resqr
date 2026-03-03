@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Shield, ChevronRight, Activity, Heart, Zap, CheckCircle2, Loader2, Smartphone, CreditCard } from 'lucide-react';
 import { Button } from '../components/ui/Button';
+import { Badge } from '../components/ui/Badge';
 import { Link } from 'react-router-dom';
 import { db } from '../lib/firebase';
 import { ref, onValue } from 'firebase/database';

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Phone, MapPin, AlertCircle, Heart, Activity, Info, Loader2 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
+import { Badge } from '../components/ui/Badge';
 import { motion } from 'framer-motion';
 import { useParams } from 'react-router-dom';
 import { db } from '../lib/firebase';
@@ -76,7 +77,6 @@ export default function EmergencyPage() {
         }
     };
 
-    return (
     return (
         <div className="min-h-screen bg-white text-slate-900">
             {/* Urgency Header - Clean Light */}
