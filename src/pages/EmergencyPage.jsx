@@ -83,9 +83,9 @@ export default function EmergencyPage() {
             <div className="bg-white border-b border-slate-100 p-8 text-center">
                 <div className="flex flex-col items-center justify-center gap-4">
                     <img
-                        src={`${import.meta.env.BASE_URL}logo.png`}
-                        alt="RESQR Logo"
-                        style={{ height: '64px', width: 'auto' }}
+                        src={`${import.meta.env.BASE_URL}logo2.png`}
+                        alt="RESQR Medical Profile"
+                        style={{ height: '72px', width: 'auto' }}
                         className="drop-shadow-sm"
                     />
                     <div className="flex flex-col items-center">
@@ -185,7 +185,7 @@ export default function EmergencyPage() {
 
                 <footer className="text-center py-16 opacity-30">
                     <div className="flex items-center justify-center gap-4 mb-4">
-                        <img src={`${import.meta.env.BASE_URL}logo.png`} alt="RESQR Logo" className="h-10 w-auto grayscale" />
+                        <img src={`${import.meta.env.BASE_URL}logo2.png`} alt="RESQR Logo" className="h-12 w-auto grayscale" />
                     </div>
                     <p className="text-[10px] font-black uppercase tracking-[0.5em] text-slate-900">Advanced Identity Guardian • Universal Access</p>
                 </footer>
