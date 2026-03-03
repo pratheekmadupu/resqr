@@ -229,7 +229,11 @@ export default function AdminPanel() {
             <main className="flex-1 p-4 md:p-8 space-y-8 overflow-y-auto max-h-screen">
                 <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-3xl font-extrabold capitalize">{activeTab} Panel</h1>
+                        <h1 className="text-3xl font-extrabold capitalize">
+                            {activeTab === 'users' ? 'Registered Accounts' :
+                                activeTab === 'profiles' ? 'Medical QR Profiles' :
+                                    activeTab + ' Panel'}
+                        </h1>
                         <p className="text-slate-400">Manage your system from a single interface.</p>
                     </div>
                     <div className="flex gap-3">
