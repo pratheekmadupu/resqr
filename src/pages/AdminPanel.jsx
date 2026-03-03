@@ -59,7 +59,10 @@ export default function AdminPanel() {
         const unsubProfiles = onValue(profilesRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
-                setProfilesList(Object.values(data));
+                const list = Object.entries(data).map(([id, val]) => ({ id, ...val }));
+                setProfilesList(list);
+            } else {
+                setProfilesList([]);
             }
         });
 
@@ -163,6 +166,7 @@ export default function AdminPanel() {
                     {[
                         { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
                         { id: 'users', label: 'Auth Users', icon: <Users size={20} /> },
+                        { id: 'profiles', label: 'Medical Profiles', icon: <Activity size={20} /> },
                         { id: 'products', label: 'Inventory & Prices', icon: <Package size={20} /> },
                         { id: 'ads', label: 'Ad Campaigns', icon: <Megaphone size={20} /> },
                         { id: 'settings', label: 'Settings', icon: <Settings size={20} /> },
@@ -371,6 +375,58 @@ export default function AdminPanel() {
                                             </tr>
                                         );
                                     })}
+                                </tbody>
+                            </table>
+                        </div>
+                    </Card>
+                )}
+
+                {activeTab === 'profiles' && (
+                    <Card className="bg-slate-900 border-slate-800 overflow-hidden">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left">
+                                <thead className="bg-slate-950 text-slate-500 text-[10px] font-black uppercase tracking-widest border-b border-slate-800">
+                                    <tr>
+                                        <th className="px-6 py-4 text-white">Slug / ID</th>
+                                        <th className="px-6 py-4 text-white">Patient Name</th>
+                                        <th className="px-6 py-4 text-white">Blood Group</th>
+                                        <th className="px-6 py-4 text-white">Phone</th>
+                                        <th className="px-6 py-4 text-right text-white">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-800">
+                                    {profilesList.filter(p => p.name?.toLowerCase().includes(searchTerm.toLowerCase()) || p.id?.toLowerCase().includes(searchTerm.toLowerCase())).map((profile, idx) => (
+                                        <tr key={profile.id || idx} className="hover:bg-white/5 transition-colors group">
+                                            <td className="px-6 py-4">
+                                                <code className="text-[10px] bg-slate-800 px-2 py-1 rounded text-primary font-bold">
+                                                    {profile.id || profile.name?.toLowerCase().replace(/\s+/g, '-')}
+                                                </code>
+                                            </td>
+                                            <td className="px-6 py-4 font-bold">{profile.name}</td>
+                                            <td className="px-6 py-4">
+                                                <Badge variant="danger">{profile.bloodGroup}</Badge>
+                                            </td>
+                                            <td className="px-6 py-4 text-sm text-slate-400">{profile.phone}</td>
+                                            <td className="px-6 py-4 text-right">
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <Link
+                                                        to={`/e/${profile.id || profile.name?.toLowerCase().replace(/\s+/g, '-')}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="p-2 opacity-50 hover:opacity-100 hover:text-primary transition-all bg-slate-800 rounded-lg"
+                                                    >
+                                                        <ExternalLink size={18} />
+                                                    </Link>
+                                                    <button
+                                                        className="p-2 opacity-50 hover:opacity-100 hover:text-red-500 transition-all bg-slate-800 rounded-lg"
+                                                        onClick={() => deleteItem(`profiles/${profile.id || profile.name?.toLowerCase().replace(/\s+/g, '-')}`)}
+                                                    >
+                                                        <Trash2 size={18} />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
                                 </tbody>
                             </table>
                         </div>
