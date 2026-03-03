@@ -203,7 +203,7 @@ export default function LandingPage() {
                                     <div className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Avg. Scan Time</div>
                                 </div>
                                 <div>
-                                    <div className="text-4xl font-black text-primary italic">10k+</div>
+                                    <div className="text-4xl font-black text-primary italic">{userCount}</div>
                                     <div className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Guardian Users</div>
                                 </div>
                             </div>
