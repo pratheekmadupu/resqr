@@ -79,10 +79,10 @@ export default function EmergencyPage() {
     return (
         <div className="min-h-screen bg-slate-950 text-white">
             {/* Urgency Header */}
-            <div className="bg-primary p-6 text-white text-center animate-pulse-slow">
+            <div className="bg-slate-950 border-b border-slate-800 p-6 text-white text-center">
                 <div className="flex flex-col items-center justify-center gap-2 mb-2">
                     <img src={`${import.meta.env.BASE_URL}logo.png`} alt="RESQR Logo" style={{ height: '48px', width: 'auto' }} className="mb-2" />
-                    <p className="font-bold text-lg opacity-90 uppercase tracking-widest text-white">Emergency QR</p>
+                    <p className="font-bold text-lg opacity-90 uppercase tracking-[0.3em] text-primary">Emergency QR</p>
                 </div>
             </div>
 
