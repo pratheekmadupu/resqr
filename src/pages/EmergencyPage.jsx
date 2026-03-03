@@ -78,7 +78,7 @@ export default function EmergencyPage() {
     };
 
     return (
-        <div className="min-h-screen bg-white text-slate-900">
+        <div className="min-h-screen bg-slate-950 text-white">
             {/* Urgency Header - Clean Light */}
             <div className="bg-white border-b border-slate-100 p-8 text-center">
                 <div className="flex flex-col items-center justify-center gap-4">
@@ -98,13 +98,13 @@ export default function EmergencyPage() {
             </div>
 
             <main className="p-4 sm:p-8 space-y-8 max-w-4xl mx-auto">
-                {/* Name Block - Massive and Clean */}
-                <section className="text-center py-10 border-b-2 border-slate-50 relative overflow-hidden">
+                {/* Name Block - Premium White text on dark */}
+                <section className="text-center py-10 border-b-2 border-slate-900 relative overflow-hidden">
                     <div className="absolute top-0 right-0 p-10 opacity-5 rotate-12 pointer-events-none">
                         <Activity size={120} />
                     </div>
-                    <span className="text-xs font-black text-slate-400 uppercase tracking-widest block mb-4">Patient Identity</span>
-                    <h2 className="text-5xl sm:text-7xl font-black text-slate-900 uppercase leading-none tracking-tighter drop-shadow-sm break-words">
+                    <span className="text-xs font-black text-slate-500 uppercase tracking-widest block mb-4">Patient Identity</span>
+                    <h2 className="text-5xl sm:text-7xl font-black text-white uppercase leading-none tracking-tighter drop-shadow-sm break-words">
                         {user.name}
                     </h2>
                 </section>
@@ -118,16 +118,16 @@ export default function EmergencyPage() {
                         <span className="text-8xl font-black text-primary drop-shadow-lg">{user.bloodGroup}</span>
                     </div>
 
-                    <div className="bg-slate-50 p-8 rounded-[40px] border border-slate-100 flex flex-col items-center justify-center text-center">
+                    <div className="bg-slate-900 p-8 rounded-[40px] border border-slate-800 flex flex-col items-center justify-center text-center">
                         <Activity size={48} className="text-primary mb-4" />
-                        <span className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2 text-center">Primary Medical Condition</span>
-                        <span className="text-3xl font-black text-slate-900 uppercase italic tracking-tight break-words">{user.conditions}</span>
+                        <span className="text-xs font-black text-slate-500 uppercase tracking-widest mb-2 text-center">Primary Medical Condition</span>
+                        <span className="text-3xl font-black text-white uppercase italic tracking-tight break-words">{user.conditions}</span>
                     </div>
                 </div>
 
                 {/* Info Blocks */}
                 <div className="space-y-6">
-                    <div className="bg-white p-8 rounded-[40px] border border-slate-100 shadow-sm relative overflow-hidden">
+                    <div className="bg-slate-900 p-8 rounded-[40px] border border-slate-800 shadow-sm relative overflow-hidden">
                         <div className="absolute top-0 right-0 p-6 opacity-5">
                             <AlertCircle size={64} />
                         </div>
@@ -135,9 +135,9 @@ export default function EmergencyPage() {
                             <div className="p-3 bg-red-500 rounded-2xl text-white shadow-lg shadow-red-500/20">
                                 <AlertCircle size={24} />
                             </div>
-                            <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Crucial Allergies</span>
+                            <span className="text-xs font-black text-slate-500 uppercase tracking-widest">Crucial Allergies</span>
                         </div>
-                        <p className="text-3xl font-black text-slate-900 uppercase tracking-tight italic">{user.allergies}</p>
+                        <p className="text-3xl font-black text-white uppercase tracking-tight italic">{user.allergies}</p>
                     </div>
 
                     <div className="bg-slate-950 p-8 rounded-[40px] text-white shadow-2xl relative group overflow-hidden">
@@ -187,7 +187,7 @@ export default function EmergencyPage() {
                     <div className="flex items-center justify-center gap-4 mb-4">
                         <img src={`${import.meta.env.BASE_URL}logo2.png`} alt="RESQR Logo" className="h-12 w-auto grayscale" />
                     </div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.5em] text-slate-900">Advanced Identity Guardian • Universal Access</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.5em] text-white/40">Advanced Identity Guardian • Universal Access</p>
                 </footer>
             </main>
         </div>
