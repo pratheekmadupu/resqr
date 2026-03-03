@@ -20,9 +20,9 @@ export default function LandingPage() {
     ];
 
     useEffect(() => {
-        // Fetch User Count
-        const profilesRef = ref(db, 'profiles');
-        const unsubProfiles = onValue(profilesRef, (snapshot) => {
+        // Fetch Authenticated User Count
+        const usersRef = ref(db, 'users');
+        const unsubUsers = onValue(usersRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 const count = Object.keys(data).length;
@@ -46,7 +46,7 @@ export default function LandingPage() {
         });
 
         return () => {
-            unsubProfiles();
+            unsubUsers();
             unsubProducts();
         };
     }, []);

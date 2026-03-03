@@ -6,7 +6,7 @@ import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { auth } from '../lib/firebase';
+import { auth, db } from '../lib/firebase';
 import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
@@ -15,6 +15,7 @@ import {
     updateProfile,
     onAuthStateChanged
 } from 'firebase/auth';
+import { ref, update } from 'firebase/database';
 
 export default function LoginPage() {
     const [isLogin, setIsLogin] = useState(true);
@@ -32,17 +33,32 @@ export default function LoginPage() {
         return () => unsubscribe();
     }, [navigate]);
 
+    const syncUserToDb = async (user, displayName) => {
+        try {
+            await update(ref(db, `users/${user.uid}`), {
+                uid: user.uid,
+                name: displayName || user.displayName || 'Anonymous',
+                email: user.email,
+                lastLogin: new Date().toISOString()
+            });
+        } catch (error) {
+            console.error("Database sync error:", error);
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         const toastId = toast.loading(isLogin ? 'Authenticating...' : 'Creating your account...');
 
         try {
             if (isLogin) {
-                await signInWithEmailAndPassword(auth, email, password);
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                await syncUserToDb(userCredential.user);
                 toast.success('Welcome back!', { id: toastId });
             } else {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 await updateProfile(userCredential.user, { displayName: name });
+                await syncUserToDb(userCredential.user, name);
                 toast.success('Account created successfully!', { id: toastId });
             }
             navigate('/dashboard');
@@ -55,7 +71,8 @@ export default function LoginPage() {
     const handleGoogleSignIn = async () => {
         const provider = new GoogleAuthProvider();
         try {
-            await signInWithPopup(auth, provider);
+            const result = await signInWithPopup(auth, provider);
+            await syncUserToDb(result.user);
             toast.success('Signed in with Google!');
             navigate('/payment');
         } catch (error) {

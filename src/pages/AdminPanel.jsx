@@ -17,6 +17,7 @@ export default function AdminPanel() {
     const [activeTab, setActiveTab] = useState('dashboard');
     const [searchTerm, setSearchTerm] = useState('');
     const [users, setUsers] = useState([]);
+    const [profilesList, setProfilesList] = useState([]);
     const [products, setProducts] = useState([]);
     const [ads, setAds] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -27,18 +28,38 @@ export default function AdminPanel() {
     const [editingProduct, setEditingProduct] = useState(null);
     const [editingAd, setEditingAd] = useState(null);
 
+    const filteredUsers = users.filter(u =>
+        (u.name?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+        (u.email?.toLowerCase() || "").includes(searchTerm.toLowerCase())
+    );
+
+    const getProfileForAuthUser = (email) => {
+        if (!email) return null;
+        return profilesList.find(p => p.email === email || (p.name && p.name.toLowerCase() === email.split('@')[0].toLowerCase()));
+    };
+
     useEffect(() => {
-        const usersRef = ref(db, 'profiles');
+        const authUsersRef = ref(db, 'users');
+        const profilesRef = ref(db, 'profiles');
         const productsRef = ref(db, 'config/products');
         const adsRef = ref(db, 'config/ads');
 
-        const unsubUsers = onValue(usersRef, (snapshot) => {
+        const unsubUsers = onValue(authUsersRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 const userList = Object.entries(data).map(([id, val]) => ({ id, ...val }));
                 setUsers(userList);
+            } else {
+                setUsers([]);
             }
             setLoading(false);
+        });
+
+        const unsubProfiles = onValue(profilesRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                setProfilesList(Object.values(data));
+            }
         });
 
         const unsubProducts = onValue(productsRef, (snapshot) => {
@@ -59,6 +80,7 @@ export default function AdminPanel() {
 
         return () => {
             unsubUsers();
+            unsubProfiles();
             unsubProducts();
             unsubAds();
         };
@@ -125,11 +147,6 @@ export default function AdminPanel() {
         { label: 'Active Ads', value: ads.filter(a => a.active).length, change: '+15%', icon: <Megaphone /> },
     ];
 
-    const filteredUsers = users.filter(u =>
-        u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        u.email?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
     return (
         <div className="min-h-screen bg-slate-950 flex flex-col md:flex-row text-white">
             {/* Sidebar */}
@@ -144,7 +161,7 @@ export default function AdminPanel() {
                 <nav className="space-y-1">
                     {[
                         { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
-                        { id: 'users', label: 'User Records', icon: <Users size={20} /> },
+                        { id: 'users', label: 'Auth Users', icon: <Users size={20} /> },
                         { id: 'products', label: 'Inventory & Prices', icon: <Package size={20} /> },
                         { id: 'ads', label: 'Ad Campaigns', icon: <Megaphone size={20} /> },
                         { id: 'settings', label: 'Settings', icon: <Settings size={20} /> },
@@ -153,8 +170,8 @@ export default function AdminPanel() {
                             key={item.id}
                             onClick={() => setActiveTab(item.id)}
                             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-bold ${activeTab === item.id
-                                    ? 'bg-primary text-white shadow-lg shadow-primary/10'
-                                    : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                                ? 'bg-primary text-white shadow-lg shadow-primary/10'
+                                : 'text-slate-400 hover:bg-slate-800 hover:text-white'
                                 }`}
                         >
                             {item.icon} {item.label}
@@ -218,7 +235,7 @@ export default function AdminPanel() {
                                                 <div className="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center font-bold">{user.name?.[0]}</div>
                                                 <div>
                                                     <p className="font-bold">{user.name}</p>
-                                                    <p className="text-xs text-slate-500">{user.email}</p>
+                                                    <p className="text-[10px] font-black uppercase text-primary tracking-widest">{user.id}</p>
                                                 </div>
                                             </div>
                                             <Badge variant="success">New User</Badge>
@@ -273,29 +290,53 @@ export default function AdminPanel() {
                             <table className="w-full text-left">
                                 <thead className="bg-slate-950 text-slate-500 text-[10px] font-black uppercase tracking-widest border-b border-slate-800">
                                     <tr>
-                                        <th className="px-6 py-4 text-white">Full Name</th>
-                                        <th className="px-6 py-4 text-white">Contact</th>
-                                        <th className="px-6 py-4 text-white">Blood Group</th>
-                                        <th className="px-6 py-4 text-white">Emergency Phone</th>
+                                        <th className="px-6 py-4 text-white">User</th>
+                                        <th className="px-6 py-4 text-white">Auth Method</th>
+                                        <th className="px-6 py-4 text-white">Last Login</th>
+                                        <th className="px-6 py-4 text-white">Medical Profile</th>
                                         <th className="px-6 py-4 text-right text-white">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-800">
-                                    {filteredUsers.map(user => (
-                                        <tr key={user.id} className="hover:bg-white/5 transition-colors group">
-                                            <td className="px-6 py-4 font-bold">{user.name}</td>
-                                            <td className="px-6 py-4 text-sm text-slate-400">{user.phone || '--'}</td>
-                                            <td className="px-6 py-4">
-                                                <Badge variant="danger">{user.bloodGroup}</Badge>
-                                            </td>
-                                            <td className="px-6 py-4 text-sm text-slate-400">{user.emergencyContactPhone}</td>
-                                            <td className="px-6 py-4 text-right">
-                                                <button className="p-2 opacity-50 hover:opacity-100 hover:text-red-500" onClick={() => deleteItem(`profiles/${user.id}`)}>
-                                                    <Trash2 size={18} />
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
+                                    {filteredUsers.map(user => {
+                                        const profile = getProfileForAuthUser(user.email);
+                                        return (
+                                            <tr key={user.id} className="hover:bg-white/5 transition-colors group">
+                                                <td className="px-6 py-4">
+                                                    <div className="flex flex-col">
+                                                        <span className="font-bold text-white">{user.name}</span>
+                                                        <span className="text-xs text-slate-500">{user.email}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <Badge variant={user.email?.includes('gmail') ? 'primary' : 'gray'}>
+                                                        {user.email?.includes('gmail') ? 'Google' : 'Email'}
+                                                    </Badge>
+                                                </td>
+                                                <td className="px-6 py-4 text-xs text-slate-400">
+                                                    {user.lastLogin ? new Date(user.lastLogin).toLocaleString() : 'N/A'}
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    {profile ? (
+                                                        <div className="flex flex-col gap-1">
+                                                            <div className="flex items-center gap-2">
+                                                                <Badge variant="success">Active</Badge>
+                                                                <span className="text-xs font-bold text-primary">{profile.bloodGroup}</span>
+                                                            </div>
+                                                            <span className="text-[10px] text-slate-500 uppercase font-black">{profile.id || 'N/A'}</span>
+                                                        </div>
+                                                    ) : (
+                                                        <Badge variant="gray" className="opacity-50 italic">No Profile Yet</Badge>
+                                                    )}
+                                                </td>
+                                                <td className="px-6 py-4 text-right">
+                                                    <button className="p-2 opacity-50 hover:opacity-100 hover:text-red-500" onClick={() => deleteItem(`users/${user.id}`)}>
+                                                        <Trash2 size={18} />
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
                                 </tbody>
                             </table>
                         </div>
