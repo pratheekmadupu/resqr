@@ -8,7 +8,7 @@ import { QRCodeCanvas } from 'qrcode.react';
 import { Modal } from '../components/ui/Modal';
 import { Input } from '../components/ui/Input';
 import { db } from '../lib/firebase';
-import { ref, get } from 'firebase/database';
+import { ref, get, update } from 'firebase/database';
 import PromotedAd from '../components/PromotedAd';
 import toast from 'react-hot-toast';
 
@@ -16,6 +16,38 @@ export default function Dashboard() {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [loading, setLoading] = useState(true);
     const [profile, setProfile] = useState(null);
+    const [editData, setEditData] = useState({});
+
+    useEffect(() => {
+        if (profile) {
+            setEditData({
+                name: profile.name || "",
+                bloodGroup: profile.bloodGroup || "",
+                dob: profile.dob || "",
+                medicalConditions: profile.medicalConditions || "",
+                emergencyContactName: profile.emergencyContactName || "",
+                emergencyContactPhone: profile.emergencyContactPhone || "",
+            });
+        }
+    }, [profile]);
+
+    const handleUpdateProfile = async () => {
+        const slug = localStorage.getItem('resqr_active_slug');
+        if (!slug) return;
+
+        try {
+            const updates = {};
+            updates[`profiles/${slug}`] = { ...profile, ...editData };
+
+            await update(ref(db), updates);
+            setProfile({ ...profile, ...editData });
+            toast.success('Passport updated!');
+            setIsEditModalOpen(false);
+        } catch (error) {
+            console.error("Update error:", error);
+            toast.error('Failed to update profile');
+        }
+    };
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -246,21 +278,52 @@ export default function Dashboard() {
                 title="Edit Health Passport"
             >
                 <div className="space-y-6 p-4">
-                    <Input label="Full Name" defaultValue={profile?.name || ""} className="bg-slate-950" />
+                    <Input
+                        label="Full Name"
+                        value={editData.name}
+                        onChange={(e) => setEditData({ ...editData, name: e.target.value })}
+                        className="bg-slate-950"
+                    />
                     <div className="grid grid-cols-2 gap-4">
-                        <Input label="Blood Group" defaultValue={profile?.bloodGroup || ""} className="bg-slate-950" />
-                        <Input label="DOB" type="date" defaultValue={profile?.dob || ""} className="bg-slate-950" />
+                        <Input
+                            label="Blood Group"
+                            value={editData.bloodGroup}
+                            onChange={(e) => setEditData({ ...editData, bloodGroup: e.target.value })}
+                            className="bg-slate-950"
+                        />
+                        <Input
+                            label="DOB"
+                            type="date"
+                            value={editData.dob}
+                            onChange={(e) => setEditData({ ...editData, dob: e.target.value })}
+                            className="bg-slate-950"
+                        />
                     </div>
                     <div className="w-full">
                         <label className="block text-xs font-black text-white opacity-40 uppercase tracking-[0.2em] mb-2">Medical Conditions</label>
-                        <textarea className="w-full px-4 py-4 bg-slate-950 border border-slate-800 rounded-2xl h-32 text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary font-bold" defaultValue={profile?.medicalConditions || ""} />
+                        <textarea
+                            className="w-full px-4 py-4 bg-slate-950 border border-slate-800 rounded-2xl h-32 text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary font-bold"
+                            value={editData.medicalConditions}
+                            onChange={(e) => setEditData({ ...editData, medicalConditions: e.target.value })}
+                        />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <Input
+                            label="Emergency Contact Name"
+                            value={editData.emergencyContactName}
+                            onChange={(e) => setEditData({ ...editData, emergencyContactName: e.target.value })}
+                            className="bg-slate-950"
+                        />
+                        <Input
+                            label="Emergency Contact Phone"
+                            value={editData.emergencyContactPhone}
+                            onChange={(e) => setEditData({ ...editData, emergencyContactPhone: e.target.value })}
+                            className="bg-slate-950"
+                        />
                     </div>
                     <div className="pt-6 flex gap-4">
                         <Button variant="outline" className="flex-1 border-slate-800 bg-slate-900 font-bold" onClick={() => setIsEditModalOpen(false)}>Cancel</Button>
-                        <Button className="flex-1 font-black italic text-lg" onClick={() => {
-                            toast.success('Passport updated!');
-                            setIsEditModalOpen(false);
-                        }}>Save Changes</Button>
+                        <Button className="flex-1 font-black italic text-lg" onClick={handleUpdateProfile}>Save Changes</Button>
                     </div>
                 </div>
             </Modal>

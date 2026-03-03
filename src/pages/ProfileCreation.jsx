@@ -40,7 +40,12 @@ export default function ProfileCreation() {
                 const nameSlug = formData.name.toLowerCase().trim().replace(/\s+/g, '-');
 
                 // Save to Firebase Realtime Database
-                await set(ref(db, 'profiles/' + nameSlug), formData);
+                const profileData = {
+                    ...formData,
+                    email: auth.currentUser?.email || "",
+                    uid: auth.currentUser?.uid || ""
+                };
+                await set(ref(db, 'profiles/' + nameSlug), profileData);
 
                 // Also save the active slug for the QR code to use locally
                 localStorage.setItem('resqr_active_slug', nameSlug);
