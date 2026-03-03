@@ -9,10 +9,11 @@ import { Card, CardHeader } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
-import { db } from '../lib/firebase';
+import { db, auth } from '../lib/firebase';
 import { ref, onValue, set, push, remove, update } from 'firebase/database';
 import toast from 'react-hot-toast';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { onAuthStateChanged } from 'firebase/auth';
 
 export default function AdminPanel() {
     const [activeTab, setActiveTab] = useState('dashboard');
@@ -22,6 +23,15 @@ export default function AdminPanel() {
     const [products, setProducts] = useState([]);
     const [ads, setAds] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [authLoading, setAuthLoading] = useState(true);
+    const navigate = useNavigate();
+
+    // List of allowed admin emails
+    const ADMIN_EMAILS = [
+        'pratheekmadupu@gmail.com', // User's email
+        'resqr.official@gmail.com'
+    ];
 
     // Form states
     const [isProductModalOpen, setIsProductModalOpen] = useState(false);
@@ -40,6 +50,19 @@ export default function AdminPanel() {
     };
 
     useEffect(() => {
+        const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+            if (user && ADMIN_EMAILS.includes(user.email)) {
+                setIsAdmin(true);
+            } else {
+                setIsAdmin(false);
+                if (!authLoading) {
+                    toast.error("Not authorized! Admins only.");
+                    navigate('/');
+                }
+            }
+            setAuthLoading(false);
+        });
+
         const authUsersRef = ref(db, 'users');
         const profilesRef = ref(db, 'profiles');
         const productsRef = ref(db, 'config/products');
@@ -83,12 +106,23 @@ export default function AdminPanel() {
         });
 
         return () => {
+            unsubscribeAuth();
             unsubUsers();
             unsubProfiles();
             unsubProducts();
             unsubAds();
         };
-    }, []);
+    }, [navigate, authLoading]);
+
+    if (authLoading) {
+        return (
+            <div className="min-h-screen bg-transparent flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            </div>
+        );
+    }
+
+    if (!isAdmin) return null;
 
     const handleAddProduct = (e) => {
         e.preventDefault();
