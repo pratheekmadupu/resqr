@@ -164,37 +164,48 @@ export default function LandingPage() {
                 </div>
             </section>
 
-            {/* About Section */}
-            <section id="about" className="py-24 bg-slate-900 border-b border-slate-800 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-1/3 h-full bg-primary/5 -skew-x-12 translate-x-1/2"></div>
+            {/* About Section - Premium White Refresh */}
+            <section id="about" className="py-32 bg-white border-b border-slate-100 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-1/4 h-full bg-slate-50 -skew-x-12 translate-x-1/2"></div>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+                        <motion.div
+                            initial={{ opacity: 0, x: -40 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                        >
+                            <img
+                                src="/about_data.png"
+                                alt="Medical Data Security"
+                                className="rounded-[40px] shadow-2xl border-4 border-white hover:scale-[1.02] transition-transform duration-700"
+                            />
+                        </motion.div>
+
                         <div>
-                            <h2 className="text-4xl font-black mb-8 text-white uppercase italic tracking-tighter">About <span className="text-primary italic">RESQR</span></h2>
-                            <div className="space-y-6 text-lg text-white opacity-70 leading-relaxed font-bold">
+                            <Badge variant="primary" className="mb-6 px-6 py-2 italic font-black">THE RESQR MISSION</Badge>
+                            <h2 className="text-5xl font-black mb-8 text-slate-900 uppercase italic tracking-tighter leading-none">
+                                SECONDS MATTER. <br />
+                                <span className="text-primary italic">INFORMATION SAVES.</span>
+                            </h2>
+                            <div className="space-y-6 text-xl text-slate-600 leading-relaxed font-medium italic">
                                 <p>
-                                    At RESQR, we believe that <span className="text-white opacity-100 italic">information is the best medicine in the first minutes of an accident</span>. Our mission is to bridge the gap between an emergency and life-saving care.
+                                    At RESQR, we believe that <span className="text-slate-900 font-black">information is the best medicine</span> in the first minutes of an accident. Our mission is to bridge the gap between an emergency and life-saving care.
                                 </p>
                                 <p>
-                                    Founded in 2024, our team of safety experts and technology enthusiasts developed the "Smart QR Tag" system — a robust, privacy-first platform that lets first responders access your blood group, allergies, and emergency contacts instantly.
-                                </p>
-                                <p className="text-white opacity-100">
-                                    Trusted by thousands across the country, we are dedicated to making personal safety accessible, affordable, and high-tech.
+                                    Our "Smart QR Tag" system — a robust, privacy-first platform that lets first responders access your <span className="text-primary font-black">Blood Group, Allergies, and Emergency Contacts</span> instantly without requiring any paperwork.
                                 </p>
                             </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            {[
-                                { label: "SAFE & SECURE", icon: <Shield size={24} /> },
-                                { label: "INDIGENOUS TECH", icon: <Zap size={24} /> },
-                                { label: "24/7 SUPPORT", icon: <Activity size={24} /> },
-                                { label: "MADE WITH CARE", icon: <Heart size={24} /> }
-                            ].map((badge, i) => (
-                                <div key={i} className="p-8 bg-slate-950 border border-slate-800 rounded-3xl flex flex-col items-center justify-center text-center group hover:border-primary/50 transition-colors">
-                                    <div className="mb-4 text-primary group-hover:scale-110 transition-transform">{badge.icon}</div>
-                                    <span className="text-xs font-black uppercase tracking-widest">{badge.label}</span>
+
+                            <div className="mt-10 pt-10 border-t border-slate-100 grid grid-cols-2 gap-8">
+                                <div>
+                                    <div className="text-4xl font-black text-slate-900 italic">2.4s</div>
+                                    <div className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Avg. Scan Time</div>
                                 </div>
-                            ))}
+                                <div>
+                                    <div className="text-4xl font-black text-primary italic">10k+</div>
+                                    <div className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Guardian Users</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
