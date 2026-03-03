@@ -11,6 +11,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ContactUs from './pages/ContactUs';
 import LegalPage from './pages/LegalPage';
+import AboutUs from './pages/AboutUs';
 
 function App() {
     return (
@@ -19,6 +20,7 @@ function App() {
             <main className="flex-grow">
                 <Routes>
                     <Route path="/" element={<LandingPage />} />
+                    <Route path="/about" element={<AboutUs />} />
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/create-profile" element={<ProfileCreation />} />
                     <Route path="/payment" element={<PaymentPage />} />

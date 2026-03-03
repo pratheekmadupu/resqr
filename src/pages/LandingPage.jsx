@@ -103,6 +103,19 @@ export default function LandingPage() {
                                 </Button>
                             </Link>
                         </motion.div>
+
+                        <motion.div
+                            initial={{ opacity: 0, y: 40 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.6, duration: 0.8 }}
+                            className="mt-20 relative max-w-4xl mx-auto z-10"
+                        >
+                            <img
+                                src="/about_scan.png"
+                                alt="RESQR Emergency Scan"
+                                className="rounded-3xl border-8 border-slate-900 shadow-[0_0_80px_rgba(255,50,50,0.1)] hover:scale-[1.01] transition-transform"
+                            />
+                        </motion.div>
                     </div>
                 </div>
 

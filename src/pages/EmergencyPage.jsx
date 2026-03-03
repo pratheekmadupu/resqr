@@ -77,76 +77,117 @@ export default function EmergencyPage() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-950 text-white">
-            {/* Urgency Header */}
-            <div className="bg-slate-950 border-b border-slate-800 p-6 text-white text-center">
-                <div className="flex flex-col items-center justify-center gap-2 mb-2">
-                    <img src={`${import.meta.env.BASE_URL}logo.png`} alt="RESQR Logo" style={{ height: '48px', width: 'auto' }} className="mb-2" />
-                    <p className="font-bold text-lg opacity-90 uppercase tracking-[0.3em] text-primary">Emergency QR</p>
+    return (
+        <div className="min-h-screen bg-white text-slate-900">
+            {/* Urgency Header - Clean Light */}
+            <div className="bg-white border-b border-slate-100 p-8 text-center">
+                <div className="flex flex-col items-center justify-center gap-4">
+                    <img
+                        src={`${import.meta.env.BASE_URL}logo.png`}
+                        alt="RESQR Logo"
+                        style={{ height: '64px', width: 'auto' }}
+                        className="drop-shadow-sm"
+                    />
+                    <div className="flex flex-col items-center">
+                        <Badge variant="primary" className="px-6 py-1 font-black italic shadow-lg shadow-primary/10 mb-2">
+                            EMERGENCY MEDICAL PROFILE
+                        </Badge>
+                        <p className="font-bold text-xs opacity-40 uppercase tracking-[0.4em]">Scan ID: #{id?.toUpperCase()}</p>
+                    </div>
                 </div>
             </div>
 
-            <main className="p-4 sm:p-8 space-y-6">
-                {/* Name Block - Massive */}
-                <section className="text-center py-6 border-b-4 border-slate-900">
-                    <span className="text-xs font-black text-white uppercase tracking-widest block mb-2">Patient name</span>
-                    <h2 className="text-5xl sm:text-7xl font-black text-white uppercase leading-none break-words">
+            <main className="p-4 sm:p-8 space-y-8 max-w-4xl mx-auto">
+                {/* Name Block - Massive and Clean */}
+                <section className="text-center py-10 border-b-2 border-slate-50 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-10 opacity-5 rotate-12 pointer-events-none">
+                        <Activity size={120} />
+                    </div>
+                    <span className="text-xs font-black text-slate-400 uppercase tracking-widest block mb-4">Patient Identity</span>
+                    <h2 className="text-5xl sm:text-7xl font-black text-slate-900 uppercase leading-none tracking-tighter drop-shadow-sm break-words">
                         {user.name}
                     </h2>
                 </section>
 
                 {/* Primary Stats Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="bg-red-950/20 p-8 rounded-3xl border-2 border-primary/20 flex flex-col items-center justify-center">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="bg-primary/5 p-8 rounded-[40px] border border-primary/10 flex flex-col items-center justify-center relative group overflow-hidden">
+                        <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                         <Heart size={48} className="text-primary mb-4" />
-                        <span className="text-sm font-black text-primary uppercase tracking-widest">Blood group</span>
-                        <span className="text-7xl font-black text-primary">{user.bloodGroup}</span>
+                        <span className="text-xs font-black text-primary uppercase tracking-widest mb-1">Blood Registry</span>
+                        <span className="text-8xl font-black text-primary drop-shadow-lg">{user.bloodGroup}</span>
                     </div>
 
-                    <div className="bg-slate-900 p-8 rounded-3xl border border-slate-800 flex flex-col items-center justify-center text-center">
+                    <div className="bg-slate-50 p-8 rounded-[40px] border border-slate-100 flex flex-col items-center justify-center text-center">
                         <Activity size={48} className="text-primary mb-4" />
-                        <span className="text-sm font-black text-white uppercase tracking-widest">Primary condition</span>
-                        <span className="text-3xl font-black text-white mt-2 break-words">{user.conditions}</span>
+                        <span className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2 text-center">Primary Medical Condition</span>
+                        <span className="text-3xl font-black text-slate-900 uppercase italic tracking-tight break-words">{user.conditions}</span>
                     </div>
                 </div>
 
                 {/* Info Blocks */}
-                <div className="space-y-4">
-                    <div className="bg-slate-900 p-6 rounded-3xl border border-slate-800">
-                        <div className="flex items-center gap-2 mb-2">
-                            <Info size={24} className="text-primary" />
-                            <span className="text-sm font-black text-white uppercase tracking-widest">Allergies</span>
+                <div className="space-y-6">
+                    <div className="bg-white p-8 rounded-[40px] border border-slate-100 shadow-sm relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-6 opacity-5">
+                            <AlertCircle size={64} />
                         </div>
-                        <p className="text-3xl font-bold text-white">{user.allergies}</p>
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="p-3 bg-red-500 rounded-2xl text-white shadow-lg shadow-red-500/20">
+                                <AlertCircle size={24} />
+                            </div>
+                            <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Crucial Allergies</span>
+                        </div>
+                        <p className="text-3xl font-black text-slate-900 uppercase tracking-tight italic">{user.allergies}</p>
+                    </div>
+
+                    <div className="bg-slate-950 p-8 rounded-[40px] text-white shadow-2xl relative group overflow-hidden">
+                        <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                        <div className="flex items-center gap-3 mb-6 relative z-10">
+                            <div className="p-3 bg-primary rounded-2xl text-white">
+                                <Phone size={24} />
+                            </div>
+                            <span className="text-xs font-black text-white/40 uppercase tracking-widest">Emergency Contact Information</span>
+                        </div>
+                        <div className="space-y-6 relative z-10">
+                            <div>
+                                <h4 className="text-xl font-black text-white uppercase italic">{user.emergencyContact.name}</h4>
+                                <p className="text-primary font-bold uppercase text-xs tracking-widest">{user.emergencyContact.relation}</p>
+                            </div>
+                            <p className="text-4xl font-black text-white tracking-widest">{user.emergencyContact.phone}</p>
+                        </div>
                     </div>
                 </div>
 
                 {/* Actions - Massive Buttons */}
-                <div className="grid grid-cols-1 gap-4 pt-6">
+                <div className="grid grid-cols-1 gap-6 pt-10">
                     <button
                         onClick={handleCall}
-                        className="w-full bg-green-600 hover:bg-green-700 text-white p-8 rounded-3xl flex flex-col items-center justify-center gap-2 transition-transform active:scale-95 shadow-xl shadow-green-950/20"
+                        className="w-full bg-green-500 hover:bg-green-600 text-white p-10 rounded-[40px] flex flex-col items-center justify-center gap-4 transition-all hover:scale-[1.02] active:scale-95 shadow-2xl shadow-green-500/20 group"
                     >
-                        <Phone size={48} fill="currentColor" />
-                        <span className="text-3xl font-black uppercase tracking-tighter">Call Family</span>
-                        <span className="text-lg font-medium opacity-80">{user.emergencyContact.name} ({user.emergencyContact.relation})</span>
+                        <Phone size={64} fill="currentColor" className="group-hover:translate-y-[-4px] transition-transform" />
+                        <div className="text-center">
+                            <span className="text-4xl font-black uppercase tracking-tighter italic block">Initiate Emergency Call</span>
+                            <span className="text-lg font-bold opacity-80 uppercase tracking-widest">Contact Family Instantly</span>
+                        </div>
                     </button>
 
                     <button
                         onClick={handleSendLocation}
-                        className="w-full bg-slate-900 hover:bg-slate-800 text-white p-8 rounded-3xl flex flex-col items-center justify-center gap-2 transition-transform active:scale-95 border-b-8 border-slate-800 shadow-xl"
+                        className="w-full bg-slate-900 hover:bg-slate-800 text-white p-10 rounded-[40px] flex flex-col items-center justify-center gap-4 transition-all hover:scale-[1.02] active:scale-95 shadow-2xl shadow-slate-900/10 border-b-8 border-slate-950 group"
                     >
-                        <MapPin size={48} fill="currentColor" />
-                        <span className="text-3xl font-black uppercase tracking-tighter">Send My location</span>
-                        <span className="text-lg font-medium opacity-80">Via WhatsApp / SMS</span>
+                        <MapPin size={64} fill="currentColor" className="group-hover:translate-y-[-4px] transition-transform" />
+                        <div className="text-center">
+                            <span className="text-4xl font-black uppercase tracking-tighter italic block">Broadcast GPS Location</span>
+                            <span className="text-lg font-bold opacity-80 uppercase tracking-widest">Notify via WhatsApp / SMS</span>
+                        </div>
                     </button>
                 </div>
 
-                <footer className="text-center py-10 opacity-30">
-                    <div className="flex items-center justify-center gap-2 mb-2">
-                        <img src={`${import.meta.env.BASE_URL}logo.png`} alt="RESQR Logo" className="h-8 w-auto" />
+                <footer className="text-center py-16 opacity-30">
+                    <div className="flex items-center justify-center gap-4 mb-4">
+                        <img src={`${import.meta.env.BASE_URL}logo.png`} alt="RESQR Logo" className="h-10 w-auto grayscale" />
                     </div>
-                    <p className="text-xs font-bold uppercase tracking-widest text-white">Powered by Smart ID Technology</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.5em] text-slate-900">Advanced Identity Guardian • Universal Access</p>
                 </footer>
             </main>
         </div>
