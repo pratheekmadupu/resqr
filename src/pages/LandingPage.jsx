@@ -112,7 +112,7 @@ export default function LandingPage() {
                             className="mt-20 relative max-w-4xl mx-auto z-10"
                         >
                             <img
-                                src="/about_scan.png"
+                                src={`${import.meta.env.BASE_URL}about_scan.png`}
                                 alt="RESQR Emergency Scan"
                                 className="rounded-3xl border-8 border-slate-900 shadow-[0_0_80px_rgba(255,50,50,0.1)] hover:scale-[1.01] transition-transform"
                             />
@@ -176,7 +176,7 @@ export default function LandingPage() {
                             viewport={{ once: true }}
                         >
                             <img
-                                src="/about_data.png"
+                                src={`${import.meta.env.BASE_URL}about_data.png`}
                                 alt="Medical Data Security"
                                 className="rounded-[40px] shadow-2xl border-4 border-white hover:scale-[1.02] transition-transform duration-700"
                             />

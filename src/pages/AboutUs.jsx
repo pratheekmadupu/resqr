@@ -43,7 +43,7 @@ export default function AboutUs() {
                             className="order-2 lg:order-1"
                         >
                             <img
-                                src="/about_scan.png"
+                                src={`${import.meta.env.BASE_URL}about_scan.png`}
                                 alt="Emergency Scan in Action"
                                 className="rounded-[40px] shadow-2xl border-4 border-slate-900 hover:scale-[1.02] transition-transform duration-700"
                             />
@@ -108,7 +108,7 @@ export default function AboutUs() {
                             whileInView={{ opacity: 1, scale: 1 }}
                         >
                             <img
-                                src="/about_data.png"
+                                src={`${import.meta.env.BASE_URL}about_data.png`}
                                 alt="Security Dashboard"
                                 className="rounded-[40px] shadow-2xl border-4 border-slate-900 hover:rotate-2 transition-transform duration-700"
                             />
