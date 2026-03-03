@@ -12,6 +12,7 @@ import { Input } from '../components/ui/Input';
 import { db } from '../lib/firebase';
 import { ref, onValue, set, push, remove, update } from 'firebase/database';
 import toast from 'react-hot-toast';
+import { Link } from 'react-router-dom';
 
 export default function AdminPanel() {
     const [activeTab, setActiveTab] = useState('dashboard');
@@ -242,15 +243,15 @@ export default function AdminPanel() {
                                                 </div>
                                                 <div className="flex items-center gap-2">
                                                     {profile && (
-                                                        <a
-                                                            href={`/e/${profile.id}`}
+                                                        <Link
+                                                            to={`/e/${profile.id}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
                                                             className="p-2 text-primary hover:bg-primary/10 rounded-lg transition-colors"
                                                             title="View QR Profile"
                                                         >
                                                             <ExternalLink size={16} />
-                                                        </a>
+                                                        </Link>
                                                     )}
                                                     <Badge variant="success">New User</Badge>
                                                 </div>
@@ -348,15 +349,15 @@ export default function AdminPanel() {
                                                 <td className="px-6 py-4 text-right">
                                                     <div className="flex items-center justify-end gap-2 text-white">
                                                         {profile && (
-                                                            <a
-                                                                href={`/e/${profile.id}`}
+                                                            <Link
+                                                                to={`/e/${profile.id}`}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                                 className="p-2 opacity-50 hover:opacity-100 hover:text-primary transition-all bg-slate-800 rounded-lg"
                                                                 title="View QR Profile"
                                                             >
                                                                 <ExternalLink size={18} />
-                                                            </a>
+                                                            </Link>
                                                         )}
                                                         <button
                                                             className="p-2 opacity-50 hover:opacity-100 hover:text-red-500 transition-all bg-slate-800 rounded-lg"
