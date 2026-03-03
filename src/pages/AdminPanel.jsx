@@ -3,7 +3,7 @@ import {
     Search, Filter, MoreVertical, Shield, Users, CreditCard,
     Activity, ArrowUpRight, CheckCircle2, Clock, AlertTriangle,
     Plus, Trash2, Edit3, Image as ImageIcon, Megaphone,
-    Package, Settings, LayoutDashboard, LogOut, ChevronRight
+    Package, Settings, LayoutDashboard, LogOut, ChevronRight, ExternalLink
 } from 'lucide-react';
 import { Card, CardHeader } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
@@ -229,18 +229,34 @@ export default function AdminPanel() {
                             <Card className="bg-slate-900 border-slate-800">
                                 <h2 className="text-xl font-bold mb-6">Recent User Activity</h2>
                                 <div className="space-y-4">
-                                    {users.slice(-5).reverse().map(user => (
-                                        <div key={user.id} className="flex items-center justify-between p-4 bg-slate-950 rounded-xl border border-slate-800">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center font-bold">{user.name?.[0]}</div>
-                                                <div>
-                                                    <p className="font-bold">{user.name}</p>
-                                                    <p className="text-[10px] font-black uppercase text-primary tracking-widest">{user.id}</p>
+                                    {users.slice(-5).reverse().map(user => {
+                                        const profile = getProfileForAuthUser(user.email);
+                                        return (
+                                            <div key={user.id} className="flex items-center justify-between p-4 bg-slate-950 rounded-xl border border-slate-800">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center font-bold">{user.name?.[0]}</div>
+                                                    <div>
+                                                        <p className="font-bold">{user.name}</p>
+                                                        <p className="text-[10px] font-black uppercase text-primary tracking-widest">{user.id}</p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    {profile && (
+                                                        <a
+                                                            href={`/e/${profile.id}`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="p-2 text-primary hover:bg-primary/10 rounded-lg transition-colors"
+                                                            title="View QR Profile"
+                                                        >
+                                                            <ExternalLink size={16} />
+                                                        </a>
+                                                    )}
+                                                    <Badge variant="success">New User</Badge>
                                                 </div>
                                             </div>
-                                            <Badge variant="success">New User</Badge>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             </Card>
 
@@ -330,9 +346,26 @@ export default function AdminPanel() {
                                                     )}
                                                 </td>
                                                 <td className="px-6 py-4 text-right">
-                                                    <button className="p-2 opacity-50 hover:opacity-100 hover:text-red-500" onClick={() => deleteItem(`users/${user.id}`)}>
-                                                        <Trash2 size={18} />
-                                                    </button>
+                                                    <div className="flex items-center justify-end gap-2 text-white">
+                                                        {profile && (
+                                                            <a
+                                                                href={`/e/${profile.id}`}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="p-2 opacity-50 hover:opacity-100 hover:text-primary transition-all bg-slate-800 rounded-lg"
+                                                                title="View QR Profile"
+                                                            >
+                                                                <ExternalLink size={18} />
+                                                            </a>
+                                                        )}
+                                                        <button
+                                                            className="p-2 opacity-50 hover:opacity-100 hover:text-red-500 transition-all bg-slate-800 rounded-lg"
+                                                            onClick={() => deleteItem(`users/${user.id}`)}
+                                                            title="Delete User"
+                                                        >
+                                                            <Trash2 size={18} />
+                                                        </button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         );
