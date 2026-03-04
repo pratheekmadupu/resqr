@@ -206,17 +206,15 @@ export default function AdminPanel() {
             .catch(() => toast.error('Creation failed'));
     };
 
-    const handleSendOTP = (e) => {
+    const handleSendOTP = async (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
         const email = formData.get('email');
         const name = formData.get('name');
 
-        // Generate 6 digit OTP
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         setCurrentOTP(otp);
 
-        // Store data temporarily
         setTempUserData({
             name,
             email,
@@ -224,10 +222,39 @@ export default function AdminPanel() {
             bloodGroup: formData.get('bloodGroup')
         });
 
-        // In a real app, this is where you'd call an API to send the email
-        console.log(`[DEV] OTP for ${email}: ${otp}`);
-        toast.success(`OTP Sent to ${email}! (Check console for code)`);
-        setRegistrationStep('otp');
+        const toastId = toast.loading(`Sending OTP to ${email}...`);
+
+        try {
+            // Real Email sending via EmailJS (if configured)
+            if (window.emailjs) {
+                // Initialize with your Public Key
+                // window.emailjs.init("YOUR_PUBLIC_KEY"); 
+
+                await window.emailjs.send(
+                    "service_resqr", // Your Service ID
+                    "template_otp",  // Your Template ID
+                    {
+                        to_name: name,
+                        to_email: email,
+                        otp_code: otp,
+                        reply_to: "resqr.official@gmail.com"
+                    },
+                    "O_fM_vP9N4u_W0yY5" // TEMPORARY PUBLIC KEY (Replace with yours)
+                );
+                toast.success('OTP Sent Successfully!', { id: toastId });
+            } else {
+                // Fallback for local testing
+                console.log(`[DEV] OTP for ${email}: ${otp}`);
+                toast.success(`OTP Sent! (Check console for code)`, { id: toastId });
+            }
+            setRegistrationStep('otp');
+        } catch (error) {
+            console.error('EmailJS Error:', error);
+            // Even if email fails, show code in console so admin can continue during setup
+            console.log(`[DEV] OTP for ${email}: ${otp}`);
+            toast.error('Real Email failed. Using Console Fallback.', { id: toastId });
+            setRegistrationStep('otp');
+        }
     };
 
     const handleVerifyOTP = () => {
