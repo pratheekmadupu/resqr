@@ -79,6 +79,8 @@ export default function Dashboard() {
         }
     };
 
+    const [scans, setScans] = useState([]);
+
     useEffect(() => {
         const fetchUserData = async () => {
             const slug = localStorage.getItem('resqr_active_slug');
@@ -88,9 +90,19 @@ export default function Dashboard() {
             }
 
             try {
-                const snapshot = await get(ref(db, `profiles/${slug}`));
-                if (snapshot.exists()) {
-                    setProfile(snapshot.val());
+                // Fetch Profile
+                const profileSnapshot = await get(ref(db, `profiles/${slug}`));
+                if (profileSnapshot.exists()) {
+                    const profileData = profileSnapshot.val();
+                    setProfile(profileData);
+
+                    // Fetch Scans if they exist
+                    if (profileData.scans) {
+                        const scanList = Object.entries(profileData.scans)
+                            .map(([id, data]) => ({ id, ...data }))
+                            .reverse();
+                        setScans(scanList);
+                    }
                 }
             } catch (error) {
                 console.error("Dashboard fetch error:", error);
@@ -119,12 +131,12 @@ export default function Dashboard() {
 
 
     const stats = [
-        { label: 'Total Scans', value: '0', icon: <QrCode size={20} />, color: 'bg-blue-600' },
+        { label: 'Total Scans', value: scans.length.toString(), icon: <QrCode size={20} />, color: 'bg-blue-600' },
         { label: 'Health Status', value: profile ? 'Verified' : 'Incomplete', icon: <User size={20} />, color: 'bg-green-600' },
         { label: 'Safety Index', value: profile ? 'High' : 'Low', icon: <Bell size={20} />, color: 'bg-primary' },
     ];
 
-    const recentScans = []; // User has no scan history yet
+    const recentScans = scans.slice(0, 3); // Show top 3 most recent scans
 
     return (
         <div className="min-h-screen bg-slate-950 py-10 px-4 text-white">
@@ -228,20 +240,27 @@ export default function Dashboard() {
                                 <Card className="bg-slate-900 border-slate-800 p-8">
                                     <h2 className="text-xl font-black italic uppercase tracking-tighter mb-6">Recent Scan History</h2>
                                     <div className="space-y-4">
-                                        {recentScans.map((scan, i) => (
-                                            <div key={i} className="flex items-center justify-between p-5 bg-slate-950 rounded-2xl border border-slate-800 hover:border-slate-700 transition-colors">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="p-3 bg-slate-900 rounded-xl border border-slate-800">
-                                                        <Clock size={16} className="text-primary" />
+                                        {recentScans.length > 0 ? (
+                                            recentScans.map((scan, i) => (
+                                                <div key={scan.id || i} className="flex items-center justify-between p-5 bg-slate-950 rounded-2xl border border-slate-800 hover:border-slate-700 transition-colors">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="p-3 bg-slate-900 rounded-xl border border-slate-800">
+                                                            <Clock size={16} className="text-primary" />
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-sm font-black text-white uppercase tracking-tight">{scan.location}</p>
+                                                            <p className="text-[10px] font-black text-white opacity-30 uppercase tracking-widest">{scan.time} • {scan.date}</p>
+                                                        </div>
                                                     </div>
-                                                    <div>
-                                                        <p className="text-sm font-black text-white uppercase tracking-tight">{scan.location}</p>
-                                                        <p className="text-[10px] font-black text-white opacity-30 uppercase tracking-widest">{scan.time}</p>
-                                                    </div>
+                                                    <Badge variant={scan.status === 'Test Scan' ? 'gray' : 'primary'} className="font-black">{scan.status}</Badge>
                                                 </div>
-                                                <Badge variant={scan.status === 'Test Scan' ? 'gray' : 'primary'} className="font-black">{scan.status}</Badge>
+                                            ))
+                                        ) : (
+                                            <div className="text-center py-10 opacity-30">
+                                                <QrCode size={48} className="mx-auto mb-4" />
+                                                <p className="text-xs font-black uppercase tracking-widest">No scans recorded yet</p>
                                             </div>
-                                        ))}
+                                        )}
                                     </div>
                                 </Card>
 

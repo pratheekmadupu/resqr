@@ -5,12 +5,13 @@ import { Badge } from '../components/ui/Badge';
 import { motion } from 'framer-motion';
 import { useParams } from 'react-router-dom';
 import { db } from '../lib/firebase';
-import { ref, get } from 'firebase/database';
+import { ref, get, push, serverTimestamp } from 'firebase/database';
 import toast from 'react-hot-toast';
 
 export default function EmergencyPage() {
     const { id } = useParams();
     const [loading, setLoading] = useState(true);
+    const [scanRecorded, setScanRecorded] = useState(false);
     const [user, setUser] = useState({
         name: "LOADING...",
         bloodGroup: "--",
@@ -22,6 +23,25 @@ export default function EmergencyPage() {
             phone: ""
         }
     });
+
+    const recordScan = async () => {
+        if (scanRecorded) return;
+        try {
+            const scanData = {
+                timestamp: serverTimestamp(),
+                time: new Date().toLocaleTimeString(),
+                date: new Date().toLocaleDateString(),
+                status: 'QR Scan',
+                location: 'Emergency Scan'
+            };
+
+            // Try to get city/region if possible via a simple API or just log as 'Verified Scan'
+            await push(ref(db, `profiles/${id}/scans`), scanData);
+            setScanRecorded(true);
+        } catch (e) {
+            console.error("Scan recording failed", e);
+        }
+    };
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -40,6 +60,8 @@ export default function EmergencyPage() {
                             phone: decodedUser.emergencyContactPhone
                         }
                     });
+                    // Log the scan!
+                    recordScan();
                 } else {
                     toast.error("Profile not found");
                 }
