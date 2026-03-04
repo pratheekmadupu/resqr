@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import {
     Search, Filter, MoreVertical, Shield, Users, CreditCard,
     Activity, ArrowUpRight, CheckCircle2, Clock, AlertTriangle,
-    Plus, Trash2, Edit3, Image as ImageIcon, Megaphone,
+    Plus, Trash2, Edit3, Image as ImageIcon, Megaphone, Mail,
     Package, Settings, LayoutDashboard, LogOut, ChevronRight, ExternalLink
 } from 'lucide-react';
 import { Card, CardHeader } from '../components/ui/Card';
