@@ -4,6 +4,7 @@ import { Shield, ChevronRight, ChevronLeft, User, Activity, Bell, CheckCircle2 }
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Input, Select } from '../components/ui/Input';
+import { QRCodeCanvas } from 'qrcode.react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { db, auth } from '../lib/firebase';
@@ -231,30 +232,48 @@ export default function ProfileCreation() {
                                         <p className="text-white opacity-70 mt-2">Make sure everything is correct.</p>
                                     </header>
 
-                                    <div className="bg-slate-900 rounded-2xl p-6 space-y-4 border border-slate-800">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <span className="text-xs font-bold text-white opacity-60 uppercase">Name</span>
-                                                <p className="font-bold text-white">{formData.name || 'Not provided'}</p>
-                                            </div>
-                                            <div>
-                                                <span className="text-xs font-bold text-white opacity-60 uppercase">Blood Group</span>
-                                                <p className="font-bold text-primary">{formData.bloodGroup || 'Not provided'}</p>
-                                            </div>
+                                    <div className="flex flex-col md:flex-row gap-8 items-center bg-slate-900 rounded-2xl p-6 border border-slate-800">
+                                        <div className="bg-white p-3 rounded-2xl border-4 border-slate-800 shrink-0">
+                                            <QRCodeCanvas
+                                                value={`${window.location.origin}/e/${formData.name.toLowerCase().trim().replace(/\s+/g, '-') || 'demo'}`}
+                                                size={150}
+                                                level="H"
+                                                includeMargin={true}
+                                                imageSettings={{
+                                                    src: `${import.meta.env.BASE_URL}resqr_icon.png`,
+                                                    x: undefined,
+                                                    y: undefined,
+                                                    height: 38,
+                                                    width: 38,
+                                                    excavate: true,
+                                                }}
+                                            />
                                         </div>
-                                        <div className="border-t border-slate-800 pt-4">
-                                            <span className="text-xs font-bold text-white opacity-60 uppercase">Medical Summary</span>
-                                            <p className="text-sm text-white leading-relaxed">
-                                                Allergies: {formData.allergies || 'None'}<br />
-                                                Conditions: {formData.medicalConditions || 'None'}
-                                            </p>
-                                        </div>
-                                        <div className="border-t border-slate-800 pt-4">
-                                            <span className="text-xs font-bold text-white opacity-60 uppercase">Emergency Contact</span>
-                                            <p className="font-bold text-white">
-                                                {formData.emergencyContactName} ({formData.emergencyContactRelation})<br />
-                                                <span className="text-sm font-medium text-white opacity-70">{formData.emergencyContactPhone}</span>
-                                            </p>
+                                        <div className="flex-1 space-y-4 w-full">
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <span className="text-xs font-bold text-white opacity-60 uppercase">Name</span>
+                                                    <p className="font-bold text-white">{formData.name || 'Not provided'}</p>
+                                                </div>
+                                                <div>
+                                                    <span className="text-xs font-bold text-white opacity-60 uppercase">Blood Group</span>
+                                                    <p className="font-bold text-primary">{formData.bloodGroup || 'Not provided'}</p>
+                                                </div>
+                                            </div>
+                                            <div className="border-t border-slate-800 pt-4">
+                                                <span className="text-xs font-bold text-white opacity-60 uppercase">Medical Summary</span>
+                                                <p className="text-sm text-white leading-relaxed">
+                                                    Allergies: {formData.allergies || 'None'}<br />
+                                                    Conditions: {formData.medicalConditions || 'None'}
+                                                </p>
+                                            </div>
+                                            <div className="border-t border-slate-800 pt-4">
+                                                <span className="text-xs font-bold text-white opacity-60 uppercase">Emergency Contact</span>
+                                                <p className="font-bold text-white">
+                                                    {formData.emergencyContactName} ({formData.emergencyContactRelation})<br />
+                                                    <span className="text-sm font-medium text-white opacity-70">{formData.emergencyContactPhone}</span>
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

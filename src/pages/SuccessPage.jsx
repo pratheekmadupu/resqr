@@ -11,15 +11,19 @@ export default function SuccessPage() {
     const qrRef = useRef();
 
     const handleDownload = () => {
-        const canvas = qrRef.current.querySelector('canvas');
+        const canvas = document.getElementById('success-qr-canvas') || qrRef.current.querySelector('canvas');
+        if (!canvas) {
+            toast.error('QR not ready');
+            return;
+        }
         const url = canvas.toDataURL('image/png');
         const link = document.createElement('a');
         link.href = url;
-        link.download = 'RESQR_Emergency_Tag.png';
+        link.download = `RESQR_TAG_${getUserName().replace(/\s+/g, '_')}.png`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        toast.success('QR Code downloaded!');
+        toast.success('QR TAG Downloaded!');
     };
 
     const handlePrint = () => {
@@ -56,10 +60,19 @@ export default function SuccessPage() {
 
                     <div ref={qrRef} className="bg-white p-4 rounded-xl border border-slate-700 inline-block mb-8 transition-transform group-hover:scale-105">
                         <QRCodeCanvas
+                            id="success-qr-canvas"
                             value={getQRValue()}
-                            size={200}
+                            size={220}
                             level="H"
                             includeMargin={true}
+                            imageSettings={{
+                                src: `${import.meta.env.BASE_URL}resqr_icon.png`,
+                                x: undefined,
+                                y: undefined,
+                                height: 45,
+                                width: 45,
+                                excavate: true,
+                            }}
                         />
                     </div>
 
@@ -76,8 +89,8 @@ export default function SuccessPage() {
                 </Card>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-sm mx-auto mb-12">
-                    <Button variant="outline" className="w-full" onClick={handleDownload}>
-                        <Download size={18} /> Download
+                    <Button variant="primary" size="lg" className="w-full font-black italic shadow-2xl shadow-primary/20" onClick={handleDownload}>
+                        <Download size={20} /> DOWNLOAD QR TAG
                     </Button>
                     <Button variant="outline" className="w-full" onClick={handlePrint}>
                         <Printer size={18} /> Print Card

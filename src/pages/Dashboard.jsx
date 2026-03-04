@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { LayoutDashboard, User, QrCode, Settings, Bell, ChevronRight, Edit3, ExternalLink, Download, Clock, Loader2, Shield } from 'lucide-react';
 import { Card, CardHeader, CardContent } from '../components/ui/Card';
@@ -17,6 +17,33 @@ export default function Dashboard() {
     const [loading, setLoading] = useState(true);
     const [profile, setProfile] = useState(null);
     const [editData, setEditData] = useState({});
+    const qrRef = useRef();
+
+    const handleDownload = () => {
+        try {
+            // Try different ways to find the canvas
+            const canvas = document.getElementById('resqr-qr-canvas') ||
+                qrRef.current?.querySelector('canvas') ||
+                document.querySelector('#qr-preview canvas');
+
+            if (!canvas) {
+                toast.error('Preview not ready. Please try in 2 seconds.');
+                return;
+            }
+
+            const url = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `RESQR_TAG_${userDisplayName.replace(/\s+/g, '_')}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            toast.success('MEDICAL QR DOWNLOADED!');
+        } catch (err) {
+            console.error('Download error:', err);
+            toast.error('Download failed. Try right-clicking the QR.');
+        }
+    };
 
     useEffect(() => {
         if (profile) {
@@ -104,16 +131,16 @@ export default function Dashboard() {
                 {/* Header */}
                 <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-4xl font-black text-white italic uppercase tracking-tighter">Welcome back, {userDisplayName.split(' ')[0]}</h1>
-                        <p className="text-white opacity-60 font-medium">Your emergency profile is {profile ? 'active and protecting you' : 'incomplete'}.</p>
+                        <h1 className="text-4xl font-black text-white italic uppercase tracking-tighter">Welcome back, {userDisplayName.split(' ')[0]} <span className="text-primary text-xs bg-primary/20 px-2 py-1 rounded-md not-italic animate-bounce">v3.0 - NEW LOGO</span></h1>
+                        <p className="text-white opacity-60 font-medium italic">Your emergency profile is {profile ? 'LIVE AND PROTECTING YOU' : 'incomplete'}.</p>
                     </div>
                     <div className="flex gap-3">
                         {profile && (
-                            <Button variant="outline" size="sm" className="border-slate-800 bg-slate-900 font-bold group">
-                                <Download size={18} className="group-hover:translate-y-0.5 transition-transform" /> Download Tag
+                            <Button variant="primary" size="lg" className="bg-red-600 hover:bg-red-700 font-black italic shadow-[0_0_30px_rgba(239,68,68,0.4)] px-10 py-5 text-xl" onClick={handleDownload}>
+                                <Download size={28} /> DOWNLOAD QR
                             </Button>
                         )}
-                        <Button className="font-black italic shadow-lg shadow-primary/20" size="sm" onClick={() => profile ? setIsEditModalOpen(true) : window.location.href = '/create-profile'}>
+                        <Button variant="outline" className="font-black italic border-slate-700 bg-slate-900" size="sm" onClick={() => profile ? setIsEditModalOpen(true) : window.location.href = '/create-profile'}>
                             {profile ? <Edit3 size={18} /> : <QrCode size={18} />} {profile ? 'Edit Profile' : 'Create Profile'}
                         </Button>
                     </div>
@@ -227,14 +254,25 @@ export default function Dashboard() {
                                         <h3 className="text-white font-black tracking-[0.3em] uppercase text-xs">Live Identity Tag</h3>
                                     </div>
                                     <motion.div
+                                        id="qr-preview"
+                                        ref={qrRef}
                                         whileHover={{ scale: 1.05 }}
-                                        className="bg-white p-5 rounded-3xl border-4 border-slate-800 inline-block mb-8 shadow-2xl relative group"
+                                        className="bg-white p-6 rounded-[40px] border-8 border-slate-800 inline-block mb-8 shadow-[0_0_50px_rgba(255,255,255,0.1)] relative group"
                                     >
                                         <QRCodeCanvas
+                                            id="resqr-qr-canvas"
                                             value={getQRValue()}
-                                            size={180}
+                                            size={220}
                                             level="H"
                                             includeMargin={true}
+                                            imageSettings={{
+                                                src: `${import.meta.env.BASE_URL}resqr_icon.png`,
+                                                x: undefined,
+                                                y: undefined,
+                                                height: 45,
+                                                width: 45,
+                                                excavate: true,
+                                            }}
                                         />
                                         <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl pointer-events-none flex items-center justify-center">
                                             <ExternalLink size={32} className="text-white" />
@@ -248,8 +286,8 @@ export default function Dashboard() {
                                             PREVIEW PAGE <ExternalLink size={20} />
                                         </Button>
                                         <div className="grid grid-cols-2 gap-3 pt-2">
-                                            <Button variant="outline" size="sm" className="w-full text-[10px] font-black border-slate-800 bg-slate-900 tracking-widest">PNG</Button>
-                                            <Button variant="outline" size="sm" className="w-full text-[10px] font-black border-slate-800 bg-slate-900 tracking-widest">PDF</Button>
+                                            <Button variant="primary" size="sm" className="w-full bg-red-600 font-black tracking-widest shadow-lg" onClick={handleDownload}>DOWNLOAD PNG</Button>
+                                            <Button variant="outline" size="sm" className="w-full text-[10px] font-black border-slate-700 bg-slate-900 tracking-widest" onClick={() => window.print()}>PRINT PDF</Button>
                                         </div>
                                     </div>
                                 </Card>
