@@ -36,6 +36,8 @@ export default function AdminPanel() {
     // Form states
     const [isProductModalOpen, setIsProductModalOpen] = useState(false);
     const [isAdModalOpen, setIsAdModalOpen] = useState(false);
+    const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+    const [selectedUserForProfile, setSelectedUserForProfile] = useState(null);
     const [editingProduct, setEditingProduct] = useState(null);
     const [editingAd, setEditingAd] = useState(null);
 
@@ -168,6 +170,35 @@ export default function AdminPanel() {
         }
         setIsAdModalOpen(false);
         setEditingAd(null);
+    };
+
+    const handleCreateProfile = (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const name = formData.get('name');
+        const slug = name.toLowerCase().trim().replace(/\s+/g, '-');
+
+        const profileData = {
+            name: name,
+            bloodGroup: formData.get('bloodGroup'),
+            phone: formData.get('phone'),
+            email: selectedUserForProfile?.email || '',
+            medicalConditions: formData.get('conditions') || 'None reported',
+            allergies: formData.get('allergies') || 'None reported',
+            emergencyContactName: formData.get('eName'),
+            emergencyContactRelation: formData.get('eRelation'),
+            emergencyContactPhone: formData.get('ePhone'),
+            id: slug,
+            createdAt: new Date().toISOString()
+        };
+
+        set(ref(db, `profiles/${slug}`), profileData)
+            .then(() => {
+                toast.success('Medical Profile Generated!');
+                setIsProfileModalOpen(false);
+                setSelectedUserForProfile(null);
+            })
+            .catch(() => toast.error('Creation failed'));
     };
 
     const deleteItem = (path) => {
@@ -401,6 +432,15 @@ export default function AdminPanel() {
                                                                 <ExternalLink size={18} />
                                                             </Link>
                                                         )}
+                                                        {!profile && (
+                                                            <button
+                                                                className="p-2 opacity-50 hover:opacity-100 hover:text-green-500 transition-all bg-slate-800 rounded-lg"
+                                                                onClick={() => { setSelectedUserForProfile(user); setIsProfileModalOpen(true); }}
+                                                                title="Generate Medical Profile"
+                                                            >
+                                                                <Plus size={18} />
+                                                            </button>
+                                                        )}
                                                         <button
                                                             className="p-2 opacity-50 hover:opacity-100 hover:text-red-500 transition-all bg-slate-800 rounded-lg"
                                                             onClick={() => deleteItem(`users/${user.id}`)}
@@ -566,6 +606,43 @@ export default function AdminPanel() {
                             <div className="flex gap-3 pt-4">
                                 <Button type="button" variant="outline" className="flex-1" onClick={() => setIsAdModalOpen(false)}>Cancel</Button>
                                 <Button type="submit" className="flex-1">Save Campaign</Button>
+                            </div>
+                        </form>
+                    </Card>
+                </div>
+            )}
+            {isProfileModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+                    <Card className="w-full max-w-2xl bg-slate-900 border-slate-800 p-8 overflow-y-auto max-h-[90vh]">
+                        <h2 className="text-2xl font-black mb-6">Generate Medical Profile</h2>
+                        <p className="text-slate-400 mb-6 text-sm">Target User: <span className="text-white font-bold">{selectedUserForProfile?.email}</span></p>
+                        <form onSubmit={handleCreateProfile} className="space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <Input label="Full Name" name="name" defaultValue={selectedUserForProfile?.name} required />
+                                <div className="w-full">
+                                    <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Blood Group</label>
+                                    <select name="bloodGroup" className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm focus:ring-2 focus:ring-primary/20 outline-none" required>
+                                        <option value="">Select...</option>
+                                        {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map(bg => <option key={bg} value={bg}>{bg}</option>)}
+                                    </select>
+                                </div>
+                                <Input label="Phone Number" name="phone" required />
+                                <Input label="Medical Conditions" name="conditions" placeholder="Diabetes, Hypertension, etc." />
+                                <Input label="Allergies" name="allergies" placeholder="Peanuts, Penicillin, etc." />
+                            </div>
+
+                            <div className="border-t border-slate-800 pt-6">
+                                <h3 className="text-lg font-bold mb-4">Emergency Contact</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <Input label="Contact Name" name="eName" required />
+                                    <Input label="Relation" name="eRelation" placeholder="Father, Mother, Spouse" required />
+                                    <Input label="Contact Phone" name="ePhone" required />
+                                </div>
+                            </div>
+
+                            <div className="flex gap-3 pt-4">
+                                <Button type="button" variant="outline" className="flex-1" onClick={() => setIsProfileModalOpen(false)}>Cancel</Button>
+                                <Button type="submit" className="flex-1">Generate QR Profile</Button>
                             </div>
                         </form>
                     </Card>
