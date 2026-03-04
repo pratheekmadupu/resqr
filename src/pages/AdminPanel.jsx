@@ -342,7 +342,7 @@ export default function AdminPanel() {
                     </div>
                     <div className="flex gap-3">
                         {activeTab === 'users' && (
-                            <Button onClick={() => setIsRegisterModalOpen(true)} className="gap-2 bg-green-600 hover:bg-green-700">
+                            <Button onClick={() => { setRegistrationStep('form'); setIsRegisterModalOpen(true); }} className="gap-2 bg-green-600 hover:bg-green-700">
                                 <Plus size={18} /> Register Member (OTP)
                             </Button>
                         )}
