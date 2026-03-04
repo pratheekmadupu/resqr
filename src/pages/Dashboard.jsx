@@ -18,6 +18,9 @@ export default function Dashboard() {
     const [profile, setProfile] = useState(null);
     const [editData, setEditData] = useState({});
     const qrRef = useRef();
+    const userDisplayName = profile?.name || 'User';
+    const userBloodGroup = profile?.bloodGroup || '--';
+    const userContact = profile?.emergencyContactName || '--';
 
     const handleDownload = () => {
         try {
@@ -113,9 +116,7 @@ export default function Dashboard() {
         );
     }
 
-    const userDisplayName = profile?.name || 'User';
-    const userBloodGroup = profile?.bloodGroup || '--';
-    const userContact = profile?.emergencyContactName || '--';
+
 
     const stats = [
         { label: 'Total Scans', value: '0', icon: <QrCode size={20} />, color: 'bg-blue-600' },
