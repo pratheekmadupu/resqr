@@ -38,6 +38,10 @@ export default function AdminPanel() {
     const [isAdModalOpen, setIsAdModalOpen] = useState(false);
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
     const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+    const [registrationStep, setRegistrationStep] = useState('form'); // 'form', 'otp', 'success'
+    const [currentOTP, setCurrentOTP] = useState('');
+    const [enteredOTP, setEnteredOTP] = useState('');
+    const [tempUserData, setTempUserData] = useState(null);
     const [selectedUserForProfile, setSelectedUserForProfile] = useState(null);
     const [editingProduct, setEditingProduct] = useState(null);
     const [editingAd, setEditingAd] = useState(null);
@@ -202,44 +206,72 @@ export default function AdminPanel() {
             .catch(() => toast.error('Creation failed'));
     };
 
-    const handleRegisterUser = (e) => {
+    const handleSendOTP = (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
         const email = formData.get('email');
         const name = formData.get('name');
-        const phone = formData.get('phone');
-        const uid = 'manual_' + Math.random().toString(36).substr(2, 9);
-        const slug = name.toLowerCase().trim().replace(/\s+/g, '-');
 
-        const userData = {
-            uid,
+        // Generate 6 digit OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        setCurrentOTP(otp);
+
+        // Store data temporarily
+        setTempUserData({
             name,
             email,
-            phone,
-            authMethod: 'OTP-Verified',
-            lastLogin: new Date().toISOString(),
-            status: 'Active'
-        };
+            phone: formData.get('phone'),
+            bloodGroup: formData.get('bloodGroup')
+        });
 
-        const profileData = {
-            name,
-            email,
-            phone,
-            bloodGroup: formData.get('bloodGroup') || '--',
-            id: slug,
-            createdAt: new Date().toISOString()
-        };
+        // In a real app, this is where you'd call an API to send the email
+        console.log(`[DEV] OTP for ${email}: ${otp}`);
+        toast.success(`OTP Sent to ${email}! (Check console for code)`);
+        setRegistrationStep('otp');
+    };
 
-        const updates = {};
-        updates[`users/${uid}`] = userData;
-        updates[`profiles/${slug}`] = profileData;
+    const handleVerifyOTP = () => {
+        if (enteredOTP === currentOTP) {
+            const { name, email, phone, bloodGroup } = tempUserData;
+            const uid = 'manual_' + Math.random().toString(36).substr(2, 9);
+            const slug = name.toLowerCase().trim().replace(/\s+/g, '-');
 
-        update(ref(db), updates)
-            .then(() => {
-                toast.success('User Registered with Google OTP!');
-                setIsRegisterModalOpen(false);
-            })
-            .catch(() => toast.error('Registration failed'));
+            const userData = {
+                uid,
+                name,
+                email,
+                phone,
+                authMethod: 'Google-OTP',
+                lastLogin: new Date().toISOString(),
+                status: 'Verified'
+            };
+
+            const profileData = {
+                name,
+                email,
+                phone,
+                bloodGroup: bloodGroup || '--',
+                id: slug,
+                createdAt: new Date().toISOString()
+            };
+
+            const updates = {};
+            updates[`users/${uid}`] = userData;
+            updates[`profiles/${slug}`] = profileData;
+
+            update(ref(db), updates)
+                .then(() => {
+                    setRegistrationStep('success');
+                    toast.success('Registration Verified!');
+                })
+                .catch(() => toast.error('Verification failed'));
+        } else {
+            toast.error('Invalid OTP code');
+        }
+    };
+
+    const handleRegisterUser = (e) => {
+        // This is now handled by handleSendOTP -> handleVerifyOTP
     };
 
     const deleteItem = (path) => {
@@ -697,34 +729,73 @@ export default function AdminPanel() {
             {isRegisterModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
                     <Card className="w-full max-w-lg bg-slate-900 border-slate-800 p-8">
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="p-3 bg-green-500/20 rounded-xl text-green-500">
-                                <Shield size={24} />
-                            </div>
-                            <div>
-                                <h2 className="text-2xl font-black uppercase tracking-tight">OTP Registration</h2>
-                                <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">Verify & Onboard New Member</p>
-                            </div>
-                        </div>
-
-                        <form onSubmit={handleRegisterUser} className="space-y-4">
-                            <Input label="Google Email" name="email" type="email" placeholder="user@gmail.com" required />
-                            <Input label="Full Name" name="name" required />
-                            <Input label="Phone Number" name="phone" required />
-
-                            <div className="p-4 bg-slate-950 rounded-xl border border-slate-800 space-y-3">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-xs font-bold text-slate-500 uppercase">Verification Step</span>
-                                    <Badge variant="success">GOOGLE OTP READY</Badge>
+                        {registrationStep === 'form' && (
+                            <>
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className="p-3 bg-green-500/20 rounded-xl text-green-500">
+                                        <Mail size={24} />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-2xl font-black uppercase tracking-tight">Email Onboarding</h2>
+                                        <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">Step 1: Contact Details</p>
+                                    </div>
                                 </div>
-                                <p className="text-[10px] text-slate-400 italic">User will receive a verification code on their registered Google Email to activate their emergency passport.</p>
-                            </div>
+                                <form onSubmit={handleSendOTP} className="space-y-4">
+                                    <Input label="Google Email" name="email" type="email" placeholder="user@gmail.com" required />
+                                    <Input label="Full Name" name="name" required />
+                                    <Input label="Phone Number" name="phone" required />
+                                    <div className="flex gap-3 pt-4">
+                                        <Button type="button" variant="outline" className="flex-1" onClick={() => setIsRegisterModalOpen(false)}>Cancel</Button>
+                                        <Button type="submit" className="flex-1 bg-green-600 hover:bg-green-700">Send OTP Code</Button>
+                                    </div>
+                                </form>
+                            </>
+                        )}
 
-                            <div className="flex gap-3 pt-4">
-                                <Button type="button" variant="outline" className="flex-1" onClick={() => setIsRegisterModalOpen(false)}>Cancel</Button>
-                                <Button type="submit" className="flex-1 bg-green-600 hover:bg-green-700">Add & Send OTP</Button>
+                        {registrationStep === 'otp' && (
+                            <div className="text-center space-y-6">
+                                <div className="mx-auto w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center text-primary">
+                                    <Shield size={40} />
+                                </div>
+                                <div>
+                                    <h2 className="text-2xl font-black uppercase">Verify Email</h2>
+                                    <p className="text-slate-400 text-sm">We've sent a 6-digit code to <br /><span className="text-white font-bold">{tempUserData?.email}</span></p>
+                                </div>
+                                <div className="flex justify-center gap-2">
+                                    <input
+                                        type="text"
+                                        maxLength="6"
+                                        placeholder="000000"
+                                        value={enteredOTP}
+                                        onChange={(e) => setEnteredOTP(e.target.value)}
+                                        className="w-full max-w-[200px] bg-slate-950 border-2 border-slate-800 focus:border-primary rounded-2xl p-4 text-center text-3xl font-black tracking-[0.5em] outline-none transition-all"
+                                    />
+                                </div>
+                                <div className="flex gap-3 pt-4">
+                                    <Button variant="outline" className="flex-1" onClick={() => setRegistrationStep('form')}>Back</Button>
+                                    <Button className="flex-1 bg-primary" onClick={handleVerifyOTP}>Verify & Active</Button>
+                                </div>
                             </div>
-                        </form>
+                        )}
+
+                        {registrationStep === 'success' && (
+                            <div className="text-center space-y-6 py-4">
+                                <div className="mx-auto w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center text-green-500 animate-bounce">
+                                    <CheckCircle2 size={40} />
+                                </div>
+                                <div>
+                                    <h2 className="text-3xl font-black uppercase text-white">Verified!</h2>
+                                    <p className="text-slate-400 font-bold uppercase text-xs tracking-widest mt-2">{tempUserData?.name} is now a live member</p>
+                                </div>
+                                <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800">
+                                    <p className="text-[10px] text-slate-500 uppercase font-black mb-1">Generated ID</p>
+                                    <p className="text-primary font-bold tracking-widest">{tempUserData?.name.toLowerCase().trim().replace(/\s+/g, '-')}</p>
+                                </div>
+                                <Button className="w-full bg-slate-800 hover:bg-slate-700 py-6 text-lg" onClick={() => { setIsRegisterModalOpen(false); setRegistrationStep('form'); setEnteredOTP(''); }}>
+                                    Back to Dashboard
+                                </Button>
+                            </div>
+                        )}
                     </Card>
                 </div>
             )}
