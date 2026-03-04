@@ -37,6 +37,7 @@ export default function AdminPanel() {
     const [isProductModalOpen, setIsProductModalOpen] = useState(false);
     const [isAdModalOpen, setIsAdModalOpen] = useState(false);
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+    const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
     const [selectedUserForProfile, setSelectedUserForProfile] = useState(null);
     const [editingProduct, setEditingProduct] = useState(null);
     const [editingAd, setEditingAd] = useState(null);
@@ -201,6 +202,46 @@ export default function AdminPanel() {
             .catch(() => toast.error('Creation failed'));
     };
 
+    const handleRegisterUser = (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const email = formData.get('email');
+        const name = formData.get('name');
+        const phone = formData.get('phone');
+        const uid = 'manual_' + Math.random().toString(36).substr(2, 9);
+        const slug = name.toLowerCase().trim().replace(/\s+/g, '-');
+
+        const userData = {
+            uid,
+            name,
+            email,
+            phone,
+            authMethod: 'OTP-Verified',
+            lastLogin: new Date().toISOString(),
+            status: 'Active'
+        };
+
+        const profileData = {
+            name,
+            email,
+            phone,
+            bloodGroup: formData.get('bloodGroup') || '--',
+            id: slug,
+            createdAt: new Date().toISOString()
+        };
+
+        const updates = {};
+        updates[`users/${uid}`] = userData;
+        updates[`profiles/${slug}`] = profileData;
+
+        update(ref(db), updates)
+            .then(() => {
+                toast.success('User Registered with Google OTP!');
+                setIsRegisterModalOpen(false);
+            })
+            .catch(() => toast.error('Registration failed'));
+    };
+
     const deleteItem = (path) => {
         if (confirm('Are you sure you want to delete this?')) {
             remove(ref(db, path))
@@ -268,6 +309,11 @@ export default function AdminPanel() {
                         <p className="text-slate-400">Manage your system from a single interface.</p>
                     </div>
                     <div className="flex gap-3">
+                        {activeTab === 'users' && (
+                            <Button onClick={() => setIsRegisterModalOpen(true)} className="gap-2 bg-green-600 hover:bg-green-700">
+                                <Plus size={18} /> Register Member (OTP)
+                            </Button>
+                        )}
                         {activeTab === 'products' && (
                             <Button onClick={() => { setEditingProduct(null); setIsProductModalOpen(true); }} className="gap-2">
                                 <Plus size={18} /> New Product
@@ -643,6 +689,40 @@ export default function AdminPanel() {
                             <div className="flex gap-3 pt-4">
                                 <Button type="button" variant="outline" className="flex-1" onClick={() => setIsProfileModalOpen(false)}>Cancel</Button>
                                 <Button type="submit" className="flex-1">Generate QR Profile</Button>
+                            </div>
+                        </form>
+                    </Card>
+                </div>
+            )}
+            {isRegisterModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+                    <Card className="w-full max-w-lg bg-slate-900 border-slate-800 p-8">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="p-3 bg-green-500/20 rounded-xl text-green-500">
+                                <Shield size={24} />
+                            </div>
+                            <div>
+                                <h2 className="text-2xl font-black uppercase tracking-tight">OTP Registration</h2>
+                                <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">Verify & Onboard New Member</p>
+                            </div>
+                        </div>
+
+                        <form onSubmit={handleRegisterUser} className="space-y-4">
+                            <Input label="Google Email" name="email" type="email" placeholder="user@gmail.com" required />
+                            <Input label="Full Name" name="name" required />
+                            <Input label="Phone Number" name="phone" required />
+
+                            <div className="p-4 bg-slate-950 rounded-xl border border-slate-800 space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-xs font-bold text-slate-500 uppercase">Verification Step</span>
+                                    <Badge variant="success">GOOGLE OTP READY</Badge>
+                                </div>
+                                <p className="text-[10px] text-slate-400 italic">User will receive a verification code on their registered Google Email to activate their emergency passport.</p>
+                            </div>
+
+                            <div className="flex gap-3 pt-4">
+                                <Button type="button" variant="outline" className="flex-1" onClick={() => setIsRegisterModalOpen(false)}>Cancel</Button>
+                                <Button type="submit" className="flex-1 bg-green-600 hover:bg-green-700">Add & Send OTP</Button>
                             </div>
                         </form>
                     </Card>
