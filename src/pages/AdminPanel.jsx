@@ -13,7 +13,7 @@ import { db, auth } from '../lib/firebase';
 import { ref, onValue, set, push, remove, update } from 'firebase/database';
 import toast from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
-import { onAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink } from 'firebase/auth';
 
 export default function AdminPanel() {
     const [activeTab, setActiveTab] = useState('dashboard');
@@ -221,9 +221,6 @@ export default function AdminPanel() {
         const email = formData.get('email');
         const name = formData.get('name');
 
-        const otp = Math.floor(100000 + Math.random() * 900000).toString();
-        setCurrentOTP(otp);
-
         setTempUserData({
             name,
             email,
@@ -231,38 +228,40 @@ export default function AdminPanel() {
             bloodGroup: formData.get('bloodGroup')
         });
 
-        const toastId = toast.loading(`Sending OTP to ${email}...`);
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        setCurrentOTP(otp);
+        console.log(`[DEV] Manual Activation Code for ${email}: ${otp}`);
+
+        const actionCodeSettings = {
+            url: window.location.origin + '/login',
+            handleCodeInApp: true,
+        };
+
+        const toastId = toast.loading(`Sending Google Link to ${email}...`);
 
         try {
-            // Real Email sending via EmailJS (if configured)
-            if (window.emailjs) {
-                // Initialize with your Public Key
-                // window.emailjs.init("YOUR_PUBLIC_KEY"); 
+            await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+            // Sync with DB immediately as 'Pending Verification'
+            const uid = 'p_' + Math.random().toString(36).substr(2, 9);
+            const slug = name.toLowerCase().trim().replace(/\s+/g, '-');
 
-                await window.emailjs.send(
-                    EMAILJS_CONFIG.SERVICE_ID,
-                    EMAILJS_CONFIG.TEMPLATE_ID,
-                    {
-                        to_name: name,
-                        to_email: email,
-                        otp_code: otp,
-                        reply_to: "resqr.official@gmail.com"
-                    },
-                    EMAILJS_CONFIG.PUBLIC_KEY
-                );
-                toast.success('OTP Sent Successfully!', { id: toastId });
-            } else {
-                // Fallback for local testing
-                console.log(`[DEV] OTP for ${email}: ${otp}`);
-                toast.success(`OTP Sent! (Check console for code)`, { id: toastId });
-            }
-            setRegistrationStep('otp');
+            await update(ref(db), {
+                [`users/${uid}`]: {
+                    uid, name, email,
+                    status: 'Link-Sent',
+                    authMethod: 'Firebase-Email-Link',
+                    lastLogin: 'Never'
+                },
+                [`profiles/${slug}`]: {
+                    id: slug, name, email, bloodGroup: formData.get('bloodGroup') || '--'
+                }
+            });
+
+            toast.success('Firebase Sign-in link sent!', { id: toastId });
+            setRegistrationStep('otp'); // Moving to next step UI
         } catch (error) {
-            console.error('EmailJS Error:', error);
-            // Even if email fails, show code in console so admin can continue during setup
-            console.log(`[DEV] OTP for ${email}: ${otp}`);
-            toast.error('Real Email failed. Using Console Fallback.', { id: toastId });
-            setRegistrationStep('otp');
+            console.error('Firebase Auth Error:', error);
+            toast.error(error.message || 'Failed to send link', { id: toastId });
         }
     };
 
@@ -794,22 +793,26 @@ export default function AdminPanel() {
                                     <Shield size={40} />
                                 </div>
                                 <div>
-                                    <h2 className="text-2xl font-black uppercase">Verify Email</h2>
-                                    <p className="text-slate-400 text-sm">We've sent a 6-digit code to <br /><span className="text-white font-bold">{tempUserData?.email}</span></p>
+                                    <h2 className="text-2xl font-black uppercase">Google Link Sent</h2>
+                                    <p className="text-slate-400 text-sm">A secure Firebase Login Link has been sent to <br /><span className="text-white font-bold">{tempUserData?.email}</span></p>
                                 </div>
-                                <div className="flex justify-center gap-2">
-                                    <input
-                                        type="text"
-                                        maxLength="6"
-                                        placeholder="000000"
-                                        value={enteredOTP}
-                                        onChange={(e) => setEnteredOTP(e.target.value)}
-                                        className="w-full max-w-[200px] bg-slate-950 border-2 border-slate-800 focus:border-primary rounded-2xl p-4 text-center text-3xl font-black tracking-[0.5em] outline-none transition-all"
-                                    />
+                                <div className="p-4 bg-slate-950 rounded-xl border border-slate-800">
+                                    <p className="text-[10px] text-slate-500 uppercase font-bold mb-2">Internal Verify Code</p>
+                                    <p className="text-xs text-slate-400 italic mb-4 text-center px-4">The owner must click the link to verify. You can manually active them below by entering the fallback code displayed in your console.</p>
+                                    <div className="flex justify-center gap-2">
+                                        <input
+                                            type="text"
+                                            maxLength="6"
+                                            placeholder="000000"
+                                            value={enteredOTP}
+                                            onChange={(e) => setEnteredOTP(e.target.value)}
+                                            className="w-full max-w-[200px] bg-slate-900 border-2 border-slate-800 focus:border-primary rounded-2xl p-4 text-center text-3xl font-black tracking-[0.5em] outline-none transition-all"
+                                        />
+                                    </div>
                                 </div>
                                 <div className="flex gap-3 pt-4">
                                     <Button variant="outline" className="flex-1" onClick={() => setRegistrationStep('form')}>Back</Button>
-                                    <Button className="flex-1 bg-primary" onClick={handleVerifyOTP}>Verify & Active</Button>
+                                    <Button className="flex-1 bg-primary" onClick={handleVerifyOTP}>Force Activate</Button>
                                 </div>
                             </div>
                         )}

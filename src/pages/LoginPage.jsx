@@ -13,7 +13,9 @@ import {
     GoogleAuthProvider,
     signInWithPopup,
     updateProfile,
-    onAuthStateChanged
+    onAuthStateChanged,
+    isSignInWithEmailLink,
+    signInWithEmailLink
 } from 'firebase/auth';
 import { ref, update } from 'firebase/database';
 
@@ -25,8 +27,33 @@ export default function LoginPage() {
     const navigate = useNavigate();
 
     useEffect(() => {
+        // Handle Firebase Email Link Sign-in
+        if (isSignInWithEmailLink(auth, window.location.href)) {
+            let emailForSignIn = window.localStorage.getItem('emailForSignIn');
+
+            // If email is missing, ask user for it
+            if (!emailForSignIn) {
+                emailForSignIn = window.prompt('Please provide your email for confirmation');
+            }
+
+            if (emailForSignIn) {
+                const toastId = toast.loading('Verifying your email link...');
+                signInWithEmailLink(auth, emailForSignIn, window.location.href)
+                    .then(async (result) => {
+                        window.localStorage.removeItem('emailForSignIn');
+                        await syncUserToDb(result.user);
+                        toast.success('Successfully signed in!', { id: toastId });
+                        navigate('/dashboard');
+                    })
+                    .catch((error) => {
+                        console.error("Link error:", error);
+                        toast.error('The link is invalid or expired.', { id: toastId });
+                    });
+            }
+        }
+
         const unsubscribe = onAuthStateChanged(auth, (user) => {
-            if (user) {
+            if (user && !isSignInWithEmailLink(auth, window.location.href)) {
                 navigate('/dashboard');
             }
         });
