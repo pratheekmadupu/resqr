@@ -15,8 +15,8 @@ const firebaseConfig = {
     projectId: "emergency-qr-b0adf",
     storageBucket: "emergency-qr-b0adf.firebasestorage.app",
     messagingSenderId: "326186798135",
-    appId: "1:326186798135:web:5b0252adb6e7e18c9303b2",
-    measurementId: "G-2SP6BE9YKP"
+    appId: "1:326186798135:web:21b57be22dff85849303b2",
+    measurementId: "G-SPGK1149TH"
 };
 
 // Initialize Firebase
