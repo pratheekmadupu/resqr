@@ -29,9 +29,18 @@ export default function AdminPanel() {
 
     // List of allowed admin emails
     const ADMIN_EMAILS = [
-        'pratheekmadupu2006@gmail.com', // Your correct email
+        'pratheekmadupu2006@gmail.com',
         'resqr.official@gmail.com'
     ];
+
+    // ==========================================
+    // EMAILJS CONFIGURATION (FOR REAL OTP)
+    // ==========================================
+    const EMAILJS_CONFIG = {
+        SERVICE_ID: "service_resqr",  // Paste your Service ID here
+        TEMPLATE_ID: "template_otp",  // Paste your Template ID here
+        PUBLIC_KEY: "O_fM_vP9N4u_W0yY5"    // Paste your Public Key here
+    };
 
     // Form states
     const [isProductModalOpen, setIsProductModalOpen] = useState(false);
@@ -231,15 +240,15 @@ export default function AdminPanel() {
                 // window.emailjs.init("YOUR_PUBLIC_KEY"); 
 
                 await window.emailjs.send(
-                    "service_resqr", // Your Service ID
-                    "template_otp",  // Your Template ID
+                    EMAILJS_CONFIG.SERVICE_ID,
+                    EMAILJS_CONFIG.TEMPLATE_ID,
                     {
                         to_name: name,
                         to_email: email,
                         otp_code: otp,
                         reply_to: "resqr.official@gmail.com"
                     },
-                    "O_fM_vP9N4u_W0yY5" // TEMPORARY PUBLIC KEY (Replace with yours)
+                    EMAILJS_CONFIG.PUBLIC_KEY
                 );
                 toast.success('OTP Sent Successfully!', { id: toastId });
             } else {
