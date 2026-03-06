@@ -291,13 +291,13 @@ export default function Dashboard() {
                                                     <div className="w-10 h-10 rounded-2xl bg-green-500 flex items-center justify-center text-white">
                                                         <CheckCircle2 size={20} />
                                                     </div>
-                                                    <span className="text-xs font-black uppercase tracking-widest text-slate-300 italic">Blockchain Verified</span>
+                                                    <span className="text-xs font-black uppercase tracking-widest text-white italic">Blockchain Verified</span>
                                                 </div>
                                                 <div className="flex items-center gap-5 p-6 bg-blue-500/5 rounded-[30px] border border-blue-500/10 transition-colors">
                                                     <div className="w-10 h-10 rounded-2xl bg-blue-500 flex items-center justify-center text-white">
                                                         <Lock size={20} />
                                                     </div>
-                                                    <span className="text-xs font-black uppercase tracking-widest text-slate-300 italic">Encrypted Vault</span>
+                                                    <span className="text-xs font-black uppercase tracking-widest text-white italic">Encrypted Vault</span>
                                                 </div>
                                             </div>
                                         </div>
