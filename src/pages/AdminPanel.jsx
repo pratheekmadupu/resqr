@@ -62,7 +62,11 @@ export default function AdminPanel() {
 
     const getProfileForAuthUser = (email) => {
         if (!email) return null;
-        return profilesList.find(p => p.email === email || (p.name && p.name.toLowerCase() === email.split('@')[0].toLowerCase()));
+        const lowerEmail = email.toLowerCase();
+        return profilesList.find(p =>
+            (p.email && p.email.toLowerCase() === lowerEmail) ||
+            (p.name && p.name.toLowerCase() === lowerEmail.split('@')[0])
+        );
     };
 
     useEffect(() => {
@@ -555,7 +559,15 @@ export default function AdminPanel() {
                                                                 <ExternalLink size={18} />
                                                             </Link>
                                                         )}
-                                                        {!profile && (
+                                                        {profile ? (
+                                                            <button
+                                                                className="p-3 text-slate-400 hover:text-primary transition-all bg-slate-950 rounded-xl border border-white/5 hover:border-primary/20"
+                                                                onClick={() => { setSelectedUserForProfile(user); setIsProfileModalOpen(true); }}
+                                                                title="Edit Medical Profile"
+                                                            >
+                                                                <Edit3 size={18} />
+                                                            </button>
+                                                        ) : (
                                                             <button
                                                                 className="p-3 text-slate-400 hover:text-green-500 transition-all bg-slate-950 rounded-xl border border-white/5 hover:border-green-500/20"
                                                                 onClick={() => { setSelectedUserForProfile(user); setIsProfileModalOpen(true); }}
@@ -585,6 +597,27 @@ export default function AdminPanel() {
                 {activeTab === 'profiles' && (
                     <Card className="bg-medical-card border-white/5 overflow-hidden rounded-[40px] shadow-2xl relative">
                         <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+                        <div className="p-10 border-b border-white/5 flex flex-col md:flex-row items-center justify-between gap-8">
+                            <div>
+                                <h2 className="text-3xl font-black italic uppercase tracking-tighter font-poppins">Medical Records</h2>
+                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] mt-2 italic">Active Digital Vaults</p>
+                            </div>
+                            <div className="flex items-center gap-4 w-full md:w-auto">
+                                <div className="relative group flex-1 md:w-80">
+                                    <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-primary group-hover:scale-110 transition-transform" size={20} />
+                                    <input
+                                        type="text"
+                                        placeholder="SEARCH PROFILES..."
+                                        className="pl-14 pr-8 py-5 bg-slate-950 border border-white/5 rounded-2xl text-[11px] font-black tracking-widest uppercase italic focus:outline-none focus:ring-2 focus:ring-primary/20 w-full transition-all"
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                    />
+                                </div>
+                                <Button onClick={() => setActiveTab('users')} className="h-16 px-8 rounded-2xl bg-white/5 text-white border-white/10 font-black italic uppercase tracking-widest text-[10px]">
+                                    <Plus size={18} className="mr-2" /> NEW VAULT
+                                </Button>
+                            </div>
+                        </div>
                         <div className="overflow-x-auto">
                             <table className="w-full text-left">
                                 <thead className="bg-slate-950/80 text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] italic border-b border-white/5">
@@ -785,26 +818,26 @@ export default function AdminPanel() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div className="space-y-3">
                                     <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1 italic">Legal Identity</label>
-                                    <Input name="name" defaultValue={selectedUserForProfile?.name} required className="bg-slate-950/50 border-white/5 h-16 rounded-2xl font-black italic focus:ring-primary/20" />
+                                    <Input name="name" defaultValue={getProfileForAuthUser(selectedUserForProfile?.email)?.name || selectedUserForProfile?.name} required className="bg-slate-950/50 border-white/5 h-16 rounded-2xl font-black italic focus:ring-primary/20" />
                                 </div>
                                 <div className="space-y-3">
                                     <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1 italic">Blood Type Vector</label>
-                                    <select name="bloodGroup" className="w-full bg-slate-950/50 border border-white/5 rounded-2xl h-16 px-6 text-[11px] font-black uppercase tracking-widest italic outline-none focus:ring-2 focus:ring-primary/20 transition-all appearance-none" required>
+                                    <select name="bloodGroup" defaultValue={getProfileForAuthUser(selectedUserForProfile?.email)?.bloodGroup} className="w-full bg-slate-950/50 border border-white/5 rounded-2xl h-16 px-6 text-[11px] font-black uppercase tracking-widest italic outline-none focus:ring-2 focus:ring-primary/20 transition-all appearance-none" required>
                                         <option value="" className="bg-medical-bg">Select Group...</option>
                                         {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map(bg => <option key={bg} value={bg} className="bg-medical-bg">{bg}</option>)}
                                     </select>
                                 </div>
                                 <div className="space-y-3">
                                     <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1 italic">Emergency Comm Link</label>
-                                    <Input name="phone" required className="bg-slate-950/50 border-white/5 h-16 rounded-2xl font-black italic focus:ring-primary/20" />
+                                    <Input name="phone" defaultValue={getProfileForAuthUser(selectedUserForProfile?.email)?.phone || selectedUserForProfile?.phone} required className="bg-slate-950/50 border-white/5 h-16 rounded-2xl font-black italic focus:ring-primary/20" />
                                 </div>
                                 <div className="space-y-3">
                                     <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1 italic">Pathological Markers</label>
-                                    <Input name="conditions" placeholder="DIABETES, HYPERTENSION..." className="bg-slate-950/50 border-white/5 h-16 rounded-2xl font-black italic focus:ring-primary/20" />
+                                    <Input name="conditions" defaultValue={getProfileForAuthUser(selectedUserForProfile?.email)?.medicalConditions} placeholder="DIABETES, HYPERTENSION..." className="bg-slate-950/50 border-white/5 h-16 rounded-2xl font-black italic focus:ring-primary/20" />
                                 </div>
                                 <div className="space-y-3 md:col-span-2">
                                     <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1 italic">Biosensitivity / Allergies</label>
-                                    <Input name="allergies" placeholder="PEANUTS, PENICILLIN..." className="bg-slate-950/50 border-white/5 h-16 rounded-2xl font-black italic focus:ring-primary/20" />
+                                    <Input name="allergies" defaultValue={getProfileForAuthUser(selectedUserForProfile?.email)?.allergies} placeholder="PEANUTS, PENICILLIN..." className="bg-slate-950/50 border-white/5 h-16 rounded-2xl font-black italic focus:ring-primary/20" />
                                 </div>
                             </div>
 
@@ -816,15 +849,15 @@ export default function AdminPanel() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                     <div className="space-y-3">
                                         <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1 italic">Guardian Name</label>
-                                        <Input name="eName" required className="bg-slate-950/50 border-white/5 h-16 rounded-2xl font-black italic focus:ring-primary/20" />
+                                        <Input name="eName" defaultValue={getProfileForAuthUser(selectedUserForProfile?.email)?.emergencyContactName} required className="bg-slate-950/50 border-white/5 h-16 rounded-2xl font-black italic focus:ring-primary/20" />
                                     </div>
                                     <div className="space-y-3">
                                         <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1 italic">Relation Vector</label>
-                                        <Input name="eRelation" placeholder="FATHER, SPOUSE, ETC." required className="bg-slate-950/50 border-white/5 h-16 rounded-2xl font-black italic focus:ring-primary/20" />
+                                        <Input name="eRelation" defaultValue={getProfileForAuthUser(selectedUserForProfile?.email)?.emergencyContactRelation} placeholder="FATHER, SPOUSE, ETC." required className="bg-slate-950/50 border-white/5 h-16 rounded-2xl font-black italic focus:ring-primary/20" />
                                     </div>
                                     <div className="space-y-3 md:col-span-2">
                                         <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1 italic">Guardian Contact Link</label>
-                                        <Input name="ePhone" required className="bg-slate-950/50 border-white/5 h-16 rounded-2xl font-black italic focus:ring-primary/20" />
+                                        <Input name="ePhone" defaultValue={getProfileForAuthUser(selectedUserForProfile?.email)?.emergencyContactPhone} required className="bg-slate-950/50 border-white/5 h-16 rounded-2xl font-black italic focus:ring-primary/20" />
                                     </div>
                                 </div>
                             </div>
