@@ -203,16 +203,15 @@ export default function Dashboard() {
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                             {/* Main Profile Info */}
                             <div className="lg:col-span-2 space-y-12">
-                                <Card className="bg-medical-card border-white/5 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] rounded-[50px] p-12 relative overflow-hidden">
-                                    <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-slate-800 to-transparent" />
-                                    <div className="flex items-center justify-between mb-12 pb-10 border-b border-white/5">
-                                        <div className="flex items-center gap-6">
-                                            <div className="w-16 h-16 bg-slate-950 rounded-2xl flex items-center justify-center text-primary border border-white/5 shadow-inner">
-                                                <Shield size={32} />
+                                <Card className="bg-white border-slate-200 shadow-xl rounded-[40px] p-10 relative overflow-hidden">
+                                    <div className="flex items-center justify-between mb-8 pb-8 border-b border-slate-100">
+                                        <div className="flex items-center gap-5">
+                                            <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center text-primary shadow-inner">
+                                                <Shield size={28} />
                                             </div>
                                             <div>
-                                                <h3 className="text-3xl font-black italic uppercase tracking-tighter font-poppins text-white leading-none">Emergency Passport</h3>
-                                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] mt-2 italic">Secured Tactical Records</p>
+                                                <h3 className="text-2xl font-black uppercase tracking-tighter font-poppins text-slate-900 leading-none">Emergency Passport</h3>
+                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] mt-2">Active Medical Identity</p>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-2 px-6 py-2 bg-green-500/10 border border-green-500/20 rounded-full">
@@ -220,30 +219,30 @@ export default function Dashboard() {
                                             <span className="text-[10px] font-black text-green-500 uppercase tracking-[0.2em] italic">ENCRYPTED</span>
                                         </div>
                                     </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
-                                        <div className="space-y-10">
-                                            <div className="group">
-                                                <span className="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em] italic">Vector Group</span>
-                                                <p className="text-8xl font-black text-primary italic leading-none mt-4 font-poppins tracking-tighter drop-shadow-[0_0_20px_rgba(230,57,70,0.2)]">{userBloodGroup}</p>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                                        <div className="space-y-8">
+                                            <div>
+                                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Blood Group</span>
+                                                <p className="text-7xl font-black text-primary leading-none mt-2 font-poppins tracking-tighter">{userBloodGroup}</p>
                                             </div>
                                             <div>
-                                                <span className="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em] italic">Pre-existing Pathology</span>
-                                                <p className="font-bold text-slate-300 text-lg mt-4 p-6 bg-slate-950/50 rounded-3xl border border-white/5 italic">{profile?.medicalConditions || 'Log clean: No reports'}</p>
+                                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Medical Conditions</span>
+                                                <p className="font-bold text-slate-700 text-lg mt-3 p-5 bg-slate-50 rounded-2xl border border-slate-100 italic">{profile?.medicalConditions || 'No conditions reported'}</p>
                                             </div>
                                             <div>
-                                                <span className="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em] italic">Critical Hostility (Allergies)</span>
-                                                <p className="font-bold text-primary text-lg mt-4 p-6 bg-primary/5 rounded-3xl border border-primary/10 italic shadow-[inset_0_0_30px_rgba(230,57,70,0.05)]">{profile?.allergies || 'Stable: No reactivity'}</p>
+                                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Known Allergies</span>
+                                                <p className="font-bold text-red-600 text-lg mt-2 p-5 bg-red-50 rounded-2xl border border-red-100 italic">{profile?.allergies || 'No allergies reported'}</p>
                                             </div>
                                         </div>
-                                        <div className="space-y-10">
-                                            <div className="p-8 bg-slate-950 rounded-[40px] border border-white/5 relative overflow-hidden group">
-                                                <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-bl-full border-b border-l border-primary/10 transition-all group-hover:bg-primary/10" />
-                                                <span className="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em] italic">Strategic Liaison</span>
-                                                <p className="font-black text-white text-3xl uppercase italic mt-4 tracking-tighter">{userContact}</p>
+                                        <div className="space-y-8">
+                                            <div className="p-8 bg-slate-900 rounded-[32px] text-white relative overflow-hidden group">
+                                                <div className="absolute top-0 right-0 w-20 h-20 bg-primary/10 rounded-bl-full" />
+                                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Emergency Contact</span>
+                                                <p className="font-black text-white text-2xl uppercase mt-4">{userContact}</p>
                                                 <div className="flex items-center gap-2 mt-2">
-                                                    <Badge className="bg-primary/20 text-primary border-none text-[9px] px-4 py-1 font-black italic uppercase tracking-widest">{profile?.emergencyContactRelation || '--'}</Badge>
+                                                    <Badge className="bg-primary/20 text-primary border-none text-[8px] px-3 py-1 font-bold uppercase">{profile?.emergencyContactRelation || '--'}</Badge>
                                                 </div>
-                                                <p className="text-4xl font-black text-white mt-8 tracking-tighter font-poppins">{profile?.emergencyContactPhone || '--'}</p>
+                                                <p className="text-3xl font-black text-white mt-6 tracking-tighter font-poppins">{profile?.emergencyContactPhone || '--'}</p>
                                             </div>
                                             <div className="flex flex-col gap-6">
                                                 <div className="flex items-center gap-5 p-6 bg-green-500/5 rounded-[30px] border border-green-500/10 hover:bg-green-500/10 transition-colors">
