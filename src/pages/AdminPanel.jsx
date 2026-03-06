@@ -3,7 +3,7 @@ import {
     Search, Filter, MoreVertical, Shield, Users, CreditCard,
     Activity, ArrowUpRight, CheckCircle2, Clock, AlertTriangle,
     Plus, Trash2, Edit3, Image as ImageIcon, Megaphone, Mail,
-    Package, Settings, LayoutDashboard, LogOut, ChevronRight, ExternalLink
+    Package, Settings, LayoutDashboard, LogOut, ChevronRight, ExternalLink, Bell
 } from 'lucide-react';
 import { Card, CardHeader } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
@@ -630,7 +630,10 @@ export default function AdminPanel() {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-white/5">
-                                    {profilesList.filter(p => p.name?.toLowerCase().includes(searchTerm.toLowerCase()) || p.id?.toLowerCase().includes(searchTerm.toLowerCase())).map((profile, idx) => (
+                                    {profilesList.filter(p =>
+                                        (p.name?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+                                        (p.id?.toLowerCase() || "").includes(searchTerm.toLowerCase())
+                                    ).map((profile, idx) => (
                                         <tr key={profile.id || idx} className="hover:bg-white/5 transition-all group">
                                             <td className="px-10 py-8">
                                                 <code className="text-[11px] bg-slate-950 px-4 py-2 rounded-xl text-primary font-black border border-white/5 group-hover:border-primary/20 shadow-inner">
