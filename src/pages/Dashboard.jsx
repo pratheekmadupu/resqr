@@ -368,12 +368,6 @@ export default function Dashboard() {
                                     </div>
                                 </Card>
 
-                                <Card className="bg-gradient-to-br from-primary to-slate-950 text-white p-10 rounded-[50px] shadow-2xl border border-primary/20">
-                                    <h4 className="font-black text-white mb-6 uppercase italic tracking-[0.3em] text-xl">Tactical Note</h4>
-                                    <p className="text-lg text-white/90 leading-relaxed font-black italic tracking-tight uppercase">
-                                        Always keep your RESQR beacon easily accessible for emergency responders.
-                                    </p>
-                                </Card>
                             </div>
                         </div>
                     </>
