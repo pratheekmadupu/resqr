@@ -158,99 +158,127 @@ export default function PaymentPage() {
     const gst = selectedProduct.price - subtotal;
 
     return (
-        <div className="min-h-screen bg-slate-950 py-10 px-4 text-white">
-            <div className="max-w-4xl mx-auto">
-                <header className="mb-12 text-center">
-                    <h1 className="text-4xl font-black text-white mb-4 uppercase italic tracking-tighter">Complete Your Protection</h1>
-                    <p className="text-white opacity-60 max-w-lg mx-auto">One-time payment for your selected safety gear. Lifetime validity included.</p>
+        <div className="min-h-screen bg-medical-bg py-24 px-4 text-white font-manrope selection:bg-primary/30">
+            <div className="max-w-6xl mx-auto">
+                <header className="mb-16 text-center space-y-4">
+                    <Badge className="bg-primary/20 text-primary border-none mb-4 px-6 py-1 font-black italic tracking-widest">SECURE CHECKOUT</Badge>
+                    <h1 className="text-5xl md:text-7xl font-black text-white italic uppercase tracking-tighter leading-none font-poppins">
+                        Fuel Your <span className="text-primary italic-display">Safety</span> Network.
+                    </h1>
+                    <p className="text-slate-500 font-bold uppercase tracking-[0.2em] text-[10px] italic max-w-xl mx-auto">One-time activation fee for lifetime medical data accessibility and smart emergency broadcasting.</p>
                 </header>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-                    <div className="lg:col-span-2 space-y-6">
-                        <Card className="p-8 bg-slate-900 border-slate-800">
-                            <h3 className="font-black text-white uppercase italic tracking-widest text-sm mb-6 opacity-60">1. Select Physical Product</h3>
-                            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+                    <div className="lg:col-span-8 space-y-8">
+                        <Card className="p-10 bg-medical-card border-white/5 rounded-[40px] shadow-2xl relative overflow-hidden">
+                            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+                            <h3 className="text-[10px] font-black text-slate-500 uppercase italic tracking-[0.4em] mb-10">01. Select Your Gear Variant</h3>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                                 {products.map((p) => (
                                     <button
                                         key={p.id}
                                         onClick={() => setSelectedProduct(p)}
-                                        className={`p-4 rounded-2xl border-2 transition-all text-left flex flex-col justify-between h-32 ${selectedProduct.id === p.id
-                                            ? 'border-primary bg-primary/10 shadow-lg shadow-primary/5'
-                                            : 'border-slate-800 bg-slate-950 text-white opacity-40 hover:opacity-100 hover:border-slate-700'
+                                        className={`p-6 rounded-3xl border-2 transition-all text-left flex flex-col justify-between h-40 group relative overflow-hidden ${selectedProduct.id === p.id
+                                            ? 'border-primary bg-primary/10 shadow-[0_0_30px_rgba(230,57,70,0.2)]'
+                                            : 'border-white/5 bg-slate-950/50 text-slate-500 hover:border-white/10 hover:bg-slate-950'
                                             }`}
                                     >
-                                        <p className="text-[10px] font-black uppercase tracking-widest">{p.title}</p>
-                                        <p className="text-2xl font-black italic">₹{p.price}</p>
+                                        {p.best && (
+                                            <div className="absolute -top-1 -right-1 bg-primary text-white text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-bl-xl italic">Popular</div>
+                                        )}
+                                        <p className="text-[10px] font-black uppercase tracking-widest group-hover:text-white transition-colors">{p.title}</p>
+                                        <div className="mt-auto">
+                                            <p className={`text-2xl font-black italic ${selectedProduct.id === p.id ? 'text-white' : 'text-slate-600 group-hover:text-primary transition-colors'}`}>₹{p.price}</p>
+                                        </div>
                                     </button>
                                 ))}
                             </div>
                         </Card>
 
-                        <Card className="p-0 overflow-hidden border border-slate-800 bg-slate-900 shadow-2xl">
-                            <div className="bg-slate-950 border-b border-slate-800 p-6 flex items-center justify-between">
-                                <div className="flex items-center gap-3 text-white">
-                                    <div className="bg-primary/20 p-2 rounded-xl text-primary border border-primary/20">
-                                        <Zap size={20} />
+                        <Card className="p-0 overflow-hidden border border-white/5 bg-medical-card shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] rounded-[40px] relative">
+                            <div className="bg-slate-950/80 border-b border-white/5 p-8 flex items-center justify-between backdrop-blur-xl">
+                                <div className="flex items-center gap-4 text-white">
+                                    <div className="bg-primary/20 p-3 rounded-2xl text-primary border border-primary/20 shadow-lg shadow-primary/20">
+                                        <Zap size={22} />
                                     </div>
-                                    <h2 className="font-black italic uppercase tracking-tighter text-xl">Secure Checkout</h2>
+                                    <div>
+                                        <h2 className="font-black italic uppercase tracking-tighter text-2xl leading-none">Strategic Payment</h2>
+                                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest italic mt-1">Encrypted Transaction Hub</p>
+                                    </div>
                                 </div>
-                                <ShieldCheck className="text-primary" size={24} />
+                                <div className="flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-full">
+                                    <ShieldCheck className="text-green-500" size={16} />
+                                    <span className="text-[10px] font-black text-green-500 uppercase tracking-widest">Verified</span>
+                                </div>
                             </div>
 
-                            <div className="p-8 space-y-8">
-                                <div className="p-6 rounded-2xl border-2 border-primary bg-primary/5 cursor-pointer relative group overflow-hidden">
-                                    <div className="absolute top-0 right-0 p-2 bg-primary text-white text-[10px] font-black uppercase tracking-widest">Recommended</div>
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-6 h-6 rounded-full border-4 border-primary bg-slate-950 shadow-lg shadow-primary/20"></div>
-                                        <div className="flex-1">
-                                            <h3 className="font-black text-white italic">Pay with Razorpay</h3>
-                                            <p className="text-xs text-white opacity-40 uppercase font-bold">Cards, UPI, Netbanking, Wallets</p>
+                            <div className="p-10 space-y-10">
+                                <div className="p-8 rounded-[30px] border-2 border-primary bg-primary/5 cursor-pointer relative group overflow-hidden transition-all hover:bg-primary/10">
+                                    <div className="absolute top-0 right-0 p-3 bg-primary text-white text-[8px] font-black uppercase tracking-[0.3em] italic rounded-bl-2xl">Recommended Gateway</div>
+                                    <div className="flex items-center gap-6">
+                                        <div className="w-8 h-8 rounded-full border-4 border-primary bg-slate-950 shadow-lg shadow-primary/30 flex items-center justify-center p-1">
+                                            <div className="w-full h-full bg-primary rounded-full" />
                                         </div>
-                                        <img src="https://razorpay.com/favicon.png" alt="Razorpay" className="w-6 h-6 grayscale invert" />
+                                        <div className="flex-1">
+                                            <h3 className="text-xl font-black text-white italic uppercase tracking-tight">Razorpay Instant Dispatch</h3>
+                                            <p className="text-[10px] text-slate-500 uppercase font-black italic tracking-widest mt-1">UPI • Cards • Netbanking • Wallets</p>
+                                        </div>
+                                        <img src="https://razorpay.com/favicon.png" alt="Razorpay" className="w-8 h-8 grayscale invert brightness-200" />
                                     </div>
                                 </div>
 
-                                <Button className="w-full py-8 text-2xl font-black italic shadow-2xl shadow-primary/20 hover:scale-[1.02] transition-transform" onClick={handlePayment}>
-                                    Pay ₹{selectedProduct.price} <ChevronRight size={24} />
+                                <Button className="w-full py-10 text-3xl font-black italic rounded-[30px] shadow-2xl shadow-primary/30 bg-primary text-white border-none group hover:scale-[1.02] active:scale-95 transition-all uppercase tracking-tighter" onClick={handlePayment}>
+                                    INITIATE TRANSFER ₹{selectedProduct.price} <ChevronRight size={32} className="ml-2 group-hover:translate-x-1 transition-transform" />
                                 </Button>
 
-                                <div className="flex items-center justify-center gap-6 pt-4">
-                                    <div className="flex items-center gap-2 text-[10px] font-black text-white opacity-30 uppercase tracking-[0.2em]">
-                                        <Lock size={14} /> 256-bit AES Encryption
+                                <div className="flex items-center justify-center gap-8 pt-4 opacity-30">
+                                    <div className="flex items-center gap-3 text-[9px] font-black text-white uppercase tracking-[0.4em]">
+                                        <Lock size={12} /> SSL Secured
+                                    </div>
+                                    <div className="flex items-center gap-3 text-[9px] font-black text-white uppercase tracking-[0.4em]">
+                                        <ShieldCheck size={12} /> PCI DSS Compliant
                                     </div>
                                 </div>
                             </div>
                         </Card>
                     </div>
 
-                    <div className="space-y-6">
-                        <Card className="sticky top-24 bg-slate-900 border-slate-800">
-                            <h3 className="text-sm font-black mb-8 text-white uppercase tracking-[0.3em] opacity-40 text-center">Order Summary</h3>
-                            <div className="space-y-6">
-                                <div className="flex justify-between items-center pb-6 border-b border-slate-800">
-                                    <div className="flex flex-col">
-                                        <span className="font-black text-white uppercase italic text-lg">{selectedProduct.title}</span>
-                                        <span className="text-[10px] font-bold text-primary uppercase tracking-widest">LIFETIME VALIDITY</span>
+                    <div className="lg:col-span-4 lg:sticky lg:top-24">
+                        <Card className="bg-medical-card border-white/5 rounded-[40px] shadow-2xl p-10 relative overflow-hidden">
+                            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-slate-800 to-transparent" />
+                            <h3 className="text-[10px] font-black mb-10 text-slate-500 uppercase tracking-[0.4em] italic text-center">Payload Summary</h3>
+                            <div className="space-y-8">
+                                <div className="flex justify-between items-start pb-8 border-b border-white/5">
+                                    <div className="space-y-2">
+                                        <span className="font-black text-white uppercase italic text-2xl tracking-tighter leading-none">{selectedProduct.title}</span>
+                                        <div className="flex items-center gap-2">
+                                            <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                                            <span className="text-[9px] font-black text-primary uppercase tracking-widest italic">LIFETIME ACCESS GRANTED</span>
+                                        </div>
                                     </div>
-                                    <span className="font-black text-2xl italic text-white font-mono">₹{selectedProduct.price}</span>
+                                    <span className="font-black text-3xl italic text-white font-poppins">₹{selectedProduct.price}</span>
                                 </div>
 
-                                <div className="space-y-3">
-                                    <div className="flex justify-between items-center text-xs font-bold text-white opacity-40 uppercase tracking-widest">
-                                        <span>Subtotal</span>
-                                        <span className="font-mono">₹{subtotal.toFixed(2)}</span>
+                                <div className="space-y-4">
+                                    <div className="flex justify-between items-center text-[10px] font-black text-slate-500 uppercase tracking-widest italic">
+                                        <span>Subtotal (Net)</span>
+                                        <span className="text-slate-300">₹{subtotal.toFixed(2)}</span>
                                     </div>
-                                    <div className="flex justify-between items-center text-xs font-bold text-white opacity-40 uppercase tracking-widest">
-                                        <span>GST (18%)</span>
-                                        <span className="font-mono">₹{gst.toFixed(2)}</span>
+                                    <div className="flex justify-between items-center text-[10px] font-black text-slate-500 uppercase tracking-widest italic">
+                                        <span>Taxation (18% GST)</span>
+                                        <span className="text-slate-300">₹{gst.toFixed(2)}</span>
                                     </div>
                                 </div>
 
-                                <div className="pt-6 border-t border-slate-800">
+                                <div className="pt-8 border-t border-white/5">
                                     <div className="flex justify-between items-center">
-                                        <span className="text-sm font-black text-white uppercase tracking-widest">Total Payable</span>
-                                        <span className="text-3xl font-black italic text-primary font-mono">₹{selectedProduct.price}</span>
+                                        <span className="text-[10px] font-black text-white uppercase tracking-[0.3em] italic">Total Payable</span>
+                                        <span className="text-4xl font-black italic text-primary font-poppins tracking-tighter shadow-primary/20 drop-shadow-lg">₹{selectedProduct.price}</span>
                                     </div>
+                                </div>
+
+                                <div className="mt-8 p-6 bg-slate-950 rounded-2xl border border-white/5 text-[10px] font-bold text-slate-500 italic leading-relaxed text-center">
+                                    Digital activation occurs instantly upon successful transaction confirmation. Physical tracking logs will be updated within 12 hours.
                                 </div>
                             </div>
                         </Card>

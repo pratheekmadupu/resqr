@@ -16,8 +16,9 @@ export default {
                     light: '#457B9D',
                 },
                 medical: {
-                    bg: '#F1FAEE',
-                    accent: '#A8DADC',
+                    bg: '#0A0E17', // Deep Medical Dark
+                    card: '#161C2C', // Medical Dark Card
+                    accent: '#E63946',
                 }
             },
             borderRadius: {

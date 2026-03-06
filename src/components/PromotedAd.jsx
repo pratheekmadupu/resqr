@@ -30,26 +30,28 @@ export default function PromotedAd() {
             href={ad.linkUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="block group relative overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/50 hover:bg-slate-900 transition-all"
+            className="block group relative overflow-hidden rounded-[40px] border border-white/5 bg-medical-card/50 hover:bg-medical-card transition-all shadow-xl"
         >
-            <div className="flex flex-col md:flex-row items-center gap-6 p-6">
-                <div className="w-full md:w-32 h-32 rounded-2xl overflow-hidden shrink-0 bg-slate-950 border border-slate-800">
+            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-primary/10 to-transparent group-hover:via-primary transition-all duration-700" />
+            <div className="flex flex-col md:flex-row items-center gap-8 p-8">
+                <div className="w-full md:w-40 h-40 rounded-[32px] overflow-hidden shrink-0 bg-slate-950 border border-white/5 shadow-2xl">
                     <img
                         src={ad.imageUrl}
                         alt="Promoted"
-                        className="w-full h-full object-cover transition-transform group-hover:scale-110"
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                 </div>
-                <div className="flex-1 space-y-2 text-center md:text-left">
-                    <div className="flex items-center justify-center md:justify-start gap-2 text-[10px] font-black text-primary uppercase tracking-[0.2em]">
-                        <Info size={12} /> Sponsored content
+                <div className="flex-1 space-y-4 text-center md:text-left">
+                    <div className="flex items-center justify-center md:justify-start gap-2 text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] italic">
+                        <Info size={12} className="text-primary" /> Tactical Spotlight
                     </div>
-                    <h4 className="text-xl font-black text-white italic leading-tight group-hover:text-primary transition-colors">
+                    <h4 className="text-2xl font-black text-white italic leading-none font-poppins tracking-tighter group-hover:text-primary transition-colors">
                         {ad.text}
                     </h4>
+                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">COMMUNITY PARTNER REQUISITION</p>
                 </div>
-                <div className="p-4 bg-slate-950 text-white rounded-full border border-slate-800 group-hover:bg-primary transition-colors shrink-0">
-                    <ExternalLink size={20} />
+                <div className="p-5 bg-slate-950 text-primary rounded-[24px] border border-white/5 group-hover:bg-primary group-hover:text-white transition-all shadow-xl transform group-hover:rotate-12">
+                    <ExternalLink size={24} />
                 </div>
             </div>
         </a>

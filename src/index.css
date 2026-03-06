@@ -6,7 +6,7 @@
 
 @layer base {
   body {
-    @apply bg-medical-bg text-secondary font-sans antialiased;
+    @apply bg-medical-bg text-slate-100 font-sans antialiased;
   }
 
   h1,
@@ -15,7 +15,7 @@
   h4,
   h5,
   h6 {
-    @apply font-bold text-secondary;
+    @apply font-bold text-white;
   }
 }
 

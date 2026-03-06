@@ -57,58 +57,59 @@ export default function StorePage() {
     };
 
     return (
-        <div className="min-h-screen bg-medical-bg text-secondary font-manrope">
+        <div className="min-h-screen bg-medical-bg text-white font-manrope">
             {/* Store Header */}
-            <div className="bg-white border-b border-secondary/5 pt-32 pb-20 px-4">
-                <div className="max-w-7xl mx-auto text-center">
-                    <Badge className="bg-primary/10 text-primary border-none mb-6 px-4 py-1 font-black">RESQR PHYSICAL GEAR</Badge>
-                    <h1 className="text-5xl md:text-7xl font-black text-secondary italic uppercase tracking-tighter font-poppins mb-6">
-                        Wear Your Safety.
+            <div className="bg-slate-950/40 border-b border-white/5 pt-32 pb-24 px-4 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2" />
+                <div className="max-w-7xl mx-auto text-center relative z-10">
+                    <Badge className="bg-primary/20 text-primary border-none mb-8 px-6 py-1 font-black italic tracking-widest">RESQR PHYSICAL GEAR</Badge>
+                    <h1 className="text-6xl md:text-8xl font-black text-white italic uppercase tracking-tighter font-poppins mb-8 leading-none">
+                        Wear Your <span className="text-primary italic-display">Safety.</span>
                     </h1>
-                    <p className="max-w-2xl mx-auto text-secondary/60 text-xl leading-relaxed">
+                    <p className="max-w-3xl mx-auto text-slate-400 text-xl leading-relaxed font-medium">
                         Order your physical RESQR tags today. Our smart cards, wristbands, and stickers bridge the gap between digital identity and physical survival.
                     </p>
                 </div>
             </div>
 
             {/* Product Grid */}
-            <section className="py-24 px-4">
-                <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10">
+            <section className="py-24 px-4 bg-medical-bg">
+                <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12">
                     {products.map((product, i) => (
                         <motion.div
                             key={product.id}
                             initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             transition={{ delay: i * 0.1 }}
-                            className="bg-white rounded-[40px] overflow-hidden border border-secondary/5 shadow-xl hover:shadow-2xl transition-all group lg:flex"
+                            className="bg-medical-card rounded-[50px] overflow-hidden border border-white/5 shadow-2xl hover:shadow-black/50 transition-all group lg:flex hover:-translate-y-2"
                         >
-                            <div className="lg:w-1/2 relative bg-slate-100 overflow-hidden">
+                            <div className="lg:w-1/2 relative bg-slate-900 overflow-hidden">
                                 <img
                                     src={product.image}
                                     alt={product.name}
-                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-80 group-hover:opacity-100"
                                 />
-                                <div className="absolute top-6 left-6">
-                                    <Badge className="bg-white/90 backdrop-blur-md text-secondary border-none font-black px-4 py-1 shadow-lg">
+                                <div className="absolute top-8 left-8">
+                                    <Badge className="bg-slate-900/80 backdrop-blur-md text-white border border-white/10 font-black px-5 py-2 shadow-2xl uppercase tracking-widest text-[10px] italic">
                                         {product.tag}
                                     </Badge>
                                 </div>
                             </div>
-                            <div className="lg:w-1/2 p-10 flex flex-col justify-between">
+                            <div className="lg:w-1/2 p-12 flex flex-col justify-between">
                                 <div>
-                                    <h3 className="text-3xl font-black text-secondary uppercase italic font-poppins mb-4 leading-tight">{product.name}</h3>
-                                    <p className="text-secondary/60 text-sm leading-relaxed mb-6">{product.description}</p>
+                                    <h3 className="text-3xl font-black text-white uppercase italic font-poppins mb-6 leading-tight tracking-tight">{product.name}</h3>
+                                    <p className="text-slate-400 text-sm leading-relaxed mb-8 font-medium italic">"{product.description}"</p>
 
-                                    <div className="flex items-center gap-4 mb-8">
-                                        <div className="text-4xl font-black text-primary italic font-poppins">₹{product.price}</div>
-                                        <div className="text-lg text-secondary/30 line-through font-bold">₹{product.originalPrice}</div>
-                                        <Badge className="bg-green-100 text-green-700 border-none font-black">50% OFF</Badge>
+                                    <div className="flex items-center gap-6 mb-10">
+                                        <div className="text-5xl font-black text-white italic font-poppins tracking-tighter">₹{product.price}</div>
+                                        <div className="text-xl text-slate-600 line-through font-bold">₹{product.originalPrice}</div>
+                                        <Badge className="bg-emerald-500/10 text-emerald-500 border-none font-black text-[10px] uppercase tracking-widest h-fit py-1">50% OFF</Badge>
                                     </div>
 
-                                    <ul className="space-y-3 mb-10">
+                                    <ul className="space-y-4 mb-12">
                                         {product.features.map((feature, j) => (
-                                            <li key={j} className="flex items-center gap-2 text-sm font-bold text-secondary/70">
-                                                <Zap size={14} className="text-primary" /> {feature}
+                                            <li key={j} className="flex items-center gap-3 text-sm font-bold text-slate-400 uppercase tracking-tight">
+                                                <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary"><Zap size={12} /></div> {feature}
                                             </li>
                                         ))}
                                     </ul>
@@ -116,9 +117,9 @@ export default function StorePage() {
 
                                 <Button
                                     onClick={handleAddToCart}
-                                    className="w-full py-6 rounded-2xl font-black text-lg italic shadow-xl shadow-primary/20 flex items-center justify-center gap-3"
+                                    className="w-full py-8 rounded-2xl font-black text-xl italic shadow-2xl shadow-primary/20 flex items-center justify-center gap-4 bg-primary text-white border-none transition-transform active:scale-95 uppercase tracking-tighter"
                                 >
-                                    <ShoppingCart size={22} /> BUY NOW <ArrowRight size={22} />
+                                    <ShoppingCart size={24} /> BUY NOW <ArrowRight size={24} />
                                 </Button>
                             </div>
                         </motion.div>
@@ -127,61 +128,62 @@ export default function StorePage() {
             </section>
 
             {/* Shopping Benefits */}
-            <section className="py-24 bg-secondary text-white border-y border-white/5">
-                <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-12 text-center">
-                    <div className="flex flex-col items-center">
-                        <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mb-6 text-primary">
-                            <Truck size={32} />
+            <section className="py-24 bg-slate-950 text-white border-y border-white/5">
+                <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-16 text-center">
+                    <div className="flex flex-col items-center group">
+                        <div className="w-20 h-20 bg-white/5 rounded-3xl flex items-center justify-center mb-8 text-primary border border-white/5 group-hover:bg-primary/10 transition-colors">
+                            <Truck size={36} />
                         </div>
-                        <h4 className="font-black uppercase italic tracking-wider mb-2">Fast Delivery</h4>
-                        <p className="text-white/40 text-xs font-bold px-8 uppercase tracking-widest leading-relaxed">Pan-India shipping within 3-5 days.</p>
+                        <h4 className="font-black uppercase italic tracking-widest mb-3">Fast Delivery</h4>
+                        <p className="text-slate-500 text-[10px] font-black px-8 uppercase tracking-[0.2em] leading-relaxed">Pan-India shipping <br /> within 3-5 days.</p>
                     </div>
-                    <div className="flex flex-col items-center">
-                        <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mb-6 text-blue-400">
-                            <RefreshCw size={32} />
+                    <div className="flex flex-col items-center group">
+                        <div className="w-20 h-20 bg-white/5 rounded-3xl flex items-center justify-center mb-8 text-blue-400 border border-white/5 group-hover:bg-blue-500/10 transition-colors">
+                            <RefreshCw size={36} />
                         </div>
-                        <h4 className="font-black uppercase italic tracking-wider mb-2">Easy Returns</h4>
-                        <p className="text-white/40 text-xs font-bold px-8 uppercase tracking-widest leading-relaxed">No-questions-asked 7-day return policy.</p>
+                        <h4 className="font-black uppercase italic tracking-widest mb-3">Easy Returns</h4>
+                        <p className="text-slate-500 text-[10px] font-black px-8 uppercase tracking-[0.2em] leading-relaxed">No-questions-asked <br /> 7-day return policy.</p>
                     </div>
-                    <div className="flex flex-col items-center">
-                        <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mb-6 text-green-400">
-                            <CreditCard size={32} />
+                    <div className="flex flex-col items-center group">
+                        <div className="w-20 h-20 bg-white/5 rounded-3xl flex items-center justify-center mb-8 text-emerald-400 border border-white/5 group-hover:bg-emerald-500/10 transition-colors">
+                            <CreditCard size={36} />
                         </div>
-                        <h4 className="font-black uppercase italic tracking-wider mb-2">Secure Payment</h4>
-                        <p className="text-white/40 text-xs font-bold px-8 uppercase tracking-widest leading-relaxed">Razorpay encrypted checkout gateway.</p>
+                        <h4 className="font-black uppercase italic tracking-widest mb-3">Secure Payment</h4>
+                        <p className="text-slate-500 text-[10px] font-black px-8 uppercase tracking-[0.2em] leading-relaxed">Razorpay encrypted <br /> checkout gateway.</p>
                     </div>
-                    <div className="flex flex-col items-center">
-                        <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mb-6 text-amber-400">
-                            <ShieldCheck size={32} />
+                    <div className="flex flex-col items-center group">
+                        <div className="w-20 h-20 bg-white/5 rounded-3xl flex items-center justify-center mb-8 text-amber-400 border border-white/5 group-hover:bg-amber-500/10 transition-colors">
+                            <ShieldCheck size={36} />
                         </div>
-                        <h4 className="font-black uppercase italic tracking-wider mb-2">Build Quality</h4>
-                        <p className="text-white/40 text-xs font-bold px-8 uppercase tracking-widest leading-relaxed">Premium long-lasting materials used.</p>
+                        <h4 className="font-black uppercase italic tracking-widest mb-3">Build Quality</h4>
+                        <p className="text-slate-500 text-[10px] font-black px-8 uppercase tracking-[0.2em] leading-relaxed">Premium long-lasting <br /> materials used.</p>
                     </div>
                 </div>
             </section>
 
             {/* Final Call to Action */}
-            <section className="py-32 px-4 text-center">
-                <div className="max-w-4xl mx-auto bg-white p-20 rounded-[60px] shadow-2xl relative overflow-hidden">
-                    <div className="absolute top-0 right-0 p-12 opacity-5 rotate-12 text-secondary">
-                        <ShoppingCart size={200} />
+            <section className="py-32 px-4 text-center bg-medical-bg relative overflow-hidden">
+                <div className="max-w-5xl mx-auto bg-medical-card p-20 rounded-[80px] shadow-2xl relative overflow-hidden border border-white/5">
+                    <div className="absolute top-0 right-0 p-16 opacity-[0.03] rotate-12 text-white pointer-events-none">
+                        <ShoppingCart size={300} />
                     </div>
-                    <h2 className="text-5xl font-black text-secondary italic uppercase tracking-tighter font-poppins mb-6">
-                        Bundle & Save.
+                    <Badge className="bg-emerald-500/20 text-emerald-500 border-none px-6 py-1 font-black italic tracking-widest mb-8">EXCLUSIVE BUNDLE</Badge>
+                    <h2 className="text-6xl md:text-8xl font-black text-white italic uppercase tracking-tighter font-poppins mb-10 leading-none">
+                        Bundle & <span className="text-primary italic-display">Save.</span>
                     </h2>
-                    <p className="text-secondary/60 text-lg mb-10 max-w-xl mx-auto font-medium">
-                        Get our "Complete Safety Kit" including a Smart Card, Wristband, and Sticker Pack for just ₹899 instead of ₹1047.
+                    <p className="text-slate-400 text-2xl mb-14 max-w-2xl mx-auto font-medium leading-relaxed">
+                        Get our "Complete Safety Kit" including a Smart Card, Wristband, and Sticker Pack for just <span className="text-white font-black italic underline decoration-primary underline-offset-8">₹899</span> instead of ₹1047.
                     </p>
-                    <Button size="lg" className="px-12 py-5 rounded-full font-black text-xl shadow-2xl shadow-primary/30">
+                    <Button size="lg" className="px-16 py-10 rounded-full font-black text-3xl italic shadow-2xl shadow-primary/30 uppercase tracking-tighter bg-primary text-white border-none active:scale-95 transition-all">
                         GET THE STARTER KIT
                     </Button>
                 </div>
             </section>
 
             {/* Footer Placeholder for visual consistency */}
-            <footer className="py-20 text-center opacity-30">
-                <img src="/logo.png" alt="RESQR" className="h-10 mx-auto mb-6 grayscale" />
-                <p className="text-[10px] font-black uppercase tracking-[0.4em]">Official RESQR Merch Store • Secured by SSL</p>
+            <footer className="py-24 text-center opacity-20">
+                <img src={`${import.meta.env.BASE_URL}logo.png`} alt="RESQR" className="h-10 mx-auto mb-6 invert brightness-200" />
+                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white">Official RESQR Merch Store • Secured by SSL</p>
             </footer>
         </div>
     );

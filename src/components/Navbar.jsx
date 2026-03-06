@@ -42,11 +42,11 @@ export default function Navbar() {
     }
 
     return (
-        <nav className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-secondary/5 font-manrope">
+        <nav className="sticky top-0 z-40 bg-medical-bg/80 backdrop-blur-md border-b border-white/5 font-manrope">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between py-2 items-center">
                     <Link to="/" className="flex items-center gap-2">
-                        <img src={`${import.meta.env.BASE_URL}logo.png`} alt="RESQR Logo" style={{ height: '48px', width: 'auto' }} />
+                        <img src={`${import.meta.env.BASE_URL}logo.png`} alt="RESQR Logo" className="invert brightness-200" style={{ height: '48px', width: 'auto' }} />
                     </Link>
 
                     {/* Desktop Links */}
@@ -55,30 +55,30 @@ export default function Navbar() {
                             <Link
                                 key={link.name}
                                 to={link.path}
-                                className="text-sm font-bold text-secondary/70 hover:text-primary transition-colors uppercase tracking-wider"
+                                className="text-[11px] font-black text-slate-100/40 hover:text-primary transition-all uppercase tracking-[0.2em]"
                             >
                                 {link.name}
                             </Link>
                         ))}
                         {user ? (
-                            <div className="flex items-center gap-4 border-l border-secondary/10 pl-8">
-                                <span className="text-sm font-bold text-secondary hidden lg:block">
+                            <div className="flex items-center gap-4 border-l border-white/5 pl-8">
+                                <span className="text-[11px] font-black text-slate-100 hidden lg:block uppercase tracking-wider">
                                     {user.displayName || user.email?.split('@')[0]}
                                 </span>
-                                <Button size="sm" variant="ghost" className="text-secondary opacity-60 hover:text-primary" onClick={handleLogout}>
+                                <Button size="sm" variant="ghost" className="text-white opacity-40 hover:text-primary hover:opacity-100 transition-all" onClick={handleLogout}>
                                     <LogOut size={18} />
                                 </Button>
                             </div>
                         ) : (
                             <Link to="/login">
-                                <Button size="sm" variant="secondary" className="rounded-full px-6 font-bold shadow-sm">Sign In</Button>
+                                <Button size="sm" className="rounded-full px-6 font-black italic shadow-xl shadow-primary/20 bg-primary text-white border-none text-xs tracking-widest">SIGN IN</Button>
                             </Link>
                         )}
                     </div>
 
                     {/* Mobile Menu Button */}
                     <div className="md:hidden">
-                        <button onClick={() => setIsOpen(!isOpen)} className="p-2 text-secondary">
+                        <button onClick={() => setIsOpen(!isOpen)} className="p-2 text-white">
                             {isOpen ? <X size={24} /> : <Menu size={24} />}
                         </button>
                     </div>
@@ -87,24 +87,24 @@ export default function Navbar() {
 
             {/* Mobile Menu */}
             {isOpen && (
-                <div className="md:hidden bg-white border-b border-secondary/5 py-4 px-4 space-y-4 shadow-xl">
+                <div className="md:hidden bg-medical-bg border-b border-white/5 py-4 px-4 space-y-4 shadow-2xl">
                     {navLinks.map((link) => (
                         <Link
                             key={link.name}
                             to={link.path}
-                            className="block text-base font-bold text-secondary uppercase tracking-widest"
+                            className="block text-sm font-black text-slate-100/60 uppercase tracking-widest hover:text-primary transition-colors"
                             onClick={() => setIsOpen(false)}
                         >
                             {link.name}
                         </Link>
                     ))}
                     {user ? (
-                        <Button size="md" variant="secondary" className="w-full bg-secondary text-white border-none rounded-xl" onClick={handleLogout}>
-                            Logout
+                        <Button size="md" className="w-full bg-white/5 text-white border-white/5 rounded-xl font-black italic" onClick={handleLogout}>
+                            LOGOUT
                         </Button>
                     ) : (
                         <Link to="/login">
-                            <Button size="md" variant="secondary" className="w-full rounded-xl shadow-lg">Sign In</Button>
+                            <Button size="md" className="w-full rounded-xl shadow-xl bg-primary text-white border-none font-black italic">SIGN IN</Button>
                         </Link>
                     )}
                 </div>

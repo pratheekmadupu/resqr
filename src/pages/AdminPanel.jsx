@@ -325,9 +325,9 @@ export default function AdminPanel() {
     ];
 
     return (
-        <div className="min-h-screen bg-slate-950 flex flex-col md:flex-row text-white">
+        <div className="min-h-screen bg-medical-bg flex flex-col md:flex-row text-white font-manrope">
             {/* Sidebar */}
-            <aside className="w-full md:w-64 bg-slate-900 border-r border-slate-800 p-6 space-y-8">
+            <aside className="w-full md:w-72 bg-medical-card border-r border-white/5 p-8 space-y-10 shadow-2xl z-20">
                 <div className="flex items-center gap-3 px-2">
                     <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
                         <Shield className="text-white" size={24} />
@@ -335,7 +335,7 @@ export default function AdminPanel() {
                     <span className="font-black text-xl tracking-tighter uppercase italic">RESQR Admin</span>
                 </div>
 
-                <nav className="space-y-1">
+                <nav className="space-y-2">
                     {[
                         { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
                         { id: 'users', label: 'Auth Users', icon: <Users size={20} /> },
@@ -347,12 +347,12 @@ export default function AdminPanel() {
                         <button
                             key={item.id}
                             onClick={() => setActiveTab(item.id)}
-                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-bold ${activeTab === item.id
-                                ? 'bg-primary text-white shadow-lg shadow-primary/10'
-                                : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                            className={`w-full flex items-center gap-4 px-6 py-4 rounded-[20px] transition-all font-black uppercase italic tracking-widest text-[10px] ${activeTab === item.id
+                                ? 'bg-primary text-white shadow-[0_10px_20px_rgba(230,57,70,0.2)]'
+                                : 'text-slate-500 hover:bg-white/5 hover:text-white'
                                 }`}
                         >
-                            {item.icon} {item.label}
+                            <span className={activeTab === item.id ? 'text-white' : 'text-primary'}>{item.icon}</span> {item.label}
                         </button>
                     ))}
                 </nav>
@@ -396,50 +396,52 @@ export default function AdminPanel() {
                 </header>
 
                 {activeTab === 'dashboard' && (
-                    <div className="space-y-8">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="space-y-10">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                             {stats.map((stat, i) => (
-                                <Card key={i} className="bg-slate-900 border-slate-800 p-6">
-                                    <div className="flex justify-between items-start mb-4">
-                                        <div className="p-3 bg-slate-950 rounded-xl text-primary border border-slate-800">
+                                <Card key={i} className="bg-medical-card border-white/5 p-8 rounded-[32px] shadow-xl relative overflow-hidden group">
+                                    <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-primary/20 to-transparent group-hover:via-primary transition-all duration-500" />
+                                    <div className="flex justify-between items-start mb-6">
+                                        <div className="p-4 bg-slate-950 rounded-[20px] text-primary border border-white/5 shadow-lg group-hover:scale-110 transition-transform">
                                             {stat.icon}
                                         </div>
-                                        <Badge variant="success" className="text-[10px]">{stat.change}</Badge>
+                                        <Badge className="text-[9px] font-black italic bg-green-500/10 text-green-500 border-none">{stat.change}</Badge>
                                     </div>
-                                    <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">{stat.label}</p>
-                                    <h3 className="text-3xl font-black">{stat.value}</h3>
+                                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] italic mb-1">{stat.label}</p>
+                                    <h3 className="text-4xl font-black italic tracking-tighter font-poppins">{stat.value}</h3>
                                 </Card>
                             ))}
                         </div>
 
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                            <Card className="bg-slate-900 border-slate-800">
-                                <h2 className="text-xl font-bold mb-6">Recent User Activity</h2>
-                                <div className="space-y-4">
+                            <Card className="bg-medical-card border-white/5 rounded-[40px] shadow-2xl p-10 overflow-hidden relative">
+                                <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-slate-800 to-transparent" />
+                                <h2 className="text-[10px] font-black uppercase tracking-[0.4em] mb-10 text-slate-500 italic">Recent Tactical Activity</h2>
+                                <div className="space-y-6">
                                     {users.slice(-5).reverse().map(user => {
                                         const profile = getProfileForAuthUser(user.email);
                                         return (
-                                            <div key={user.id} className="flex items-center justify-between p-4 bg-slate-950 rounded-xl border border-slate-800">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center font-bold">{user.name?.[0]}</div>
+                                            <div key={user.id} className="flex items-center justify-between p-6 bg-slate-950/50 rounded-3xl border border-white/5 hover:border-primary/20 transition-all group">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-12 h-12 rounded-2xl bg-medical-bg flex items-center justify-center font-black text-primary border border-white/5 group-hover:scale-110 transition-transform">{user.name?.[0]}</div>
                                                     <div>
-                                                        <p className="font-bold">{user.name}</p>
-                                                        <p className="text-[10px] font-black uppercase text-primary tracking-widest">{user.id}</p>
+                                                        <p className="font-black italic uppercase tracking-tighter">{user.name}</p>
+                                                        <p className="text-[9px] font-black uppercase text-slate-500 tracking-[0.2em]">{user.id}</p>
                                                     </div>
                                                 </div>
-                                                <div className="flex items-center gap-2">
+                                                <div className="flex items-center gap-3">
                                                     {profile && (
                                                         <Link
                                                             to={`/e/${profile.id}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="p-2 text-primary hover:bg-primary/10 rounded-lg transition-colors"
+                                                            className="p-3 text-slate-500 hover:text-primary bg-slate-950 rounded-xl border border-white/5 transition-all"
                                                             title="View QR Profile"
                                                         >
                                                             <ExternalLink size={16} />
                                                         </Link>
                                                     )}
-                                                    <Badge variant="success">New User</Badge>
+                                                    <Badge className="bg-green-500/10 text-green-500 border-none font-black italic tracking-widest text-[8px] px-3">DEPLOYED</Badge>
                                                 </div>
                                             </div>
                                         );
@@ -447,26 +449,30 @@ export default function AdminPanel() {
                                 </div>
                             </Card>
 
-                            <Card className="bg-slate-900 border-slate-800">
-                                <h2 className="text-xl font-bold mb-6">System Health</h2>
-                                <div className="space-y-6">
-                                    <div className="space-y-2">
-                                        <div className="flex justify-between text-sm">
-                                            <span>Database Latency</span>
-                                            <span className="text-green-500">Normal (24ms)</span>
+                            <Card className="bg-medical-card border-white/5 rounded-[40px] shadow-2xl p-10 relative overflow-hidden">
+                                <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-slate-800 to-transparent" />
+                                <h2 className="text-[10px] font-black uppercase tracking-[0.4em] mb-10 text-slate-500 italic">Infrastructure Status</h2>
+                                <div className="space-y-8">
+                                    <div className="space-y-4">
+                                        <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest italic">
+                                            <span className="text-slate-500">Vault Latency</span>
+                                            <span className="text-green-500">OPTIMAL (18ms)</span>
                                         </div>
-                                        <div className="w-full h-2 bg-slate-950 rounded-full overflow-hidden">
-                                            <div className="w-1/4 h-full bg-green-500"></div>
+                                        <div className="w-full h-1.5 bg-slate-950 rounded-full overflow-hidden">
+                                            <div className="w-1/4 h-full bg-primary animate-pulse"></div>
                                         </div>
                                     </div>
-                                    <div className="space-y-2">
-                                        <div className="flex justify-between text-sm">
-                                            <span>API Availability</span>
-                                            <span className="text-green-500">99.9%</span>
+                                    <div className="space-y-4">
+                                        <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest italic">
+                                            <span className="text-slate-500">Security Uptime</span>
+                                            <span className="text-primary">99.98% SEALED</span>
                                         </div>
-                                        <div className="w-full h-2 bg-slate-950 rounded-full overflow-hidden">
-                                            <div className="w-[99%] h-full bg-green-500"></div>
+                                        <div className="w-full h-1.5 bg-slate-950 rounded-full overflow-hidden">
+                                            <div className="w-[99.98%] h-full bg-primary"></div>
                                         </div>
+                                    </div>
+                                    <div className="pt-4 p-6 bg-slate-950/50 rounded-[20px] border border-white/5">
+                                        <p className="text-[9px] font-black text-slate-600 uppercase italic leading-relaxed">System is performing within tactical parameters. All encrypted nodes are resilient and responsive.</p>
                                     </div>
                                 </div>
                             </Card>
@@ -475,15 +481,19 @@ export default function AdminPanel() {
                 )}
 
                 {activeTab === 'users' && (
-                    <Card className="bg-slate-900 border-slate-800 overflow-hidden p-0">
-                        <div className="p-6 border-b border-slate-800 flex items-center justify-between gap-4">
-                            <h2 className="text-xl font-bold">Authenticated Users</h2>
-                            <div className="relative">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
+                    <Card className="bg-medical-card border-white/5 overflow-hidden p-0 rounded-[40px] shadow-2xl relative">
+                        <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+                        <div className="p-10 border-b border-white/5 flex flex-col md:flex-row items-center justify-between gap-8">
+                            <div>
+                                <h2 className="text-3xl font-black italic uppercase tracking-tighter font-poppins">Authenticated Units</h2>
+                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] mt-2 italic">Global Responder Access Nodes</p>
+                            </div>
+                            <div className="relative group w-full md:w-auto">
+                                <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-primary group-hover:scale-110 transition-transform" size={20} />
                                 <input
                                     type="text"
-                                    placeholder="Search by name/email..."
-                                    className="pl-10 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 w-64"
+                                    placeholder="SEARCH BY IDENTIFIER..."
+                                    className="pl-14 pr-8 py-5 bg-slate-950 border border-white/5 rounded-2xl text-[11px] font-black tracking-widest uppercase italic focus:outline-none focus:ring-2 focus:ring-primary/20 w-full md:w-96 transition-all"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
@@ -491,55 +501,55 @@ export default function AdminPanel() {
                         </div>
                         <div className="overflow-x-auto">
                             <table className="w-full text-left">
-                                <thead className="bg-slate-950 text-slate-500 text-[10px] font-black uppercase tracking-widest border-b border-slate-800">
+                                <thead className="bg-slate-950/80 text-slate-500 text-[9px] font-black uppercase tracking-[0.2em] italic border-b border-white/5">
                                     <tr>
-                                        <th className="px-6 py-4 text-white">User</th>
-                                        <th className="px-6 py-4 text-white">Auth Method</th>
-                                        <th className="px-6 py-4 text-white">Last Login</th>
-                                        <th className="px-6 py-4 text-white">Medical Profile</th>
-                                        <th className="px-6 py-4 text-right text-white">Actions</th>
+                                        <th className="px-10 py-6 text-slate-400">Tactical User</th>
+                                        <th className="px-10 py-6 text-slate-400">Encryption Method</th>
+                                        <th className="px-10 py-6 text-slate-400">Last Sync</th>
+                                        <th className="px-10 py-6 text-slate-400">Vault Condition</th>
+                                        <th className="px-10 py-6 text-right text-slate-400">Operations</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-slate-800">
+                                <tbody className="divide-y divide-white/5">
                                     {filteredUsers.map(user => {
                                         const profile = getProfileForAuthUser(user.email);
                                         return (
-                                            <tr key={user.id} className="hover:bg-white/5 transition-colors group">
-                                                <td className="px-6 py-4">
+                                            <tr key={user.id} className="hover:bg-white/5 transition-all group">
+                                                <td className="px-10 py-8">
                                                     <div className="flex flex-col">
-                                                        <span className="font-bold text-white">{user.name}</span>
-                                                        <span className="text-xs text-slate-500">{user.email}</span>
+                                                        <span className="font-black text-white italic tracking-tight text-lg">{user.name}</span>
+                                                        <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest">{user.email}</span>
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4">
-                                                    <Badge variant={user.email?.includes('gmail') ? 'primary' : 'gray'}>
-                                                        {user.email?.includes('gmail') ? 'Google' : 'Email'}
+                                                <td className="px-10 py-8">
+                                                    <Badge className={`${user.email?.includes('gmail') ? 'bg-primary/10 text-primary border-primary/20' : 'bg-slate-800 text-slate-400 border-white/5'} px-4 py-1 font-black italic text-[9px]`}>
+                                                        {user.email?.includes('gmail') ? 'GOOGLE AUTH' : 'SECURE EMAIL'}
                                                     </Badge>
                                                 </td>
-                                                <td className="px-6 py-4 text-xs text-slate-400">
-                                                    {user.lastLogin ? new Date(user.lastLogin).toLocaleString() : 'N/A'}
+                                                <td className="px-10 py-8 text-[10px] font-black text-slate-400 italic uppercase">
+                                                    {user.lastLogin ? new Date(user.lastLogin).toLocaleString() : 'PENDING'}
                                                 </td>
-                                                <td className="px-6 py-4">
+                                                <td className="px-10 py-8">
                                                     {profile ? (
-                                                        <div className="flex flex-col gap-1">
-                                                            <div className="flex items-center gap-2">
-                                                                <Badge variant="success">Active</Badge>
-                                                                <span className="text-xs font-bold text-primary">{profile.bloodGroup}</span>
+                                                        <div className="flex flex-col gap-2">
+                                                            <div className="flex items-center gap-3">
+                                                                <Badge className="bg-green-500/10 text-green-500 border-none font-black italic px-4 py-1 text-[8px]">ACTIVE</Badge>
+                                                                <span className="text-sm font-black text-primary italic font-poppins">{profile.bloodGroup}</span>
                                                             </div>
-                                                            <span className="text-[10px] text-slate-500 uppercase font-black">{profile.id || 'N/A'}</span>
+                                                            <span className="text-[9px] text-slate-600 uppercase font-black tracking-widest italic">{profile.id || 'N/A'}</span>
                                                         </div>
                                                     ) : (
-                                                        <Badge variant="gray" className="opacity-50 italic">No Profile Yet</Badge>
+                                                        <Badge className="bg-slate-800 text-slate-500 border-none font-black italic px-4 py-1 text-[8px] opacity-40 uppercase tracking-widest">No Node Initialized</Badge>
                                                     )}
                                                 </td>
-                                                <td className="px-6 py-4 text-right">
-                                                    <div className="flex items-center justify-end gap-2 text-white">
+                                                <td className="px-10 py-8 text-right">
+                                                    <div className="flex items-center justify-end gap-3">
                                                         {profile && (
                                                             <Link
                                                                 to={`/e/${profile.id}`}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
-                                                                className="p-2 opacity-50 hover:opacity-100 hover:text-primary transition-all bg-slate-800 rounded-lg"
+                                                                className="p-3 text-slate-400 hover:text-primary transition-all bg-slate-950 rounded-xl border border-white/5 hover:border-primary/20"
                                                                 title="View QR Profile"
                                                             >
                                                                 <ExternalLink size={18} />
@@ -547,7 +557,7 @@ export default function AdminPanel() {
                                                         )}
                                                         {!profile && (
                                                             <button
-                                                                className="p-2 opacity-50 hover:opacity-100 hover:text-green-500 transition-all bg-slate-800 rounded-lg"
+                                                                className="p-3 text-slate-400 hover:text-green-500 transition-all bg-slate-950 rounded-xl border border-white/5 hover:border-green-500/20"
                                                                 onClick={() => { setSelectedUserForProfile(user); setIsProfileModalOpen(true); }}
                                                                 title="Generate Medical Profile"
                                                             >
@@ -555,7 +565,7 @@ export default function AdminPanel() {
                                                             </button>
                                                         )}
                                                         <button
-                                                            className="p-2 opacity-50 hover:opacity-100 hover:text-red-500 transition-all bg-slate-800 rounded-lg"
+                                                            className="p-3 text-slate-400 hover:text-red-500 transition-all bg-slate-950 rounded-xl border border-white/5 hover:border-primary/20"
                                                             onClick={() => deleteItem(`users/${user.id}`)}
                                                             title="Delete User"
                                                         >
@@ -573,46 +583,47 @@ export default function AdminPanel() {
                 )}
 
                 {activeTab === 'profiles' && (
-                    <Card className="bg-slate-900 border-slate-800 overflow-hidden">
+                    <Card className="bg-medical-card border-white/5 overflow-hidden rounded-[40px] shadow-2xl relative">
+                        <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
                         <div className="overflow-x-auto">
                             <table className="w-full text-left">
-                                <thead className="bg-slate-950 text-slate-500 text-[10px] font-black uppercase tracking-widest border-b border-slate-800">
+                                <thead className="bg-slate-950/80 text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] italic border-b border-white/5">
                                     <tr>
-                                        <th className="px-6 py-4 text-white">Slug / ID</th>
-                                        <th className="px-6 py-4 text-white">Patient Name</th>
-                                        <th className="px-6 py-4 text-white">Blood Group</th>
-                                        <th className="px-6 py-4 text-white">Phone</th>
-                                        <th className="px-6 py-4 text-right text-white">Actions</th>
+                                        <th className="px-10 py-6 text-slate-400">Vault Slug / ID</th>
+                                        <th className="px-10 py-6 text-slate-400">Operator Name</th>
+                                        <th className="px-10 py-6 text-slate-400">Vector Group</th>
+                                        <th className="px-10 py-6 text-slate-400">Primary Comm Link</th>
+                                        <th className="px-10 py-6 text-right text-slate-400">Tactical Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-slate-800">
+                                <tbody className="divide-y divide-white/5">
                                     {profilesList.filter(p => p.name?.toLowerCase().includes(searchTerm.toLowerCase()) || p.id?.toLowerCase().includes(searchTerm.toLowerCase())).map((profile, idx) => (
-                                        <tr key={profile.id || idx} className="hover:bg-white/5 transition-colors group">
-                                            <td className="px-6 py-4">
-                                                <code className="text-[10px] bg-slate-800 px-2 py-1 rounded text-primary font-bold">
+                                        <tr key={profile.id || idx} className="hover:bg-white/5 transition-all group">
+                                            <td className="px-10 py-8">
+                                                <code className="text-[11px] bg-slate-950 px-4 py-2 rounded-xl text-primary font-black border border-white/5 group-hover:border-primary/20 shadow-inner">
                                                     {profile.id || profile.name?.toLowerCase().replace(/\s+/g, '-')}
                                                 </code>
                                             </td>
-                                            <td className="px-6 py-4 font-bold">{profile.name}</td>
-                                            <td className="px-6 py-4">
-                                                <Badge variant="danger">{profile.bloodGroup}</Badge>
+                                            <td className="px-10 py-8 font-black text-white italic tracking-tight text-lg">{profile.name}</td>
+                                            <td className="px-10 py-8">
+                                                <Badge className="bg-primary/20 text-primary border-none font-black italic px-4 py-1 text-sm font-poppins">{profile.bloodGroup}</Badge>
                                             </td>
-                                            <td className="px-6 py-4 text-sm text-slate-400">{profile.phone}</td>
-                                            <td className="px-6 py-4 text-right">
-                                                <div className="flex items-center justify-end gap-2">
+                                            <td className="px-10 py-8 text-[11px] font-black text-slate-500 uppercase italic tracking-widest">{profile.phone}</td>
+                                            <td className="px-10 py-8 text-right">
+                                                <div className="flex items-center justify-end gap-3">
                                                     <Link
                                                         to={`/e/${profile.id || profile.name?.toLowerCase().replace(/\s+/g, '-')}`}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className="p-2 opacity-50 hover:opacity-100 hover:text-primary transition-all bg-slate-800 rounded-lg"
+                                                        className="p-3 text-slate-400 hover:text-primary transition-all bg-slate-950 border border-white/5 rounded-xl hover:border-primary/20"
                                                     >
-                                                        <ExternalLink size={18} />
+                                                        <ExternalLink size={20} />
                                                     </Link>
                                                     <button
-                                                        className="p-2 opacity-50 hover:opacity-100 hover:text-red-500 transition-all bg-slate-800 rounded-lg"
+                                                        className="p-3 text-slate-400 hover:text-red-500 transition-all bg-slate-950 border border-white/5 rounded-xl hover:border-primary/20"
                                                         onClick={() => deleteItem(`profiles/${profile.id || profile.name?.toLowerCase().replace(/\s+/g, '-')}`)}
                                                     >
-                                                        <Trash2 size={18} />
+                                                        <Trash2 size={20} />
                                                     </button>
                                                 </div>
                                             </td>
@@ -625,49 +636,57 @@ export default function AdminPanel() {
                 )}
 
                 {activeTab === 'products' && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                         {products.map(prod => (
-                            <Card key={prod.id} className="bg-slate-900 border-slate-800 p-6 relative group">
-                                <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button onClick={() => { setEditingProduct(prod); setIsProductModalOpen(true); }} className="p-2 bg-slate-950 border border-slate-800 rounded-lg hover:text-primary"><Edit3 size={16} /></button>
-                                    <button onClick={() => deleteItem(`config/products/${prod.id}`)} className="p-2 bg-slate-950 border border-slate-800 rounded-lg hover:text-red-500"><Trash2 size={16} /></button>
+                            <Card key={prod.id} className="bg-medical-card border-white/5 p-10 relative group rounded-[40px] shadow-2xl overflow-hidden">
+                                <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-primary/20 to-transparent group-hover:via-primary transition-all duration-700" />
+                                <div className="absolute top-8 right-8 flex gap-3 opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0">
+                                    <button onClick={() => { setEditingProduct(prod); setIsProductModalOpen(true); }} className="p-3 bg-slate-950 border border-white/5 rounded-xl hover:text-primary transition-all"><Edit3 size={18} /></button>
+                                    <button onClick={() => deleteItem(`config/products/${prod.id}`)} className="p-3 bg-slate-950 border border-white/5 rounded-xl hover:text-primary transition-all"><Trash2 size={18} /></button>
                                 </div>
-                                <h3 className="text-xl font-black mb-1">{prod.title}</h3>
-                                <p className="text-3xl font-black text-primary mb-4">₹{prod.price}</p>
-                                <ul className="space-y-2 mb-6">
+                                <h3 className="text-2xl font-black italic uppercase tracking-tighter mb-2 font-poppins">{prod.title}</h3>
+                                <p className="text-5xl font-black text-primary italic mb-8 font-poppins shadow-primary/20">₹{prod.price}</p>
+                                <ul className="space-y-4 mb-10">
                                     {prod.features?.map((f, i) => (
-                                        <li key={i} className="text-xs text-slate-400 flex items-center gap-2">
-                                            <div className="w-1 h-1 bg-primary rounded-full" /> {f}
+                                        <li key={i} className="text-[11px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-3 italic">
+                                            <div className="w-2 h-2 bg-primary rounded-full shadow-[0_0_10px_rgba(230,57,70,0.5)]" /> {f}
                                         </li>
                                     ))}
                                 </ul>
-                                {prod.best && <Badge variant="primary" className="w-full justify-center py-2">Most Popular</Badge>}
+                                {prod.best && <Badge className="w-full justify-center py-4 bg-primary text-white border-none rounded-2xl font-black italic uppercase tracking-widest text-[10px] shadow-lg shadow-primary/20">STRATEGIC CHOICE</Badge>}
                             </Card>
                         ))}
                     </div>
                 )}
 
                 {activeTab === 'ads' && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                         {ads.map(ad => (
-                            <Card key={ad.id} className="bg-slate-900 border-slate-800 overflow-hidden p-0 group">
-                                <div className="relative h-48 bg-slate-950 flex items-center justify-center overflow-hidden">
+                            <Card key={ad.id} className="bg-medical-card border-white/5 overflow-hidden p-0 group rounded-[40px] shadow-2xl relative">
+                                <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-primary/20 to-transparent group-hover:via-primary transition-all duration-700" />
+                                <div className="relative h-56 bg-slate-950 flex items-center justify-center overflow-hidden border-b border-white/5">
                                     {ad.imageUrl ? (
-                                        <img src={ad.imageUrl} className="w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-500" />
+                                        <img src={ad.imageUrl} className="w-full h-full object-cover opacity-40 group-hover:scale-105 transition-transform duration-1000" />
                                     ) : (
-                                        <ImageIcon size={48} className="text-slate-800" />
+                                        <div className="flex flex-col items-center gap-4 text-slate-800">
+                                            <ImageIcon size={64} className="opacity-20" />
+                                            <span className="text-[8px] font-black uppercase tracking-[0.5em]">No Visual Data</span>
+                                        </div>
                                     )}
-                                    <div className="absolute top-4 right-4 flex gap-2">
-                                        <button onClick={() => { setEditingAd(ad); setIsAdModalOpen(true); }} className="p-2 bg-slate-900/80 backdrop-blur-md rounded-lg hover:text-primary"><Edit3 size={16} /></button>
-                                        <button onClick={() => deleteItem(`config/ads/${ad.id}`)} className="p-2 bg-slate-900/80 backdrop-blur-md rounded-lg hover:text-red-500"><Trash2 size={16} /></button>
+                                    <div className="absolute top-6 right-6 flex gap-2 opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0">
+                                        <button onClick={() => { setEditingAd(ad); setIsAdModalOpen(true); }} className="p-3 bg-slate-900/90 backdrop-blur-xl border border-white/10 rounded-xl hover:text-primary transition-all"><Edit3 size={18} /></button>
+                                        <button onClick={() => deleteItem(`config/ads/${ad.id}`)} className="p-3 bg-slate-900/90 backdrop-blur-xl border border-white/10 rounded-xl hover:text-red-500 transition-all"><Trash2 size={18} /></button>
                                     </div>
-                                    <Badge className="absolute bottom-4 left-4" variant={ad.active ? 'success' : 'gray'}>
-                                        {ad.active ? 'Running' : 'Paused'}
+                                    <Badge className="absolute bottom-6 left-6 px-4 py-1.5 border-none font-black italic tracking-widest text-[8px]" variant={ad.active ? 'success' : 'gray'}>
+                                        {ad.active ? 'OPERATIONAL' : 'STANDBY'}
                                     </Badge>
                                 </div>
-                                <div className="p-6">
-                                    <h4 className="font-bold mb-2 break-words">{ad.text || 'No description'}</h4>
-                                    <p className="text-xs text-slate-500 break-all">{ad.linkUrl}</p>
+                                <div className="p-8">
+                                    <h4 className="text-lg font-black text-white italic leading-tight mb-4 group-hover:text-primary transition-colors line-clamp-2">{ad.text || 'No description'}</h4>
+                                    <div className="flex items-center gap-2 text-[9px] font-black text-slate-600 uppercase italic tracking-widest overflow-hidden">
+                                        <ExternalLink size={10} className="shrink-0" />
+                                        <span className="truncate">{ad.linkUrl}</span>
+                                    </div>
                                 </div>
                             </Card>
                         ))}
@@ -677,27 +696,42 @@ export default function AdminPanel() {
 
             {/* Modals */}
             {isProductModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-                    <Card className="w-full max-w-md bg-slate-900 border-slate-800 p-8">
-                        <h2 className="text-2xl font-black mb-6">{editingProduct ? 'Edit Product' : 'Add New Product'}</h2>
-                        <form onSubmit={handleAddProduct} className="space-y-4">
-                            <Input label="Product Title" name="title" defaultValue={editingProduct?.title} required />
-                            <Input label="Price (₹)" name="price" type="number" defaultValue={editingProduct?.price} required />
-                            <div className="w-full">
-                                <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Features (Comma separated)</label>
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-medical-bg/95 backdrop-blur-md">
+                    <Card className="w-full max-w-xl bg-medical-card border-white/5 p-12 rounded-[50px] shadow-[0_0_100px_rgba(0,0,0,0.5)] relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent" />
+                        <h2 className="text-4xl font-black italic uppercase tracking-tighter mb-10 font-poppins">{editingProduct ? 'Update SKU' : 'New Deployment'}</h2>
+                        <form onSubmit={handleAddProduct} className="space-y-8">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div className="space-y-3">
+                                    <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1 italic">Product Designation</label>
+                                    <Input name="title" defaultValue={editingProduct?.title} required className="bg-slate-950/50 border-white/5 h-16 rounded-2xl font-black italic focus:ring-primary/20" />
+                                </div>
+                                <div className="space-y-3">
+                                    <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1 italic">Value Requisition (₹)</label>
+                                    <Input name="price" type="number" defaultValue={editingProduct?.price} required className="bg-slate-950/50 border-white/5 h-16 rounded-2xl font-black italic focus:ring-primary/20 text-primary" />
+                                </div>
+                            </div>
+                            <div className="w-full space-y-3">
+                                <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1 italic">Tactical Capabilities (Comma separated)</label>
                                 <textarea
                                     name="features"
-                                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm focus:ring-2 focus:ring-primary/20 outline-none h-32"
+                                    className="w-full bg-slate-950/50 border border-white/5 rounded-[30px] p-6 text-[11px] font-black uppercase tracking-widest italic outline-none focus:ring-2 focus:ring-primary/20 transition-all h-40"
                                     defaultValue={editingProduct?.features?.join(', ')}
+                                    placeholder="e.g. LIFETIME ACCESS, GLOBAL COVERAGE..."
                                 />
                             </div>
-                            <label className="flex items-center gap-3 cursor-pointer">
-                                <input type="checkbox" name="best" defaultChecked={editingProduct?.best} className="w-5 h-5 accent-primary" />
-                                <span className="font-bold">Mark as "Most Popular"</span>
+                            <label className="flex items-center gap-4 cursor-pointer group">
+                                <div className="relative">
+                                    <input type="checkbox" name="best" defaultChecked={editingProduct?.best} className="peer hidden" />
+                                    <div className="w-8 h-8 rounded-xl bg-slate-950 border border-white/5 peer-checked:bg-primary peer-checked:border-primary transition-all flex items-center justify-center">
+                                        <CheckCircle2 size={16} className="text-white scale-0 peer-checked:scale-100 transition-transform" />
+                                    </div>
+                                </div>
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] italic text-slate-400 group-hover:text-primary transition-colors">SET AS STRATEGIC PRIORITY</span>
                             </label>
-                            <div className="flex gap-3 pt-4">
-                                <Button type="button" variant="outline" className="flex-1" onClick={() => setIsProductModalOpen(false)}>Cancel</Button>
-                                <Button type="submit" className="flex-1">Save Product</Button>
+                            <div className="flex gap-6 pt-6">
+                                <Button type="button" variant="ghost" className="flex-1 h-16 rounded-2xl font-black italic uppercase tracking-widest text-[10px] text-slate-500 hover:text-white" onClick={() => setIsProductModalOpen(false)}>Abort</Button>
+                                <Button type="submit" className="flex-1 h-16 rounded-2xl bg-primary text-white border-none font-black italic uppercase tracking-widest text-[10px] shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all">Execute Save</Button>
                             </div>
                         </form>
                     </Card>
@@ -705,133 +739,186 @@ export default function AdminPanel() {
             )}
 
             {isAdModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-                    <Card className="w-full max-w-md bg-slate-900 border-slate-800 p-8">
-                        <h2 className="text-2xl font-black mb-6">{editingAd ? 'Edit Ad' : 'Add New Ad'}</h2>
-                        <form onSubmit={handleAddAd} className="space-y-4">
-                            <Input label="Lead Text" name="text" defaultValue={editingAd?.text} placeholder="Sponsered: Big Sale Now!" required />
-                            <Input label="Image URL" name="imageUrl" defaultValue={editingAd?.imageUrl} placeholder="https://..." required />
-                            <Input label="Destination URL" name="linkUrl" defaultValue={editingAd?.linkUrl} placeholder="https://..." required />
-                            <label className="flex items-center gap-3 cursor-pointer">
-                                <input type="checkbox" name="active" defaultChecked={editingAd?.active !== false} className="w-5 h-5 accent-primary" />
-                                <span className="font-bold">Enable Ad immediately</span>
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-medical-bg/95 backdrop-blur-md">
+                    <Card className="w-full max-w-xl bg-medical-card border-white/5 p-12 rounded-[50px] shadow-[0_0_100px_rgba(0,0,0,0.5)] relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+                        <h2 className="text-4xl font-black italic uppercase tracking-tighter mb-10 font-poppins">{editingAd ? 'Refine Intel' : 'New Campaign'}</h2>
+                        <form onSubmit={handleAddAd} className="space-y-6">
+                            <div className="space-y-3">
+                                <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1 italic">Tactical Message</label>
+                                <Input name="text" defaultValue={editingAd?.text} placeholder="e.g. SECURE YOUR FUTURE" required className="bg-slate-950/50 border-white/5 h-16 rounded-2xl font-black italic focus:ring-primary/20" />
+                            </div>
+                            <div className="space-y-3">
+                                <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1 italic">Visual Node (URL)</label>
+                                <Input name="imageUrl" defaultValue={editingAd?.imageUrl} placeholder="https://..." required className="bg-slate-950/50 border-white/5 h-16 rounded-2xl font-black italic focus:ring-primary/20" />
+                            </div>
+                            <div className="space-y-3">
+                                <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1 italic">Destination Vector (URL)</label>
+                                <Input name="linkUrl" defaultValue={editingAd?.linkUrl} placeholder="https://..." required className="bg-slate-950/50 border-white/5 h-16 rounded-2xl font-black italic focus:ring-primary/20" />
+                            </div>
+                            <label className="flex items-center gap-4 cursor-pointer group pt-2">
+                                <div className="relative">
+                                    <input type="checkbox" name="active" defaultChecked={editingAd?.active !== false} className="peer hidden" />
+                                    <div className="w-8 h-8 rounded-xl bg-slate-950 border border-white/5 peer-checked:bg-primary peer-checked:border-primary transition-all flex items-center justify-center">
+                                        <CheckCircle2 size={16} className="text-white scale-0 peer-checked:scale-100 transition-transform" />
+                                    </div>
+                                </div>
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] italic text-slate-400 group-hover:text-primary transition-colors">INITIALIZE BROADCAST IMMEDIATELY</span>
                             </label>
-                            <div className="flex gap-3 pt-4">
-                                <Button type="button" variant="outline" className="flex-1" onClick={() => setIsAdModalOpen(false)}>Cancel</Button>
-                                <Button type="submit" className="flex-1">Save Campaign</Button>
+                            <div className="flex gap-6 pt-6">
+                                <Button type="button" variant="ghost" className="flex-1 h-16 rounded-2xl font-black italic uppercase tracking-widest text-[10px] text-slate-500 hover:text-white" onClick={() => setIsAdModalOpen(false)}>Abort</Button>
+                                <Button type="submit" className="flex-1 h-16 rounded-2xl bg-primary text-white border-none font-black italic uppercase tracking-widest text-[10px] shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all">Deploy Intelligence</Button>
                             </div>
                         </form>
                     </Card>
                 </div>
             )}
             {isProfileModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-                    <Card className="w-full max-w-2xl bg-slate-900 border-slate-800 p-8 overflow-y-auto max-h-[90vh]">
-                        <h2 className="text-2xl font-black mb-6">Generate Medical Profile</h2>
-                        <p className="text-slate-400 mb-6 text-sm">Target User: <span className="text-white font-bold">{selectedUserForProfile?.email}</span></p>
-                        <form onSubmit={handleCreateProfile} className="space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <Input label="Full Name" name="name" defaultValue={selectedUserForProfile?.name} required />
-                                <div className="w-full">
-                                    <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Blood Group</label>
-                                    <select name="bloodGroup" className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm focus:ring-2 focus:ring-primary/20 outline-none" required>
-                                        <option value="">Select...</option>
-                                        {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map(bg => <option key={bg} value={bg}>{bg}</option>)}
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-medical-bg/95 backdrop-blur-md">
+                    <Card className="w-full max-w-3xl bg-medical-card border-white/5 p-12 rounded-[50px] shadow-[0_0_100px_rgba(0,0,0,0.5)] overflow-y-auto max-h-[90vh] relative">
+                        <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent" />
+                        <div className="mb-10">
+                            <h2 className="text-4xl font-black italic uppercase tracking-tighter font-poppins">Vault Initialization</h2>
+                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] mt-2 italic">Target Subject: <span className="text-primary">{selectedUserForProfile?.email}</span></p>
+                        </div>
+                        <form onSubmit={handleCreateProfile} className="space-y-10">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div className="space-y-3">
+                                    <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1 italic">Legal Identity</label>
+                                    <Input name="name" defaultValue={selectedUserForProfile?.name} required className="bg-slate-950/50 border-white/5 h-16 rounded-2xl font-black italic focus:ring-primary/20" />
+                                </div>
+                                <div className="space-y-3">
+                                    <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1 italic">Blood Type Vector</label>
+                                    <select name="bloodGroup" className="w-full bg-slate-950/50 border border-white/5 rounded-2xl h-16 px-6 text-[11px] font-black uppercase tracking-widest italic outline-none focus:ring-2 focus:ring-primary/20 transition-all appearance-none" required>
+                                        <option value="" className="bg-medical-bg">Select Group...</option>
+                                        {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map(bg => <option key={bg} value={bg} className="bg-medical-bg">{bg}</option>)}
                                     </select>
                                 </div>
-                                <Input label="Phone Number" name="phone" required />
-                                <Input label="Medical Conditions" name="conditions" placeholder="Diabetes, Hypertension, etc." />
-                                <Input label="Allergies" name="allergies" placeholder="Peanuts, Penicillin, etc." />
-                            </div>
-
-                            <div className="border-t border-slate-800 pt-6">
-                                <h3 className="text-lg font-bold mb-4">Emergency Contact</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <Input label="Contact Name" name="eName" required />
-                                    <Input label="Relation" name="eRelation" placeholder="Father, Mother, Spouse" required />
-                                    <Input label="Contact Phone" name="ePhone" required />
+                                <div className="space-y-3">
+                                    <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1 italic">Emergency Comm Link</label>
+                                    <Input name="phone" required className="bg-slate-950/50 border-white/5 h-16 rounded-2xl font-black italic focus:ring-primary/20" />
+                                </div>
+                                <div className="space-y-3">
+                                    <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1 italic">Pathological Markers</label>
+                                    <Input name="conditions" placeholder="DIABETES, HYPERTENSION..." className="bg-slate-950/50 border-white/5 h-16 rounded-2xl font-black italic focus:ring-primary/20" />
+                                </div>
+                                <div className="space-y-3 md:col-span-2">
+                                    <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1 italic">Biosensitivity / Allergies</label>
+                                    <Input name="allergies" placeholder="PEANUTS, PENICILLIN..." className="bg-slate-950/50 border-white/5 h-16 rounded-2xl font-black italic focus:ring-primary/20" />
                                 </div>
                             </div>
 
-                            <div className="flex gap-3 pt-4">
-                                <Button type="button" variant="outline" className="flex-1" onClick={() => setIsProfileModalOpen(false)}>Cancel</Button>
-                                <Button type="submit" className="flex-1">Generate QR Profile</Button>
+                            <div className="border-t border-white/5 pt-10">
+                                <div className="flex items-center gap-3 mb-8">
+                                    <Badge className="bg-primary/20 text-primary border-none p-2 rounded-lg"><Bell size={16} /></Badge>
+                                    <h3 className="text-xl font-black italic uppercase tracking-tight font-poppins">Guardian Protocol</h3>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1 italic">Guardian Name</label>
+                                        <Input name="eName" required className="bg-slate-950/50 border-white/5 h-16 rounded-2xl font-black italic focus:ring-primary/20" />
+                                    </div>
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1 italic">Relation Vector</label>
+                                        <Input name="eRelation" placeholder="FATHER, SPOUSE, ETC." required className="bg-slate-950/50 border-white/5 h-16 rounded-2xl font-black italic focus:ring-primary/20" />
+                                    </div>
+                                    <div className="space-y-3 md:col-span-2">
+                                        <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1 italic">Guardian Contact Link</label>
+                                        <Input name="ePhone" required className="bg-slate-950/50 border-white/5 h-16 rounded-2xl font-black italic focus:ring-primary/20" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-6 pt-6">
+                                <Button type="button" variant="ghost" className="flex-1 h-16 rounded-2xl font-black italic uppercase tracking-widest text-[10px] text-slate-500 hover:text-white" onClick={() => setIsProfileModalOpen(false)}>Cancel Protocol</Button>
+                                <Button type="submit" className="flex-1 h-16 rounded-2xl bg-primary text-white border-none font-black italic uppercase tracking-widest text-[10px] shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all">Establish Vault</Button>
                             </div>
                         </form>
                     </Card>
                 </div>
             )}
             {isRegisterModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-                    <Card className="w-full max-w-lg bg-slate-900 border-slate-800 p-8">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-medical-bg/95 backdrop-blur-md">
+                    <Card className="w-full max-w-xl bg-medical-card border-white/5 p-12 rounded-[50px] shadow-[0_0_100px_rgba(0,0,0,0.5)] relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent" />
                         {registrationStep === 'form' && (
-                            <>
-                                <div className="flex items-center gap-3 mb-6">
-                                    <div className="p-3 bg-green-500/20 rounded-xl text-green-500">
-                                        <Mail size={24} />
+                            <div className="space-y-10">
+                                <div className="flex items-center gap-6">
+                                    <div className="p-5 bg-primary/10 rounded-[20px] text-primary shadow-[0_0_20px_rgba(230,57,70,0.2)]">
+                                        <Mail size={32} />
                                     </div>
                                     <div>
-                                        <h2 className="text-2xl font-black uppercase tracking-tight">Email Onboarding</h2>
-                                        <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">Step 1: Contact Details</p>
+                                        <h2 className="text-3xl font-black italic uppercase tracking-tighter font-poppins">Subject Onboarding</h2>
+                                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] mt-1 italic">Phase 1: Secure Data Entry</p>
                                     </div>
                                 </div>
-                                <form onSubmit={handleSendOTP} className="space-y-4">
-                                    <Input label="Google Email" name="email" type="email" placeholder="user@gmail.com" required />
-                                    <Input label="Full Name" name="name" required />
-                                    <Input label="Phone Number" name="phone" required />
-                                    <div className="flex gap-3 pt-4">
-                                        <Button type="button" variant="outline" className="flex-1" onClick={() => setIsRegisterModalOpen(false)}>Cancel</Button>
-                                        <Button type="submit" className="flex-1 bg-green-600 hover:bg-green-700">Send OTP Code</Button>
+                                <form onSubmit={handleSendOTP} className="space-y-6">
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1 italic">Target Gmail Identifier</label>
+                                        <Input name="email" type="email" placeholder="USER@GMAIL.COM" required className="bg-slate-950/50 border-white/5 h-16 rounded-2xl font-black italic focus:ring-primary/20" />
+                                    </div>
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1 italic">Full Legal Name</label>
+                                        <Input name="name" required className="bg-slate-950/50 border-white/5 h-16 rounded-2xl font-black italic focus:ring-primary/20" />
+                                    </div>
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1 italic">Comm Link Phone</label>
+                                        <Input name="phone" required className="bg-slate-950/50 border-white/5 h-16 rounded-2xl font-black italic focus:ring-primary/20" />
+                                    </div>
+                                    <div className="flex gap-6 pt-6">
+                                        <Button type="button" variant="ghost" className="flex-1 h-16 rounded-2xl font-black italic uppercase tracking-widest text-[10px] text-slate-500 hover:text-white" onClick={() => setIsRegisterModalOpen(false)}>Abort</Button>
+                                        <Button type="submit" className="flex-1 h-16 rounded-2xl bg-primary text-white border-none font-black italic uppercase tracking-widest text-[10px] shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all">Transmit OTP Code</Button>
                                     </div>
                                 </form>
-                            </>
+                            </div>
                         )}
 
                         {registrationStep === 'otp' && (
-                            <div className="text-center space-y-6">
-                                <div className="mx-auto w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center text-primary">
-                                    <Shield size={40} />
+                            <div className="text-center space-y-10 py-6">
+                                <div className="mx-auto w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center text-primary shadow-[0_0_40px_rgba(230,57,70,0.2)] border border-primary/20">
+                                    <Shield size={48} className="animate-pulse" />
                                 </div>
                                 <div>
-                                    <h2 className="text-2xl font-black uppercase">Google Link Sent</h2>
-                                    <p className="text-slate-400 text-sm">A secure Firebase Login Link has been sent to <br /><span className="text-white font-bold">{tempUserData?.email}</span></p>
+                                    <h2 className="text-4xl font-black italic uppercase tracking-tighter font-poppins">Link Dispatched</h2>
+                                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mt-2 italic">A secure Firebase vector has been sent to <br /><span className="text-white font-black tracking-widest">{tempUserData?.email}</span></p>
                                 </div>
-                                <div className="p-4 bg-slate-950 rounded-xl border border-slate-800">
-                                    <p className="text-[10px] text-slate-500 uppercase font-bold mb-2">Internal Verify Code</p>
-                                    <p className="text-xs text-slate-400 italic mb-4 text-center px-4">The owner must click the link to verify. You can manually active them below by entering the fallback code displayed in your console.</p>
-                                    <div className="flex justify-center gap-2">
+                                <div className="p-10 bg-slate-950 rounded-[30px] border border-white/5 relative overflow-hidden group">
+                                    <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+                                    <p className="text-[9px] font-black text-slate-600 uppercase tracking-[0.4em] mb-6 italic">Tactical Fallback Code</p>
+                                    <div className="flex justify-center">
                                         <input
                                             type="text"
                                             maxLength="6"
                                             placeholder="000000"
                                             value={enteredOTP}
                                             onChange={(e) => setEnteredOTP(e.target.value)}
-                                            className="w-full max-w-[200px] bg-slate-900 border-2 border-slate-800 focus:border-primary rounded-2xl p-4 text-center text-3xl font-black tracking-[0.5em] outline-none transition-all"
+                                            className="w-full max-w-[280px] bg-slate-950 border-2 border-white/5 focus:border-primary rounded-[30px] py-8 text-center text-5xl font-black tracking-[0.3em] outline-none transition-all shadow-inner font-poppins text-primary"
                                         />
                                     </div>
+                                    <p className="text-[8px] text-slate-700 uppercase font-black tracking-widest mt-8 italic leading-relaxed px-10">The subject must authorize via the encrypted link. Use fallback only for manual overrides.</p>
                                 </div>
-                                <div className="flex gap-3 pt-4">
-                                    <Button variant="outline" className="flex-1" onClick={() => setRegistrationStep('form')}>Back</Button>
-                                    <Button className="flex-1 bg-primary" onClick={handleVerifyOTP}>Force Activate</Button>
+                                <div className="flex gap-6 pt-6">
+                                    <Button variant="ghost" className="flex-1 h-16 rounded-2xl font-black italic uppercase tracking-widest text-[10px] text-slate-500 hover:text-white" onClick={() => setRegistrationStep('form')}>Re-Initialize</Button>
+                                    <Button className="flex-1 h-16 rounded-2xl bg-primary text-white border-none font-black italic uppercase tracking-widest text-[10px] shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all" onClick={handleVerifyOTP}>Force Activation</Button>
                                 </div>
                             </div>
                         )}
 
                         {registrationStep === 'success' && (
-                            <div className="text-center space-y-6 py-4">
-                                <div className="mx-auto w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center text-green-500 animate-bounce">
-                                    <CheckCircle2 size={40} />
+                            <div className="text-center space-y-10 py-10">
+                                <div className="mx-auto w-24 h-24 bg-green-500/10 rounded-full flex items-center justify-center text-green-500 shadow-[0_0_40px_rgba(34,197,94,0.2)] border border-green-500/20">
+                                    <CheckCircle2 size={56} className="animate-bounce" />
                                 </div>
                                 <div>
-                                    <h2 className="text-3xl font-black uppercase text-white">Verified!</h2>
-                                    <p className="text-slate-400 font-bold uppercase text-xs tracking-widest mt-2">{tempUserData?.name} is now a live member</p>
+                                    <h2 className="text-5xl font-black italic uppercase tracking-tighter text-white font-poppins">Live & Secure</h2>
+                                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] mt-2 italic">{tempUserData?.name} is now a broadcast node</p>
                                 </div>
-                                <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800">
-                                    <p className="text-[10px] text-slate-500 uppercase font-black mb-1">Generated ID</p>
-                                    <p className="text-primary font-bold tracking-widest">{tempUserData?.name.toLowerCase().trim().replace(/\s+/g, '-')}</p>
+                                <div className="p-10 bg-slate-950 rounded-[40px] border border-white/5 relative overflow-hidden">
+                                    <p className="text-[9px] text-slate-600 uppercase font-black italic tracking-[0.4em] mb-2">Established Identifier</p>
+                                    <p className="text-2xl font-black text-primary tracking-tighter italic font-poppins transition-all group-hover:scale-110">{tempUserData?.name.toLowerCase().trim().replace(/\s+/g, '-')}</p>
                                 </div>
-                                <Button className="w-full bg-slate-800 hover:bg-slate-700 py-6 text-lg" onClick={() => { setIsRegisterModalOpen(false); setRegistrationStep('form'); setEnteredOTP(''); }}>
-                                    Back to Dashboard
+                                <Button className="w-full h-20 rounded-[24px] bg-white/5 hover:bg-white/10 text-white border border-white/10 font-black italic uppercase tracking-widest text-[11px] transition-all" onClick={() => { setIsRegisterModalOpen(false); setRegistrationStep('form'); setEnteredOTP(''); }}>
+                                    Return to Command Hub
                                 </Button>
                             </div>
                         )}

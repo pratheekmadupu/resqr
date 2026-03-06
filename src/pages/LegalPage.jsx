@@ -75,43 +75,59 @@ export default function LegalPage() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-950 py-20 px-4 text-white">
+        <div className="min-h-screen bg-medical-bg py-24 px-4 text-white font-manrope">
             <div className="max-w-6xl mx-auto">
+                <header className="text-center mb-16">
+                    <Badge className="bg-primary/20 text-primary border-none px-6 py-1 font-black italic tracking-widest mb-6">TRANSPARENCY HUB</Badge>
+                    <h1 className="text-5xl md:text-7xl font-black italic uppercase tracking-tighter leading-none font-poppins mb-6">
+                        Legal & <span className="text-primary italic-display">Compliance</span>
+                    </h1>
+                </header>
+
                 <div className="flex flex-col lg:flex-row gap-12">
                     {/* Navigation Sidebar */}
-                    <aside className="lg:w-72 space-y-2">
-                        <div className="bg-primary p-6 rounded-2xl mb-8 border border-primary/20 shadow-xl shadow-primary/10">
-                            <h1 className="text-2xl font-black italic uppercase tracking-tighter text-white">Legal & Compliance</h1>
-                            <p className="text-[10px] uppercase font-black tracking-widest text-white/50 pt-2 border-t border-white/10 mt-2 italic">Building Trust through Clarity</p>
-                        </div>
+                    <aside className="lg:w-80 space-y-3">
                         {tabs.map(tab => (
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`w-full flex items-center justify-between px-6 py-4 rounded-xl transition-all font-bold italic uppercase tracking-wider text-sm ${activeTab === tab.id
-                                        ? 'bg-slate-900 border border-primary text-primary shadow-lg'
-                                        : 'bg-transparent border border-transparent text-white/40 hover:text-white hover:bg-slate-900'
+                                className={`w-full flex items-center justify-between px-6 py-5 rounded-[20px] transition-all font-black italic uppercase tracking-[0.1em] text-[11px] ${activeTab === tab.id
+                                    ? 'bg-medical-card border-2 border-primary text-white shadow-2xl shadow-primary/10'
+                                    : 'bg-medical-card/40 border-2 border-white/5 text-slate-500 hover:text-white hover:border-white/10'
                                     }`}
                             >
-                                <span className="flex items-center gap-3">
-                                    {tab.icon} {tab.label}
+                                <span className="flex items-center gap-4">
+                                    <div className={`${activeTab === tab.id ? 'text-primary' : 'text-slate-600'}`}>
+                                        {tab.icon}
+                                    </div>
+                                    {tab.label}
                                 </span>
-                                <ChevronRight size={16} className={activeTab === tab.id ? 'opacity-100' : 'opacity-0'} />
+                                <ChevronRight size={16} className={activeTab === tab.id ? 'text-primary translate-x-1' : 'opacity-0'} />
                             </button>
                         ))}
+
+                        <div className="mt-12 p-8 bg-slate-950 rounded-[30px] border border-white/5 relative overflow-hidden group">
+                            <div className="absolute -top-10 -right-10 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity">
+                                <Shield size={120} />
+                            </div>
+                            <h4 className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-4 italic">Security Badge</h4>
+                            <p className="text-slate-500 text-xs font-bold leading-relaxed">
+                                All legal documents are digitally signed and timestamped for chain of custody protection.
+                            </p>
+                        </div>
                     </aside>
 
                     {/* Content Area */}
                     <main className="flex-1">
-                        <Card className="p-8 md:p-12 bg-slate-900 border-slate-800 shadow-2xl relative overflow-hidden h-full">
-                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-blue-600 to-primary"></div>
+                        <Card className="p-10 md:p-16 bg-medical-card border-white/5 shadow-2xl rounded-[40px] relative overflow-hidden h-full min-h-[600px]">
+                            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-primary/50 to-transparent"></div>
                             <AnimatePresence mode="wait">
                                 <motion.div
                                     key={activeTab}
-                                    initial={{ opacity: 0, x: 20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: -20 }}
-                                    transition={{ duration: 0.3 }}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -20 }}
+                                    transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                                 >
                                     {content[activeTab]}
                                 </motion.div>
