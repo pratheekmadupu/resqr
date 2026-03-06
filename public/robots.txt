@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /payment
+Disallow: /success
+
+Sitemap: https://resqr.co.in/sitemap.xml
