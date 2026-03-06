@@ -81,6 +81,30 @@ export default function Dashboard() {
 
     const [scans, setScans] = useState([]);
 
+    const handleCallFamily = () => {
+        if (!profile?.emergencyContactPhone) {
+            toast.error("No family contact number set");
+            return;
+        }
+        window.location.href = `tel:${profile.emergencyContactPhone}`;
+    };
+
+    const handleShareLocationWithFamily = () => {
+        if (!profile?.emergencyContactPhone) {
+            toast.error("No family contact number set");
+            return;
+        }
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((position) => {
+                const { latitude, longitude } = position.coords;
+                const msg = encodeURIComponent(`I am in an emergency! My live location: https://www.google.com/maps?q=${latitude},${longitude}`);
+                window.location.href = `https://wa.me/${profile.emergencyContactPhone.replace(/\D/g, '')}?text=${msg}`;
+            });
+        } else {
+            toast.error("GPS not supported");
+        }
+    };
+
     useEffect(() => {
         const fetchUserData = async () => {
             const slug = localStorage.getItem('resqr_active_slug');
@@ -236,13 +260,36 @@ export default function Dashboard() {
                                         </div>
                                         <div className="space-y-8">
                                             <div className="p-8 bg-slate-900 rounded-[32px] text-white relative overflow-hidden group">
-                                                <div className="absolute top-0 right-0 w-20 h-20 bg-primary/10 rounded-bl-full" />
-                                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Emergency Contact</span>
-                                                <p className="font-black text-white text-2xl uppercase mt-4">{userContact}</p>
-                                                <div className="flex items-center gap-2 mt-2">
-                                                    <Badge className="bg-primary/20 text-primary border-none text-[8px] px-3 py-1 font-bold uppercase">{profile?.emergencyContactRelation || '--'}</Badge>
+                                                <div className="absolute top-0 right-0 w-24 h-24 bg-primary/10 rounded-bl-full" />
+                                                <div className="flex justify-between items-start relative z-10">
+                                                    <div>
+                                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Emergency Contact</span>
+                                                        <p className="font-black text-white text-2xl uppercase mt-4">{userContact}</p>
+                                                        <div className="flex items-center gap-2 mt-2">
+                                                            <Badge className="bg-primary/20 text-primary border-none text-[8px] px-3 py-1 font-bold uppercase">{profile?.emergencyContactRelation || '--'}</Badge>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex flex-col gap-3">
+                                                        <button
+                                                            onClick={handleCallFamily}
+                                                            className="p-4 bg-green-500 hover:bg-green-600 rounded-2xl shadow-lg transition-all active:scale-95"
+                                                            title="Call Family"
+                                                        >
+                                                            <Phone size={20} fill="currentColor" />
+                                                        </button>
+                                                        <button
+                                                            onClick={handleShareLocationWithFamily}
+                                                            className="p-4 bg-primary hover:bg-primary/80 rounded-2xl shadow-lg transition-all active:scale-95"
+                                                            title="Share GPS with Family"
+                                                        >
+                                                            <MapPin size={20} fill="currentColor" />
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                                <p className="text-3xl font-black text-white mt-6 tracking-tighter font-poppins">{profile?.emergencyContactPhone || '--'}</p>
+                                                <div className="mt-6 pt-6 border-t border-white/5 relative z-10">
+                                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] block mb-1">Family Number</span>
+                                                    <p className="text-3xl font-black text-white tracking-tighter font-poppins">{profile?.emergencyContactPhone || '--'}</p>
+                                                </div>
                                             </div>
                                             <div className="flex flex-col gap-6">
                                                 <div className="flex items-center gap-5 p-6 bg-green-500/5 rounded-[30px] border border-green-500/10 hover:bg-green-500/10 transition-colors">
@@ -260,9 +307,9 @@ export default function Dashboard() {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="mt-16">
-                                        <Button className="w-full bg-white/5 hover:bg-white/10 text-white rounded-[30px] py-8 border border-white/5 font-black text-xl gap-3 uppercase italic tracking-tighter group transition-all" onClick={() => setIsEditModalOpen(true)}>
-                                            SYNC IDENTITY RECODS <ChevronRight size={24} className="text-primary group-hover:translate-x-2 transition-transform" />
+                                    <div className="mt-12">
+                                        <Button className="w-full bg-slate-950 hover:bg-slate-800 text-white rounded-2xl py-6 font-bold text-lg gap-2 uppercase tracking-wide group" onClick={() => setIsEditModalOpen(true)}>
+                                            UPDATE MEDICAL RECORDS <ChevronRight size={20} className="text-primary group-hover:translate-x-1 transition-transform" />
                                         </Button>
                                     </div>
                                 </Card>
