@@ -216,7 +216,7 @@ export default function EmergencyPage() {
                         <div className="space-y-10">
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] block mb-3 italic">Guardian Name</span>
+                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] block mb-3 italic">Contact Name</span>
                                     <h4 className="text-3xl font-black text-white uppercase italic tracking-tight">{user.emergencyContact.name}</h4>
                                 </div>
                                 <div className="text-right">
@@ -226,7 +226,7 @@ export default function EmergencyPage() {
                             </div>
                             <div className="pt-2">
                                 <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] block mb-3 italic">Direct Secure Line</span>
-                                <p className="text-5xl font-black text-white tracking-tighter font-poppins italic">{user.emergencyContact.phone}</p>
+                                <p className="text-2xl font-black text-white/20 tracking-[0.2em] font-poppins italic uppercase">Encrypted for Privacy</p>
                             </div>
                         </div>
                     </div>
@@ -240,7 +240,7 @@ export default function EmergencyPage() {
                     >
                         <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
                         <Phone size={28} fill="white" className="relative z-10" />
-                        <span className="text-2xl font-black uppercase italic tracking-tighter relative z-10">Call Guardian</span>
+                        <span className="text-2xl font-black uppercase italic tracking-tighter relative z-10">Call {user.emergencyContact.relation || 'Guardian'}</span>
                     </button>
 
                     <button
@@ -249,7 +249,7 @@ export default function EmergencyPage() {
                     >
                         <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
                         <MapPin size={28} fill="white" className="relative z-10" />
-                        <span className="text-2xl font-black uppercase italic tracking-tighter relative z-10">Broadcast GPS</span>
+                        <span className="text-2xl font-black uppercase italic tracking-tighter relative z-10">Send GPS to {user.emergencyContact.relation || 'Guardian'}</span>
                     </button>
                 </div>
 
