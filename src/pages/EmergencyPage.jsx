@@ -124,128 +124,140 @@ export default function EmergencyPage() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-red-100">
-            {/* Urgency Header - Clean Professional White */}
-            <div className="bg-white border-b border-slate-200 p-6 text-center sticky top-0 z-40 shadow-sm">
-                <div className="flex flex-col items-center justify-center gap-2">
+        <div className="min-h-screen bg-medical-bg text-white font-manrope selection:bg-primary/30">
+            {/* Urgency Header - Dark Professional Hub */}
+            <div className="bg-slate-950/80 backdrop-blur-md border-b border-white/5 p-6 text-center sticky top-0 z-40 shadow-2xl">
+                <div className="flex flex-col items-center justify-center gap-3">
                     <img
                         src={`${import.meta.env.BASE_URL}logo.png`}
                         alt="RESQR Medical Profile"
                         style={{ height: '48px', width: 'auto' }}
                     />
                     <div className="flex flex-col items-center">
-                        <Badge className="px-4 py-1 font-bold bg-primary text-white border-none text-[10px] tracking-widest uppercase">
-                            EMERGENCY MEDICAL PROFILE
+                        <Badge className="px-5 py-1 font-black italic bg-primary/20 text-primary border-none text-[10px] tracking-widest uppercase">
+                            ENCRYPTED MEDICAL PROFILE
                         </Badge>
-                        <p className="font-semibold text-[8px] text-slate-400 mt-1 uppercase tracking-widest">Digital Identification Vault</p>
+                        <p className="font-bold text-[8px] text-slate-500 mt-1 uppercase tracking-widest italic">Secure Digital Identification Vault</p>
                     </div>
                 </div>
             </div>
 
-            <main className="p-4 sm:p-8 space-y-6 max-w-2xl mx-auto">
-                {/* Name Block - Passport Style */}
-                <section className="bg-white rounded-3xl shadow-md border border-slate-200 overflow-hidden">
-                    <div className="bg-slate-900 p-3 flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                        <span>Identity Records</span>
-                        <span className="text-primary">Secured</span>
+            <main className="p-4 sm:p-8 space-y-8 max-w-2xl mx-auto">
+                {/* Name Block - Tactical ID Style */}
+                <section className="bg-medical-card rounded-[40px] shadow-2xl border border-white/5 overflow-hidden relative">
+                    <div className="bg-slate-950 p-4 flex justify-between items-center text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] italic">
+                        <span>Unit Identification</span>
+                        <span className="text-emerald-500 flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                            Verified
+                        </span>
                     </div>
-                    <div className="p-10 text-center">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Legal Identity</span>
-                        <h2 className="text-4xl sm:text-5xl font-black text-slate-900 uppercase tracking-tight break-words font-poppins">
+                    <div className="p-12 text-center">
+                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] block mb-3 italic">Identity Owner</span>
+                        <h2 className="text-4xl sm:text-6xl font-black text-white uppercase italic tracking-tighter break-words font-poppins leading-none">
                             {user.name}
                         </h2>
                     </div>
+                    <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
                 </section>
 
                 {/* Primary Stats Grid */}
-                <div className="grid grid-cols-1 gap-6">
-                    <div className="bg-white p-8 rounded-3xl shadow-md border border-slate-200 flex items-center justify-between relative overflow-hidden">
-                        <div className="flex items-center gap-6">
-                            <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-                                <Heart size={32} />
+                <div className="grid grid-cols-1 gap-8">
+                    <div className="bg-medical-card p-10 rounded-[40px] shadow-2xl border border-white/5 flex items-center justify-between relative overflow-hidden group">
+                        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/5 to-transparent opacity-50" />
+                        <div className="flex items-center gap-8 relative z-10">
+                            <div className="w-20 h-20 bg-primary rounded-3xl flex items-center justify-center text-white shadow-2xl shadow-primary/20 transition-transform group-hover:scale-105">
+                                <Heart size={36} fill="white" />
                             </div>
                             <div>
-                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Blood Type</span>
-                                <h3 className="text-5xl font-black text-primary leading-none font-poppins">{user.bloodGroup}</h3>
+                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] block mb-2 italic">Blood Type</span>
+                                <h3 className="text-6xl font-black text-white leading-none font-poppins tracking-tighter italic">{user.bloodGroup}</h3>
                             </div>
                         </div>
-                        <div className="hidden sm:block opacity-5">
-                            <Activity size={100} />
+                        <div className="hidden sm:block opacity-[0.03] absolute right-0 bottom-0 -mb-10 -mr-10">
+                            <Activity size={240} />
                         </div>
                     </div>
 
-                    <div className="bg-slate-900 p-8 rounded-3xl shadow-xl flex flex-col items-start gap-4 text-white relative overflow-hidden">
-                        <div className="flex items-center gap-3">
-                            <Activity size={24} className="text-primary" />
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Primary Diagnosis</span>
+                    <div className="bg-slate-950 p-10 rounded-[40px] shadow-2xl border border-white/5 flex flex-col items-start gap-6 text-white relative overflow-hidden group">
+                        <div className="flex items-center gap-4">
+                            <div className="p-3 bg-primary/20 rounded-2xl text-primary border border-primary/20">
+                                <Activity size={24} />
+                            </div>
+                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">Clinical Diagnosis</span>
                         </div>
-                        <p className="text-2xl font-bold uppercase tracking-tight break-words leading-tight">{user.conditions}</p>
+                        <p className="text-3xl font-black italic uppercase tracking-tight break-words leading-none text-white">{user.conditions}</p>
+                        <div className="absolute bottom-0 right-0 w-32 h-32 bg-primary/5 blur-3xl rounded-full" />
                     </div>
                 </div>
 
                 {/* Info Blocks */}
-                <div className="space-y-6">
-                    <div className="bg-white p-8 rounded-3xl shadow-md border border-slate-200">
-                        <div className="flex items-center gap-4 mb-4">
-                            <div className="p-3 bg-primary/10 rounded-xl text-primary">
+                <div className="space-y-8">
+                    <div className="bg-medical-card p-10 rounded-[40px] shadow-2xl border border-white/5 relative overflow-hidden">
+                        <div className="flex items-center gap-4 mb-8">
+                            <div className="p-3 bg-primary/20 rounded-2xl text-primary border border-primary/20 shadow-lg shadow-primary/20">
                                 <AlertCircle size={22} />
                             </div>
-                            <h3 className="text-lg font-bold text-slate-800 uppercase tracking-tight">Critical Allergies / Alerts</h3>
+                            <h3 className="text-xl font-black text-white italic uppercase tracking-tighter leading-none">Critical Alerts</h3>
                         </div>
-                        <p className="text-xl font-bold text-red-600 uppercase p-4 bg-red-50 rounded-2xl border border-red-100">{user.allergies}</p>
+                        <p className="text-2xl font-black text-primary uppercase italic p-8 bg-slate-950/50 rounded-3xl border border-primary/20 shadow-inner">
+                            {user.allergies}
+                        </p>
                     </div>
 
                     {/* RE-ADDED FAMILY CONTACT SECTION */}
-                    <div className="bg-white p-8 rounded-3xl shadow-md border border-slate-200">
-                        <div className="flex items-center gap-4 mb-6 border-b border-slate-100 pb-4">
-                            <div className="p-3 bg-blue-500/10 rounded-xl text-blue-600">
+                    <div className="bg-medical-card p-10 rounded-[40px] shadow-2xl border border-white/5">
+                        <div className="flex items-center gap-4 mb-10 border-b border-white/5 pb-8">
+                            <div className="p-3 bg-blue-500/20 rounded-2xl text-blue-500 border border-blue-500/20 shadow-lg shadow-blue-500/20">
                                 <Phone size={22} />
                             </div>
-                            <h3 className="text-lg font-bold text-slate-800 uppercase tracking-tight">Emergency Family Contact</h3>
+                            <h3 className="text-xl font-black text-white italic uppercase tracking-tighter">Emergency Liaison</h3>
                         </div>
-                        <div className="space-y-4">
+                        <div className="space-y-10">
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Contact Name</span>
-                                    <h4 className="text-2xl font-black text-slate-900 uppercase italic">{user.emergencyContact.name}</h4>
+                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] block mb-3 italic">Guardian Name</span>
+                                    <h4 className="text-3xl font-black text-white uppercase italic tracking-tight">{user.emergencyContact.name}</h4>
                                 </div>
                                 <div className="text-right">
-                                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Relation</span>
-                                    <Badge className="bg-blue-500/10 text-blue-700 border-none font-bold uppercase py-1">{user.emergencyContact.relation}</Badge>
+                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] block mb-3 italic">Relation</span>
+                                    <Badge className="bg-blue-500/10 text-blue-400 border-none font-black uppercase py-2 px-6 italic tracking-widest">{user.emergencyContact.relation}</Badge>
                                 </div>
                             </div>
                             <div className="pt-2">
-                                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Family Number</span>
-                                <p className="text-4xl font-black text-slate-900 tracking-tighter font-poppins">{user.emergencyContact.phone}</p>
+                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] block mb-3 italic">Direct Secure Line</span>
+                                <p className="text-5xl font-black text-white tracking-tighter font-poppins italic">{user.emergencyContact.phone}</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Actions - Fast Response */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-6">
                     <button
                         onClick={handleCall}
-                        className="w-full bg-green-600 hover:bg-green-700 text-white p-8 rounded-3xl flex items-center justify-center gap-4 transition-all active:scale-95 shadow-lg shadow-green-600/20"
+                        className="w-full bg-emerald-600 hover:bg-emerald-700 text-white p-10 rounded-[35px] flex items-center justify-center gap-5 transition-all active:scale-95 shadow-2xl shadow-emerald-900/40 relative overflow-hidden group"
                     >
-                        <Phone size={24} fill="currentColor" />
-                        <span className="text-xl font-bold uppercase tracking-tight">Call Home</span>
+                        <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <Phone size={28} fill="white" className="relative z-10" />
+                        <span className="text-2xl font-black uppercase italic tracking-tighter relative z-10">Call Guardian</span>
                     </button>
 
                     <button
                         onClick={handleSendLocation}
-                        className="w-full bg-primary hover:bg-primary-dark text-white p-8 rounded-3xl flex items-center justify-center gap-4 transition-all active:scale-95 shadow-lg shadow-primary/20"
+                        className="w-full bg-primary hover:bg-primary-dark text-white p-10 rounded-[35px] flex items-center justify-center gap-5 transition-all active:scale-95 shadow-2xl shadow-primary/40 relative overflow-hidden group"
                     >
-                        <MapPin size={24} fill="currentColor" />
-                        <span className="text-xl font-bold uppercase tracking-tight">Share GPS</span>
+                        <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <MapPin size={28} fill="white" className="relative z-10" />
+                        <span className="text-2xl font-black uppercase italic tracking-tighter relative z-10">Broadcast GPS</span>
                     </button>
                 </div>
 
-                <footer className="text-center py-12 opacity-50">
-                    <div className="flex items-center justify-center gap-4 mb-3">
-                        <img src={`${import.meta.env.BASE_URL}logo.png`} alt="RESQR Logo" className="h-8 w-auto grayscale" />
+                <footer className="text-center py-20 opacity-30">
+                    <div className="flex items-center justify-center gap-4 mb-5">
+                        <img src={`${import.meta.env.BASE_URL}logo.png`} alt="RESQR Logo" className="h-10 w-auto grayscale brightness-200" />
                     </div>
-                    <p className="text-[8px] font-bold uppercase tracking-[0.4em] text-slate-500">Secured Identity Network • Universal Emergency Portal</p>
+                    <p className="text-[9px] font-black uppercase tracking-[0.5em] text-slate-500 italic">Global Identity Protection Network • Encrypted Portal</p>
                 </footer>
             </main>
         </div>
