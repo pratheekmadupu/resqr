@@ -10,7 +10,7 @@ export default function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-16">
                     <div className="space-y-8">
                         <Link to="/" className="flex items-center gap-2">
-                            <img src={`${import.meta.env.BASE_URL}logo.png`} alt="RESQR Logo" className="invert brightness-200" style={{ height: '52px', width: 'auto' }} />
+                            <img src={`${import.meta.env.BASE_URL}logo.png`} alt="RESQR Logo" style={{ height: '52px', width: 'auto' }} />
                         </Link>
                         <p className="text-slate-500 text-sm leading-relaxed font-medium">
                             The world's most advanced emergency identification system. We bridge the gap between physical safety and digital health data when every second counts.

@@ -237,7 +237,7 @@ export default function EmergencyPage() {
 
                 <footer className="text-center py-20 opacity-30">
                     <div className="flex items-center justify-center gap-4 mb-4">
-                        <img src={`${import.meta.env.BASE_URL}logo.png`} alt="RESQR Logo" className="h-10 w-auto grayscale" />
+                        <img src={`${import.meta.env.BASE_URL}logo.png`} alt="RESQR Logo" className="h-10 w-auto" />
                     </div>
                     <p className="text-[10px] font-black uppercase tracking-[0.4em] text-secondary">Advanced Identity Guardian • Universal Access</p>
                 </footer>

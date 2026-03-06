@@ -114,7 +114,7 @@ export default function LoginPage() {
                 <div className="text-center mb-12">
                     <Link to="/" className="inline-block relative group">
                         <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
-                        <img src={`${import.meta.env.BASE_URL}logo.png`} alt="RESQR Logo" className="relative invert brightness-200 h-16 w-auto" />
+                        <img src={`${import.meta.env.BASE_URL}logo.png`} alt="RESQR Logo" className="relative h-16 w-auto" />
                     </Link>
                     <div className="mt-8 space-y-3">
                         <h1 className="text-4xl md:text-5xl font-black text-white italic uppercase tracking-tighter leading-none font-poppins">

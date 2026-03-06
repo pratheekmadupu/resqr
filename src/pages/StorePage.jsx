@@ -182,7 +182,7 @@ export default function StorePage() {
 
             {/* Footer Placeholder for visual consistency */}
             <footer className="py-24 text-center opacity-20">
-                <img src={`${import.meta.env.BASE_URL}logo.png`} alt="RESQR" className="h-10 mx-auto mb-6 invert brightness-200" />
+                <img src={`${import.meta.env.BASE_URL}logo.png`} alt="RESQR" className="h-10 mx-auto mb-6" />
                 <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white">Official RESQR Merch Store • Secured by SSL</p>
             </footer>
         </div>

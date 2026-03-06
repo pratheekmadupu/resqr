@@ -184,7 +184,7 @@ export default function AboutUs() {
             </section>
 
             <footer className="py-20 text-center opacity-30">
-                <img src={`${import.meta.env.BASE_URL}logo.png`} alt="RESQR" className="h-10 mx-auto mb-6 grayscale invert" />
+                <img src={`${import.meta.env.BASE_URL}logo.png`} alt="RESQR" className="h-10 mx-auto mb-6" />
                 <p className="text-[10px] font-black uppercase tracking-[0.4em]">Official About Page • Secured by Guardian Cloud</p>
             </footer>
         </div>

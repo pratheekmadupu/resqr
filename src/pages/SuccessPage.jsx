@@ -129,8 +129,8 @@ export default function SuccessPage() {
                     </Link>
                 </div>
 
-                <footer className="mt-24 opacity-20">
-                    <img src={`${import.meta.env.BASE_URL}logo.png`} alt="RESQR" className="h-10 mx-auto mb-6 invert grayscale" />
+                <footer className="mt-24 opacity-60">
+                    <img src={`${import.meta.env.BASE_URL}logo.png`} alt="RESQR" className="h-10 mx-auto mb-6" />
                     <p className="text-[8px] font-black uppercase tracking-[0.5em] text-white">
                         Powered by Guardian Blockchain • End-to-End Safety Infrastructure
                     </p>
