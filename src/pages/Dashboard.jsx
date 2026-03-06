@@ -64,6 +64,7 @@ export default function Dashboard() {
                 bloodGroup: profile.bloodGroup || "",
                 dob: profile.dob || "",
                 medicalConditions: profile.medicalConditions || "",
+                allergies: profile.allergies || "",
                 emergencyContactName: profile.emergencyContactName || "",
                 emergencyContactPhone: profile.emergencyContactPhone || "",
                 emergencyContactRelation: profile.emergencyContactRelation || ""
@@ -380,50 +381,86 @@ export default function Dashboard() {
             </div>
 
             <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title="Secure Profile Sync">
-                <div className="space-y-8">
-                    <Input
-                        label="Internal Identity Name"
-                        value={editData.name}
-                        onChange={(e) => setEditData({ ...editData, name: e.target.value })}
-                    />
-                    <div className="grid grid-cols-2 gap-8">
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Vector Group</label>
-                            <select
-                                className="w-full px-4 py-4 bg-slate-950 border border-white/5 rounded-2xl text-white appearance-none font-bold"
-                                value={editData.bloodGroup}
-                                onChange={(e) => setEditData({ ...editData, bloodGroup: e.target.value })}
-                            >
-                                {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map(bg => <option key={bg} value={bg}>{bg}</option>)}
-                            </select>
+                <div className="space-y-6">
+                    <div className="p-4 bg-primary/10 border border-primary/20 rounded-2xl flex items-center gap-4">
+                        <Lock size={18} className="text-primary" />
+                        <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em] italic">
+                            Encryption Active: Your medical data is protected
+                        </p>
+                    </div>
+
+                    <div className="space-y-4">
+                        {/* Basic Identity */}
+                        <div className="space-y-4 p-6 bg-slate-900/50 rounded-3xl border border-white/5">
+                            <h4 className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">Primary Identity</h4>
+                            <Input
+                                label="Operator Full Name (Legal Name)"
+                                value={editData.name}
+                                onChange={(e) => setEditData({ ...editData, name: e.target.value })}
+                            />
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic ml-1">Blood Group</label>
+                                    <select
+                                        className="w-full px-4 py-3 bg-slate-950 border border-white/5 rounded-xl text-white appearance-none font-bold"
+                                        value={editData.bloodGroup}
+                                        onChange={(e) => setEditData({ ...editData, bloodGroup: e.target.value })}
+                                    >
+                                        <option value="">Select Group</option>
+                                        {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map(bg => <option key={bg} value={bg}>{bg}</option>)}
+                                    </select>
+                                </div>
+                                <Input
+                                    label="Date of Birth"
+                                    type="date"
+                                    value={editData.dob}
+                                    onChange={(e) => setEditData({ ...editData, dob: e.target.value })}
+                                />
+                            </div>
                         </div>
-                        <Input
-                            label="Birth Timestamp"
-                            type="date"
-                            value={editData.dob}
-                            onChange={(e) => setEditData({ ...editData, dob: e.target.value })}
-                        />
+
+                        {/* Medical Data */}
+                        <div className="space-y-4 p-6 bg-slate-900/50 rounded-3xl border border-white/5">
+                            <h4 className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">Clinical Intelligence</h4>
+                            <Input
+                                label="Medical Conditions (e.g., Diabetes, Hypertension)"
+                                value={editData.medicalConditions}
+                                onChange={(e) => setEditData({ ...editData, medicalConditions: e.target.value })}
+                            />
+                            <Input
+                                label="Critical Allergies & Alerts"
+                                value={editData.allergies}
+                                onChange={(e) => setEditData({ ...editData, allergies: e.target.value })}
+                            />
+                        </div>
+
+                        {/* Emergency Liaison */}
+                        <div className="space-y-4 p-6 bg-slate-900/50 rounded-3xl border border-white/5">
+                            <h4 className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-4 italic">Emergency Liaison (Family)</h4>
+                            <Input
+                                label="Family Member Name"
+                                value={editData.emergencyContactName}
+                                onChange={(e) => setEditData({ ...editData, emergencyContactName: e.target.value })}
+                            />
+                            <div className="grid grid-cols-2 gap-4">
+                                <Input
+                                    label="Relation"
+                                    placeholder="e.g. Father, Spouse"
+                                    value={editData.emergencyContactRelation}
+                                    onChange={(e) => setEditData({ ...editData, emergencyContactRelation: e.target.value })}
+                                />
+                                <Input
+                                    label="Phone Number"
+                                    value={editData.emergencyContactPhone}
+                                    onChange={(e) => setEditData({ ...editData, emergencyContactPhone: e.target.value })}
+                                />
+                            </div>
+                        </div>
                     </div>
-                    <Input
-                        label="Medical Conditions"
-                        value={editData.medicalConditions}
-                        onChange={(e) => setEditData({ ...editData, medicalConditions: e.target.value })}
-                    />
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <Input
-                            label="Liaison Name"
-                            value={editData.emergencyContactName}
-                            onChange={(e) => setEditData({ ...editData, emergencyContactName: e.target.value })}
-                        />
-                        <Input
-                            label="Liaison Comm Link"
-                            value={editData.emergencyContactPhone}
-                            onChange={(e) => setEditData({ ...editData, emergencyContactPhone: e.target.value })}
-                        />
-                    </div>
-                    <div className="pt-8 flex gap-6">
-                        <Button variant="outline" className="flex-1" onClick={() => setIsEditModalOpen(false)}>Abort</Button>
-                        <Button className="flex-1" onClick={handleUpdateProfile}>Commit</Button>
+
+                    <div className="pt-6 flex gap-4">
+                        <Button variant="outline" className="flex-1 rounded-2xl h-14 font-bold border-white/10 text-slate-400 hover:text-white" onClick={() => setIsEditModalOpen(false)}>ABORT SYNC</Button>
+                        <Button className="flex-1 rounded-2xl h-14 font-black bg-primary text-white shadow-lg shadow-primary/20 italic" onClick={handleUpdateProfile}>COMMIT CHANGES</Button>
                     </div>
                 </div>
             </Modal>
