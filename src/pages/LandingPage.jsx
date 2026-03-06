@@ -91,14 +91,14 @@ export default function LandingPage() {
                             </Badge>
 
                             <h1 className="text-5xl md:text-7xl font-extrabold text-white font-poppins leading-tight mb-6">
-                                Emergency <span className="text-primary italic">AI Identity</span> for Instant Medical Access
+                                Emergency <span className="text-primary italic">QR Identity</span> for Instant Medical Access
                             </h1>
 
                             <p className="text-xl text-slate-400 mb-10 leading-relaxed max-w-xl">
-                                If an accident happens, our
-                                <span className="text-white font-bold"> AI Assistant</span> summarizes your
-                                <span className="text-white font-bold"> medical info</span> and provides
-                                <span className="text-white font-bold"> life-saving instructions</span> for responders instantly.
+                                If an accident happens, a simple QR scan gives first responders your
+                                <span className="text-white font-bold"> medical info</span>,
+                                <span className="text-white font-bold"> emergency contacts</span>, and
+                                <span className="text-white font-bold"> life-saving details</span> instantly.
                             </p>
 
                             <div className="flex flex-wrap gap-4">
@@ -203,59 +203,6 @@ export default function LandingPage() {
                             Generate Free QR ID
                         </Button>
                     </Link>
-                </div>
-            </section>
-
-            {/* AI FEATURE SHOWCASE */}
-            <section className="py-24 bg-medical-bg relative overflow-hidden">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-                        <motion.div {...fadeInUp}>
-                            <Badge className="bg-indigo-500/20 text-indigo-300 border-none px-4 py-1 font-black italic mb-6">NEXT-GEN TECH</Badge>
-                            <h2 className="text-4xl md:text-6xl font-black text-white font-poppins italic uppercase tracking-tighter leading-none mb-8">
-                                AI-Powered <br /> <span className="text-indigo-400">Tactical Response.</span>
-                            </h2>
-                            <p className="text-slate-400 text-xl font-medium leading-relaxed mb-10">
-                                RESQR isn't just a database. Our AI Assistant analyzes your conditions and provides immediate, context-aware instructions for first-responders.
-                            </p>
-
-                            <div className="space-y-6">
-                                {[
-                                    "Dynamic First-Aid Summaries",
-                                    "Condition-Specific Alerts (Diabetic, Cardiac, etc.)",
-                                    "Nearest Trauma Care Logic",
-                                    "Encrypted Neural Stream Protocol"
-                                ].map((feature, i) => (
-                                    <div key={i} className="flex items-center gap-4">
-                                        <div className="w-6 h-6 rounded-full bg-indigo-500/10 flex items-center justify-center">
-                                            <div className="w-2 h-2 rounded-full bg-indigo-500" />
-                                        </div>
-                                        <span className="text-slate-200 text-sm font-black uppercase tracking-widest italic">{feature}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </motion.div>
-
-                        <div className="relative">
-                            <div className="bg-indigo-500/10 p-12 rounded-[50px] border border-indigo-500/20 backdrop-blur-3xl">
-                                <div className="space-y-6">
-                                    <div className="bg-slate-950/80 p-8 rounded-3xl border border-white/5 relative">
-                                        <div className="flex items-center gap-3 mb-4">
-                                            <Zap size={16} className="text-indigo-400" />
-                                            <span className="text-[9px] font-black uppercase text-indigo-400 tracking-widest">AI Analysis Node</span>
-                                        </div>
-                                        <p className="text-xs font-black uppercase tracking-tighter text-slate-400 italic">"User is Diabetic. Do not administer sugar if unconscious. Paramedics alerted."</p>
-                                        <div className="absolute top-0 right-0 p-4">
-                                            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                                        </div>
-                                    </div>
-                                    <div className="bg-slate-950/80 p-8 rounded-3xl border border-white/5 opacity-40">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-700 italic">Awaiting scanner vector output...</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </section>
 
