@@ -5,61 +5,67 @@ export default function Footer() {
     const currentYear = new Date().getFullYear();
 
     return (
-        <footer className="bg-slate-950 border-t border-slate-900">
-            <div className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
-                    <div className="space-y-4">
+        <footer className="bg-white border-t border-secondary/5 font-manrope">
+            <div className="max-w-7xl mx-auto px-4 py-20 sm:px-6 lg:px-8">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-16">
+                    <div className="space-y-6">
                         <Link to="/" className="flex items-center gap-2">
-                            <img src={`${import.meta.env.BASE_URL}logo.png`} alt="RESQR Logo" style={{ height: '48px', width: 'auto' }} />
+                            <img src={`${import.meta.env.BASE_URL}logo.png`} alt="RESQR Logo" style={{ height: '52px', width: 'auto' }} />
                         </Link>
-                        <p className="text-white text-sm leading-relaxed">
-                            Empowering individuals with smart identification solutions for critical moments. Because every second counts.
+                        <p className="text-secondary/60 text-sm leading-relaxed font-medium">
+                            The world's most advanced emergency identification system. We bridge the gap between physical safety and digital health data when every second counts.
                         </p>
                         <div className="flex gap-4">
-                            <Twitter size={20} className="text-white hover:text-primary cursor-pointer transition-colors" />
-                            <Facebook size={20} className="text-white hover:text-primary cursor-pointer transition-colors" />
-                            <Instagram size={20} className="text-white hover:text-primary cursor-pointer transition-colors" />
-                            <Github size={20} className="text-white hover:text-primary cursor-pointer transition-colors" />
+                            {[Twitter, Facebook, Instagram, Github].map((Icon, i) => (
+                                <a key={i} href="#" className="w-10 h-10 rounded-full border border-secondary/5 flex items-center justify-center text-secondary/40 hover:text-primary hover:border-primary/20 hover:bg-primary/5 transition-all">
+                                    <Icon size={18} />
+                                </a>
+                            ))}
                         </div>
                     </div>
 
                     <div>
-                        <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-4">Product</h4>
-                        <ul className="space-y-2">
-                            <li><Link to="/#features" className="text-sm text-white hover:text-primary">Features</Link></li>
-                            <li><Link to="/about" className="text-sm text-white hover:text-primary">About Us</Link></li>
-                            <li><Link to="/#pricing" className="text-sm text-white hover:text-primary">Pricing</Link></li>
-                            <li><Link to="/contact" className="text-sm text-white hover:text-primary">Enterprise</Link></li>
+                        <h4 className="text-xs font-black text-secondary uppercase tracking-[0.2em] mb-8">Ecosystem</h4>
+                        <ul className="space-y-4">
+                            <li><Link to="/store" className="text-sm font-bold text-secondary/60 hover:text-primary">Official Store</Link></li>
+                            <li><Link to="/#features" className="text-sm font-bold text-secondary/60 hover:text-primary">Core Technology</Link></li>
+                            <li><Link to="/about" className="text-sm font-bold text-secondary/60 hover:text-primary">Our Mission</Link></li>
+                            <li><Link to="/contact" className="text-sm font-bold text-secondary/60 hover:text-primary">Enterprise Solutions</Link></li>
                         </ul>
                     </div>
 
                     <div>
-                        <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-4">Support</h4>
-                        <ul className="space-y-2">
-                            <li><Link to="/contact" className="text-sm text-white hover:text-primary">Contact Us</Link></li>
-                            <li><Link to="/legal" className="text-sm text-white hover:text-primary">Privacy Policy</Link></li>
-                            <li><Link to="/legal" className="text-sm text-white hover:text-primary">Terms & Conditions</Link></li>
+                        <h4 className="text-xs font-black text-secondary uppercase tracking-[0.2em] mb-8">Guardian Support</h4>
+                        <ul className="space-y-4">
+                            <li><Link to="/contact" className="text-sm font-bold text-secondary/60 hover:text-primary">Contact Helpdesk</Link></li>
+                            <li><Link to="/legal" className="text-sm font-bold text-secondary/60 hover:text-primary">Privacy Shield</Link></li>
+                            <li><Link to="/legal" className="text-sm font-bold text-secondary/60 hover:text-primary">Guardian Terms</Link></li>
+                            <li><Link to="/dashboard" className="text-sm font-bold text-secondary/60 hover:text-primary">Identity Recovery</Link></li>
                         </ul>
                     </div>
 
                     <div>
-                        <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-4">Newsletter</h4>
-                        <p className="text-sm text-white mb-4">Join 10,000+ people staying safe with RESQR updates.</p>
-                        <div className="flex gap-2">
+                        <h4 className="text-xs font-black text-secondary uppercase tracking-[0.2em] mb-8">Secure Updates</h4>
+                        <p className="text-sm text-secondary/60 mb-6 font-medium">Join 50,000+ protected users worldwide.</p>
+                        <div className="flex flex-col gap-3">
                             <input
                                 type="email"
-                                placeholder="email@example.com"
-                                className="bg-slate-900 border border-slate-800 px-3 py-2 rounded-lg text-sm w-full focus:outline-none focus:ring-2 focus:ring-primary/20 text-white"
+                                placeholder="Email address"
+                                className="bg-slate-50 border border-secondary/5 px-4 py-3 rounded-2xl text-sm w-full focus:outline-none focus:ring-2 focus:ring-primary/10 text-secondary font-bold"
                             />
-                            <button className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold active:scale-95 transition-transform" onClick={() => alert('Thank you for joining!')}>Join</button>
+                            <button className="bg-secondary text-white px-6 py-3 rounded-2xl text-sm font-black uppercase tracking-widest active:scale-95 transition-transform" onClick={() => alert('Welcome to the RESQR Guardian list!')}>Protect Me</button>
                         </div>
                     </div>
                 </div>
 
-                <div className="mt-12 pt-8 border-t border-slate-900 text-center">
-                    <p className="text-white text-sm">
-                        © {currentYear} RESQR Inc. All rights reserved.
+                <div className="mt-20 pt-10 border-t border-secondary/5 flex flex-col md:flex-row justify-between items-center gap-6">
+                    <p className="text-secondary/40 text-[10px] font-black uppercase tracking-[0.3em]">
+                        © {currentYear} RESQR IDENTITY SYSTEMS INC. ALL RIGHTS RESERVED.
                     </p>
+                    <div className="flex items-center gap-2 opacity-30">
+                        <div className="w-2 h-2 rounded-full bg-green-500" />
+                        <span className="text-[10px] font-black uppercase tracking-widest text-secondary">Global Node Network: Online</span>
+                    </div>
                 </div>
             </div>
         </footer>

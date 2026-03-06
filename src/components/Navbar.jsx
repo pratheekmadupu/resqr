@@ -32,6 +32,7 @@ export default function Navbar() {
 
     const navLinks = [
         { name: 'Home', path: '/' },
+        { name: 'Shop', path: '/store' },
         { name: 'About Us', path: '/about' },
         { name: 'Pricing', path: '/#pricing' },
     ];
@@ -41,7 +42,7 @@ export default function Navbar() {
     }
 
     return (
-        <nav className="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800">
+        <nav className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-secondary/5 font-manrope">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between py-2 items-center">
                     <Link to="/" className="flex items-center gap-2">
@@ -54,30 +55,30 @@ export default function Navbar() {
                             <Link
                                 key={link.name}
                                 to={link.path}
-                                className="text-sm font-medium text-white hover:text-primary transition-colors"
+                                className="text-sm font-bold text-secondary/70 hover:text-primary transition-colors uppercase tracking-wider"
                             >
                                 {link.name}
                             </Link>
                         ))}
                         {user ? (
-                            <div className="flex items-center gap-4 border-l border-slate-800 pl-8">
-                                <span className="text-sm font-bold text-white hidden lg:block">
+                            <div className="flex items-center gap-4 border-l border-secondary/10 pl-8">
+                                <span className="text-sm font-bold text-secondary hidden lg:block">
                                     {user.displayName || user.email?.split('@')[0]}
                                 </span>
-                                <Button size="sm" variant="ghost" className="text-white opacity-60 hover:text-white" onClick={handleLogout}>
+                                <Button size="sm" variant="ghost" className="text-secondary opacity-60 hover:text-primary" onClick={handleLogout}>
                                     <LogOut size={18} />
                                 </Button>
                             </div>
                         ) : (
                             <Link to="/login">
-                                <Button size="sm" variant="secondary">Sign In</Button>
+                                <Button size="sm" variant="secondary" className="rounded-full px-6 font-bold shadow-sm">Sign In</Button>
                             </Link>
                         )}
                     </div>
 
                     {/* Mobile Menu Button */}
                     <div className="md:hidden">
-                        <button onClick={() => setIsOpen(!isOpen)} className="p-2 text-slate-600">
+                        <button onClick={() => setIsOpen(!isOpen)} className="p-2 text-secondary">
                             {isOpen ? <X size={24} /> : <Menu size={24} />}
                         </button>
                     </div>
@@ -86,24 +87,24 @@ export default function Navbar() {
 
             {/* Mobile Menu */}
             {isOpen && (
-                <div className="md:hidden bg-slate-900 border-b border-slate-800 py-4 px-4 space-y-4">
+                <div className="md:hidden bg-white border-b border-secondary/5 py-4 px-4 space-y-4 shadow-xl">
                     {navLinks.map((link) => (
                         <Link
                             key={link.name}
                             to={link.path}
-                            className="block text-base font-medium text-white"
+                            className="block text-base font-bold text-secondary uppercase tracking-widest"
                             onClick={() => setIsOpen(false)}
                         >
                             {link.name}
                         </Link>
                     ))}
                     {user ? (
-                        <Button size="md" variant="secondary" className="w-full bg-slate-800 text-white border-none" onClick={handleLogout}>
+                        <Button size="md" variant="secondary" className="w-full bg-secondary text-white border-none rounded-xl" onClick={handleLogout}>
                             Logout
                         </Button>
                     ) : (
                         <Link to="/login">
-                            <Button size="md" variant="secondary" className="w-full">Sign In</Button>
+                            <Button size="md" variant="secondary" className="w-full rounded-xl shadow-lg">Sign In</Button>
                         </Link>
                     )}
                 </div>

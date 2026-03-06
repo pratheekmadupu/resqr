@@ -12,6 +12,7 @@ import Footer from './components/Footer';
 import ContactUs from './pages/ContactUs';
 import LegalPage from './pages/LegalPage';
 import AboutUs from './pages/AboutUs';
+import StorePage from './pages/StorePage';
 
 function App() {
     return (
@@ -21,6 +22,7 @@ function App() {
                 <Routes>
                     <Route path="/" element={<LandingPage />} />
                     <Route path="/about" element={<AboutUs />} />
+                    <Route path="/store" element={<StorePage />} />
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/create-profile" element={<ProfileCreation />} />
                     <Route path="/payment" element={<PaymentPage />} />

@@ -8,20 +8,27 @@ export default {
         extend: {
             colors: {
                 primary: {
-                    DEFAULT: '#ef4444',
-                    dark: '#dc2626',
+                    DEFAULT: '#E63946', // Emergency Red
+                    dark: '#D62828',
                 },
                 secondary: {
-                    DEFAULT: '#0a0a0a',
-                    light: '#171717',
+                    DEFAULT: '#1D3557', // Dark Blue
+                    light: '#457B9D',
+                },
+                medical: {
+                    bg: '#F1FAEE',
+                    accent: '#A8DADC',
                 }
             },
             borderRadius: {
                 'xl': '1rem',
                 '2xl': '1.5rem',
+                '3xl': '2rem',
             },
             fontFamily: {
                 sans: ['Inter', 'sans-serif'],
+                poppins: ['Poppins', 'sans-serif'],
+                manrope: ['Manrope', 'sans-serif'],
             },
         },
     },
