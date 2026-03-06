@@ -91,28 +91,29 @@ export default function LandingPage() {
                             </Badge>
 
                             <h1 className="text-5xl md:text-7xl font-extrabold text-white font-poppins leading-tight mb-6">
-                                Emergency <span className="text-primary italic">QR Identity</span> for Instant Medical Access
+                                Emergency <span className="text-primary italic">AI Identity</span> for Instant Medical Access
                             </h1>
 
                             <p className="text-xl text-slate-400 mb-10 leading-relaxed max-w-xl">
-                                If an accident happens, a simple QR scan gives first responders your
-                                <span className="text-white font-bold"> medical info</span>,
-                                <span className="text-white font-bold"> emergency contacts</span>, and
-                                <span className="text-white font-bold"> life-saving details</span> instantly.
+                                If an accident happens, our
+                                <span className="text-white font-bold"> AI Assistant</span> summarizes your
+                                <span className="text-white font-bold"> medical info</span> and provides
+                                <span className="text-white font-bold"> life-saving instructions</span> for responders instantly.
                             </p>
 
                             <div className="flex flex-wrap gap-4">
                                 <Link to="/create-profile">
-                                    <Button size="lg" className="px-10 py-4 rounded-full text-lg shadow-xl shadow-primary/20 bg-primary text-white border-none">
-                                        Create Your QR ID
+                                    <Button size="lg" className="px-10 py-6 rounded-3xl text-lg shadow-xl shadow-primary/20 bg-primary text-white border-none font-black italic uppercase tracking-tighter">
+                                        SECURE PREMIUM ID
                                     </Button>
                                 </Link>
-                                <Button
-                                    onClick={() => setIsDemoOpen(true)}
-                                    variant="outline" size="lg" className="px-10 py-4 rounded-full text-lg border-white/10 bg-white/5 text-white hover:bg-white/10 font-bold"
-                                >
-                                    <Play size={20} className="mr-2 fill-current" /> Watch Demo
-                                </Button>
+                                <Link to="/free-qr">
+                                    <Button
+                                        variant="outline" size="lg" className="px-10 py-6 rounded-3xl text-lg border-white/10 bg-white/5 text-white hover:bg-white/10 font-black italic uppercase tracking-tighter"
+                                    >
+                                        Try FREE QR
+                                    </Button>
+                                </Link>
                             </div>
 
                             <div className="mt-12 flex items-center gap-6">
@@ -181,6 +182,79 @@ export default function LandingPage() {
                                 <div className="absolute bottom-0 right-0 w-80 h-80 bg-secondary/10 rounded-full blur-[120px]" />
                             </div>
                         </motion.div>
+                    </div>
+                </div>
+            </section>
+
+            {/* VIRAL SECTION - STARTUP GROWTH */}
+            <section className="bg-primary/5 py-12 border-b border-primary/10">
+                <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
+                    <div className="flex items-center gap-6">
+                        <div className="w-16 h-16 bg-primary/20 rounded-2xl flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                            <QrCode size={32} />
+                        </div>
+                        <div>
+                            <h3 className="text-2xl font-black italic uppercase tracking-tighter text-white">Need immediate protection?</h3>
+                            <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Create a basic temporary ID in under 30 seconds for free.</p>
+                        </div>
+                    </div>
+                    <Link to="/free-qr">
+                        <Button className="px-12 py-6 rounded-2xl bg-white text-primary hover:bg-slate-100 border-none font-black italic uppercase tracking-widest shadow-xl">
+                            Generate Free QR ID
+                        </Button>
+                    </Link>
+                </div>
+            </section>
+
+            {/* AI FEATURE SHOWCASE */}
+            <section className="py-24 bg-medical-bg relative overflow-hidden">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+                        <motion.div {...fadeInUp}>
+                            <Badge className="bg-indigo-500/20 text-indigo-300 border-none px-4 py-1 font-black italic mb-6">NEXT-GEN TECH</Badge>
+                            <h2 className="text-4xl md:text-6xl font-black text-white font-poppins italic uppercase tracking-tighter leading-none mb-8">
+                                AI-Powered <br /> <span className="text-indigo-400">Tactical Response.</span>
+                            </h2>
+                            <p className="text-slate-400 text-xl font-medium leading-relaxed mb-10">
+                                RESQR isn't just a database. Our AI Assistant analyzes your conditions and provides immediate, context-aware instructions for first-responders.
+                            </p>
+
+                            <div className="space-y-6">
+                                {[
+                                    "Dynamic First-Aid Summaries",
+                                    "Condition-Specific Alerts (Diabetic, Cardiac, etc.)",
+                                    "Nearest Trauma Care Logic",
+                                    "Encrypted Neural Stream Protocol"
+                                ].map((feature, i) => (
+                                    <div key={i} className="flex items-center gap-4">
+                                        <div className="w-6 h-6 rounded-full bg-indigo-500/10 flex items-center justify-center">
+                                            <div className="w-2 h-2 rounded-full bg-indigo-500" />
+                                        </div>
+                                        <span className="text-slate-200 text-sm font-black uppercase tracking-widest italic">{feature}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </motion.div>
+
+                        <div className="relative">
+                            <div className="bg-indigo-500/10 p-12 rounded-[50px] border border-indigo-500/20 backdrop-blur-3xl">
+                                <div className="space-y-6">
+                                    <div className="bg-slate-950/80 p-8 rounded-3xl border border-white/5 relative">
+                                        <div className="flex items-center gap-3 mb-4">
+                                            <Zap size={16} className="text-indigo-400" />
+                                            <span className="text-[9px] font-black uppercase text-indigo-400 tracking-widest">AI Analysis Node</span>
+                                        </div>
+                                        <p className="text-xs font-black uppercase tracking-tighter text-slate-400 italic">"User is Diabetic. Do not administer sugar if unconscious. Paramedics alerted."</p>
+                                        <div className="absolute top-0 right-0 p-4">
+                                            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                                        </div>
+                                    </div>
+                                    <div className="bg-slate-950/80 p-8 rounded-3xl border border-white/5 opacity-40">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-700 italic">Awaiting scanner vector output...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>

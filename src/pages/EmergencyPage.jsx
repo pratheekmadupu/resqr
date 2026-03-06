@@ -191,6 +191,63 @@ export default function EmergencyPage() {
                     </div>
                 </div>
 
+                {/* AI EMERGENCY ASSISTANT - STARTUP/SAAS FEATURE */}
+                <section className="bg-gradient-to-br from-indigo-900/40 to-slate-900/40 rounded-[40px] shadow-2xl border border-indigo-500/10 p-10 relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-8 opacity-[0.05] group-hover:opacity-10 transition-opacity">
+                        <Zap size={160} className="text-indigo-400" />
+                    </div>
+
+                    <div className="flex items-center gap-4 mb-10">
+                        <div className="w-14 h-14 bg-indigo-500 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-indigo-500/20 relative">
+                            <Zap size={28} fill="white" />
+                            <span className="absolute -top-1 -right-1 flex h-4 w-4">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-4 w-4 bg-indigo-500"></span>
+                            </span>
+                        </div>
+                        <div>
+                            <Badge className="bg-indigo-500/20 text-indigo-300 border-none text-[8px] font-black italic tracking-[0.2em] px-3 mb-1">
+                                AI-POWERED ANALYSIS
+                            </Badge>
+                            <h3 className="text-xl font-black text-white italic uppercase tracking-tighter">Tactical Response Assistant</h3>
+                        </div>
+                    </div>
+
+                    <div className="bg-slate-950/80 backdrop-blur-xl border border-white/5 rounded-3xl p-8 relative z-10">
+                        <div className="space-y-6">
+                            <div className="flex items-start gap-4">
+                                <div className="w-2 h-2 rounded-full bg-indigo-500 mt-2 shrink-0 animate-pulse" />
+                                <p className="text-[11px] font-black uppercase text-indigo-400 tracking-widest italic leading-relaxed">
+                                    Analyzing scan context... Optimized medical response ready.
+                                </p>
+                            </div>
+
+                            <div className="grid grid-cols-1 gap-5">
+                                <div className="p-6 bg-indigo-500/5 rounded-2xl border border-indigo-500/10">
+                                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-3 italic">Immediate Instruction</span>
+                                    <p className="text-lg font-black text-white italic leading-tight uppercase tracking-tight">
+                                        {user.conditions?.toLowerCase().includes('diabetic') ? 'Hypoglycemia Risk: Do not administer sugar if unconscious. Wait for paramedics.' :
+                                            user.allergies?.toLowerCase().includes('penicillin') ? 'Allergy Alert: Strictly avoid Penicillin-based antibiotics.' :
+                                                'Standard Emergency Protocol: Maintain airway and control external bleeding immediately.'}
+                                    </p>
+                                </div>
+
+                                <div className="p-6 bg-slate-900/50 rounded-2xl border border-white/5">
+                                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-3 italic">Closest Logic Point</span>
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-emerald-500/20 rounded-lg text-emerald-500"><Navigation size={14} /></div>
+                                        <p className="text-xs font-black text-slate-300 uppercase italic">Nearest Trauma Care: 1.2 KM (Est. 4 mins)</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="mt-8 flex justify-center">
+                        <p className="text-[8px] font-black text-slate-600 uppercase tracking-[0.4em] italic">RESQR Neural Protocol v4.0.2 • Encrypted Stream</p>
+                    </div>
+                </section>
+
                 {/* Info Blocks */}
                 <div className="space-y-8">
                     <div className="bg-medical-card p-10 rounded-[40px] shadow-2xl border border-white/5 relative overflow-hidden">
