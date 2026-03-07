@@ -6,12 +6,24 @@ import { Input } from '../components/ui/Input';
 import { Badge } from '../components/ui/Badge';
 import { Link } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
+import { useEffect } from 'react';
 
 export default function ViralQR() {
     const [step, setStep] = useState('create'); // 'create', 'view'
     const [name, setName] = useState('');
     const [bloodGroup, setBloodGroup] = useState('');
     const qrRef = useRef();
+
+    useEffect(() => {
+        const queryParams = new URLSearchParams(window.location.search);
+        const nameParam = queryParams.get('name');
+        const bgParam = queryParams.get('bg');
+        if (nameParam && bgParam) {
+            setName(nameParam);
+            setBloodGroup(bgParam);
+            setStep('view');
+        }
+    }, []);
 
     const handleGenerate = (e) => {
         e.preventDefault();
@@ -101,7 +113,7 @@ export default function ViralQR() {
                             <div className="bg-slate-950 p-6 rounded-[30px] inline-block mb-10 border border-white/5">
                                 <QRCodeSVG
                                     id="viral-qr-svg"
-                                    value={`https://resqr.co.in/viral-id?name=${encodeURIComponent(name)}&bg=${encodeURIComponent(bloodGroup)}`}
+                                    value={`${window.location.origin}/viral-id?name=${encodeURIComponent(name)}&bg=${encodeURIComponent(bloodGroup)}`}
                                     size={250}
                                     bgColor={"#020617"}
                                     fgColor={"#e63946"}

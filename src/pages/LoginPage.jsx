@@ -27,6 +27,9 @@ export default function LoginPage() {
     const navigate = useNavigate();
 
     useEffect(() => {
+        const queryParams = new URLSearchParams(window.location.search);
+        const redirectTo = queryParams.get('redirect_to') || '/dashboard';
+
         // Handle Firebase Email Link Sign-in
         if (isSignInWithEmailLink(auth, window.location.href)) {
             let emailForSignIn = window.localStorage.getItem('emailForSignIn');
@@ -43,7 +46,7 @@ export default function LoginPage() {
                         window.localStorage.removeItem('emailForSignIn');
                         await syncUserToDb(result.user);
                         toast.success('Successfully signed in!', { id: toastId });
-                        navigate('/dashboard');
+                        navigate(redirectTo);
                     })
                     .catch((error) => {
                         console.error("Link error:", error);
@@ -54,7 +57,7 @@ export default function LoginPage() {
 
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user && !isSignInWithEmailLink(auth, window.location.href)) {
-                navigate('/dashboard');
+                navigate(redirectTo);
             }
         });
         return () => unsubscribe();
@@ -78,6 +81,9 @@ export default function LoginPage() {
         const toastId = toast.loading(isLogin ? 'Authenticating...' : 'Creating your account...');
 
         try {
+            const queryParams = new URLSearchParams(window.location.search);
+            const redirectTo = queryParams.get('redirect_to') || '/dashboard';
+
             if (isLogin) {
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 await syncUserToDb(userCredential.user);
@@ -88,7 +94,7 @@ export default function LoginPage() {
                 await syncUserToDb(userCredential.user, name);
                 toast.success('Account created successfully!', { id: toastId });
             }
-            navigate('/dashboard');
+            navigate(redirectTo);
         } catch (error) {
             console.error("Auth error:", error);
             toast.error(error.message || 'Authentication failed', { id: toastId });
@@ -97,11 +103,14 @@ export default function LoginPage() {
 
     const handleGoogleSignIn = async () => {
         const provider = new GoogleAuthProvider();
+        const queryParams = new URLSearchParams(window.location.search);
+        const redirectTo = queryParams.get('redirect_to') || '/dashboard';
+
         try {
             const result = await signInWithPopup(auth, provider);
             await syncUserToDb(result.user);
             toast.success('Signed in with Google!');
-            navigate('/payment');
+            navigate(redirectTo);
         } catch (error) {
             console.error("Google auth error:", error);
             toast.error(`Google Sign-in failed: ${error.code || error.message}`);

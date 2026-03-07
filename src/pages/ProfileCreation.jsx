@@ -57,7 +57,7 @@ export default function ProfileCreation() {
                 if (auth.currentUser) {
                     navigate('/payment');
                 } else {
-                    navigate('/login');
+                    navigate('/login?redirect_to=/payment');
                 }
             } catch (error) {
                 console.error("Error saving profile:", error);

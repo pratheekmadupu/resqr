@@ -4,8 +4,9 @@ import { CreditCard, ShieldCheck, Lock, ChevronRight, Zap, Loader2 } from 'lucid
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { useNavigate } from 'react-router-dom';
-import { db } from '../lib/firebase';
+import { db, auth } from '../lib/firebase';
 import { ref, onValue } from 'firebase/database';
+import { onAuthStateChanged } from 'firebase/auth';
 import toast from 'react-hot-toast';
 
 export default function PaymentPage() {
@@ -17,10 +18,17 @@ export default function PaymentPage() {
         { id: 'digital', title: 'Digital QR', price: 99, best: true },
         { id: 'band', title: 'QR Band', price: 299, best: false },
         { id: 'bracelet', title: 'QR Bracelet', price: 399, best: false },
-        { id: 'keychain', title: 'Key Chain', price: 199, best: false }
+        { id: 'keychain', title: 'Key Chain', price: 199, base: false }
     ];
 
     useEffect(() => {
+        const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                toast.error("Please login to proceed to payment.");
+                navigate('/login?redirect_to=/payment');
+            }
+        });
+
         const prodRef = ref(db, 'config/products');
         const unsub = onValue(prodRef, (snapshot) => {
             const data = snapshot.val();
@@ -54,10 +62,11 @@ export default function PaymentPage() {
         }, 2000);
 
         return () => {
+            unsubscribeAuth();
             unsub();
             clearTimeout(timer);
         };
-    }, []);
+    }, [navigate]);
 
     const loadRazorpayScript = () => {
         return new Promise((resolve) => {
