@@ -32,7 +32,6 @@ export default function Navbar() {
 
     const navLinks = [
         { name: 'Home', path: '/' },
-        { name: 'Shop', path: '/store' },
         { name: 'About Us', path: '/about' },
         { name: 'Free QR', path: '/free-qr' },
         { name: 'Pricing', path: '/#pricing' },

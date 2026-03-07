@@ -12,7 +12,6 @@ import Footer from './components/Footer';
 import ContactUs from './pages/ContactUs';
 import LegalPage from './pages/LegalPage';
 import AboutUs from './pages/AboutUs';
-import StorePage from './pages/StorePage';
 import ViralQR from './pages/ViralQR';
 
 function App() {
@@ -23,7 +22,6 @@ function App() {
                 <Routes>
                     <Route path="/" element={<LandingPage />} />
                     <Route path="/about" element={<AboutUs />} />
-                    <Route path="/store" element={<StorePage />} />
                     <Route path="/free-qr" element={<ViralQR />} />
                     <Route path="/viral-id" element={<ViralQR />} />
                     <Route path="/dashboard" element={<Dashboard />} />

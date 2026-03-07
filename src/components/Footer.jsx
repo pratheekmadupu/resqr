@@ -27,7 +27,6 @@ export default function Footer() {
                     <div>
                         <h4 className="text-[11px] font-black text-white uppercase tracking-[0.4em] mb-8 italic">Ecosystem</h4>
                         <ul className="space-y-4">
-                            <li><Link to="/store" className="text-sm font-bold text-slate-500 hover:text-primary transition-colors">Official Store</Link></li>
                             <li><Link to="/#features" className="text-sm font-bold text-slate-500 hover:text-primary transition-colors">Core Technology</Link></li>
                             <li><Link to="/about" className="text-sm font-bold text-slate-500 hover:text-primary transition-colors">Our Mission</Link></li>
                             <li><Link to="/contact" className="text-sm font-bold text-slate-500 hover:text-primary transition-colors">Enterprise Solutions</Link></li>

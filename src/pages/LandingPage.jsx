@@ -22,10 +22,7 @@ export default function LandingPage() {
     const [isDemoOpen, setIsDemoOpen] = useState(false);
 
     const defaultProducts = [
-        { title: "Digital QR", price: "99", features: ["Digital Dashboard", "Instant Access"], best: true },
-        { title: "QR Band", price: "299", features: ["Waterproof Silicon", "Wearable Safety"] },
-        { title: "QR Bracelet", price: "399", features: ["Stainless Steel", "Premium Finish"] },
-        { title: "Key Chain", price: "199", features: ["Durable TPU", "Attach to Keys"] }
+        { title: "Digital QR", price: "99", features: ["Digital Dashboard", "Instant Access", "Lifetime Validity"], best: true }
     ];
 
     useEffect(() => {
@@ -375,7 +372,7 @@ export default function LandingPage() {
             <section id="pricing" className="py-24 bg-medical-bg">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-20">
-                        <Badge className="bg-white/10 text-slate-400 border-none mb-4 px-6 py-1 font-black italic">STORE</Badge>
+                        <Badge className="bg-white/10 text-slate-400 border-none mb-4 px-6 py-1 font-black italic">PRICING</Badge>
                         <h2 className="text-4xl md:text-5xl font-black text-white font-poppins mb-6 italic uppercase tracking-tighter">Choose Your Protection</h2>
                         <p className="text-slate-400 max-w-2xl mx-auto text-lg font-medium">Lifetime validity. No subscriptions. One-time investment for life-saving safety.</p>
                     </div>
@@ -447,12 +444,14 @@ export default function LandingPage() {
                             <p className="text-slate-500 text-sm leading-relaxed mb-8 font-medium">Instantly notify emergency contacts when your QR is scanned. They receive your live location and a map link.</p>
                             <Badge className="bg-primary/20 text-primary border-none text-[10px] uppercase font-black px-4 py-1 italic">LIVE & ACTIVE</Badge>
                         </div>
-                        <Link to="/store" className="bg-medical-card p-12 rounded-[40px] border border-white/5 backdrop-blur-sm group hover:border-blue-500/20 transition-all">
+                        <div className="bg-medical-card p-12 rounded-[40px] border border-white/5 backdrop-blur-sm group hover:border-blue-500/20 transition-all lg:col-span-2">
                             <QrCode size={48} className="text-blue-400 mb-8 group-hover:scale-110 transition-transform" />
-                            <h3 className="text-2xl font-black italic uppercase tracking-tighter mb-4 font-poppins">NFC Smart Gear</h3>
-                            <p className="text-slate-500 text-sm leading-relaxed mb-8 font-medium">One-tap medical profile access through NFC-enabled wristbands and cards. Visit our shop to order yours.</p>
-                            <Badge className="bg-blue-400/20 text-blue-400 border-none text-[10px] uppercase font-black px-4 py-1 italic">SHOP GEAR</Badge>
-                        </Link>
+                            <h3 className="text-2xl font-black italic uppercase tracking-tighter mb-4 font-poppins text-white">Advanced QR Identity</h3>
+                            <p className="text-slate-500 text-sm leading-relaxed mb-8 font-medium">Get a unique, high-resolution QR identity card that you can print on any personal gear or keep on your smartphone for instant access.</p>
+                            <Link to="/create-profile">
+                                <Badge className="bg-blue-400/20 text-blue-400 border-none text-[10px] uppercase font-black px-4 py-1 italic hover:bg-blue-400/30 transition-all cursor-pointer">SECURE NOW</Badge>
+                            </Link>
+                        </div>
                         <div className="bg-medical-card p-12 rounded-[40px] border border-white/5 backdrop-blur-sm group hover:border-emerald-500/20 transition-all">
                             <Smartphone size={48} className="text-emerald-400 mb-8 group-hover:scale-110 transition-transform" />
                             <h3 className="text-2xl font-black italic uppercase tracking-tighter mb-4 font-poppins">Life Dashboard</h3>
