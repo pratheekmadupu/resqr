@@ -13,7 +13,6 @@ export default function ViralQR() {
     const [name, setName] = useState('');
     const [bloodGroup, setBloodGroup] = useState('');
     const qrRef = useRef();
-
     useEffect(() => {
         const queryParams = new URLSearchParams(window.location.search);
         const nameParam = queryParams.get('name');
@@ -21,7 +20,7 @@ export default function ViralQR() {
         if (nameParam && bgParam) {
             setName(nameParam);
             setBloodGroup(bgParam);
-            setStep('view');
+            setStep('profile');
         }
     }, []);
 
@@ -51,13 +50,67 @@ export default function ViralQR() {
         img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
     };
 
+    if (step === 'profile') {
+        return (
+            <div className="min-h-screen bg-medical-bg text-white font-manrope selection:bg-primary/30 py-10 px-4">
+                <div className="max-w-xl mx-auto space-y-8">
+                    <div className="text-center mb-10">
+                        <img src={`${import.meta.env.BASE_URL}logo.png`} alt="RESQR Logo" className="h-12 mx-auto mb-6" />
+                        <Badge className="bg-primary/20 text-primary border-none px-6 py-1 font-black italic tracking-widest text-[10px]">BASIC MEDICAL IDENTITY</Badge>
+                    </div>
+
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="bg-medical-card rounded-[50px] border-2 border-primary/20 shadow-2xl shadow-primary/10 overflow-hidden"
+                    >
+                        <div className="bg-slate-950 p-4 border-b border-white/5 flex justify-between items-center text-[10px] font-black text-slate-500 uppercase tracking-widest italic">
+                            <span>Scan Result</span>
+                            <span className="text-emerald-500">Live View</span>
+                        </div>
+                        <div className="p-12 text-center space-y-8">
+                            <div>
+                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] block mb-3 italic">Identity Owner</span>
+                                <h2 className="text-5xl font-black text-white uppercase italic tracking-tighter font-poppins leading-none">{name}</h2>
+                            </div>
+                            <div className="flex justify-center">
+                                <div className="bg-primary/10 p-10 rounded-[40px] border border-primary/20 flex flex-col items-center">
+                                    <div className="bg-primary p-4 rounded-2xl text-white mb-4">
+                                        <Heart size={32} fill="white" />
+                                    </div>
+                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] block mb-2 italic">Blood Type</span>
+                                    <h3 className="text-6xl font-black text-white leading-none font-poppins italic tracking-tighter">{bloodGroup}</h3>
+                                </div>
+                            </div>
+                            <div className="bg-slate-950 p-6 rounded-3xl border border-white/5">
+                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 italic">Alert Protocol</p>
+                                <p className="text-sm font-bold text-white uppercase">Notify emergency responders immediately.</p>
+                            </div>
+                        </div>
+                    </motion.div>
+
+                    <div className="bg-slate-900/50 p-10 rounded-[40px] border border-white/5 text-center">
+                        <Shield className="text-primary mx-auto mb-6" size={40} />
+                        <h4 className="text-2xl font-black italic uppercase tracking-tighter mb-4 leading-none text-white">Critical Limitation</h4>
+                        <p className="text-slate-400 text-sm font-medium leading-relaxed mb-8">
+                            This basic ID does not show medications, allergies, or emergency contacts. Upgrade for full protection.
+                        </p>
+                        <Link to="/create-profile">
+                            <Button className="w-full py-6 rounded-2xl bg-primary text-white border-none font-black italic uppercase tracking-widest">Get Full Protection @ ₹99</Button>
+                        </Link>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen bg-medical-bg text-white font-manrope selection:bg-primary/30 py-20 px-4">
             <div className="max-w-4xl mx-auto">
                 <div className="text-center mb-16">
                     <Badge className="bg-primary/20 text-primary border-none mb-4 px-6 py-1 font-black italic tracking-widest text-[10px]">FREE IDENTITY ENGINE</Badge>
-                    <h1 className="text-4xl md:text-7xl font-black italic uppercase tracking-tighter font-poppins mb-6 leading-none">
-                        Create Your <br /> Emergency QR in <br /> <span className="text-primary italic-display">30 Seconds.</span>
+                    <h1 className="text-4xl md:text-7xl font-black italic uppercase tracking-tighter font-poppins mb-6 leading-none text-white">
+                        Create Your <br /> Emergency QR in <br /> <span className="text-primary italic-display text-white">30 Seconds.</span>
                     </h1>
                     <p className="text-slate-400 text-lg font-medium max-w-2xl mx-auto">
                         A free, light-weight version of the RESQR premium ID. Perfect for sharing and temporary safety.
@@ -78,7 +131,7 @@ export default function ViralQR() {
                                     <label className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 ml-1 italic">Tactical Name</label>
                                     <Input
                                         placeholder="E.G. JOHN DOE"
-                                        className="bg-slate-950 border-white/5 h-20 rounded-3xl font-black italic uppercase tracking-widest px-8 focus:ring-primary/20 text-xl"
+                                        className="bg-slate-950 border-white/5 h-20 rounded-3xl font-black italic uppercase tracking-widest px-8 focus:ring-primary/20 text-xl text-white"
                                         value={name}
                                         onChange={(e) => setName(e.target.value)}
                                         required
@@ -87,7 +140,7 @@ export default function ViralQR() {
                                 <div className="space-y-4">
                                     <label className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 ml-1 italic">Vector Group (Blood)</label>
                                     <select
-                                        className="w-full bg-slate-950 border border-white/5 h-20 rounded-3xl font-black italic uppercase tracking-widest px-8 outline-none focus:ring-2 focus:ring-primary/20 appearance-none text-xl"
+                                        className="w-full bg-slate-950 border border-white/5 h-20 rounded-3xl font-black italic uppercase tracking-widest px-8 outline-none focus:ring-2 focus:ring-primary/20 appearance-none text-xl text-white"
                                         value={bloodGroup}
                                         onChange={(e) => setBloodGroup(e.target.value)}
                                         required
@@ -113,7 +166,7 @@ export default function ViralQR() {
                             <div className="bg-slate-950 p-6 rounded-[30px] inline-block mb-10 border border-white/5">
                                 <QRCodeSVG
                                     id="viral-qr-svg"
-                                    value={`${window.location.origin}/viral-id?name=${encodeURIComponent(name)}&bg=${encodeURIComponent(bloodGroup)}`}
+                                    value={`${window.location.origin}/free-qr?name=${encodeURIComponent(name)}&bg=${encodeURIComponent(bloodGroup)}`}
                                     size={250}
                                     bgColor={"#020617"}
                                     fgColor={"#e63946"}
@@ -121,7 +174,7 @@ export default function ViralQR() {
                                     includeMargin={true}
                                 />
                             </div>
-                            <h3 className="text-3xl font-black italic uppercase tracking-tighter mb-2">{name}</h3>
+                            <h3 className="text-3xl font-black italic uppercase tracking-tighter mb-2 text-white">{name}</h3>
                             <Badge className="bg-primary/20 text-primary border-none mb-10 px-6 py-2 text-xl font-poppins">{bloodGroup}</Badge>
 
                             <div className="grid grid-cols-2 gap-4">
@@ -135,29 +188,44 @@ export default function ViralQR() {
                         </div>
 
                         <div className="flex flex-col justify-center space-y-8">
-                            <div className="bg-slate-900/50 p-10 rounded-[40px] border border-white/5">
-                                <Shield className="text-primary mb-6" size={40} />
-                                <h4 className="text-2xl font-black italic uppercase tracking-tighter mb-4 leading-none">Upgrade to <br /> Full Protection</h4>
-                                <p className="text-slate-400 text-sm font-medium leading-relaxed mb-8">
-                                    This free QR only shows basic info. Our Premium ID includes real-time location alerts, full medical history, and physical emergency gear.
-                                </p>
-                                <Link to="/create-profile">
-                                    <Button className="w-full py-6 rounded-2xl bg-primary text-white border-none font-black italic uppercase tracking-widest">Get Premium ID @ ₹99</Button>
-                                </Link>
+                            <div className="bg-medical-card p-10 rounded-[40px] border border-white/5 relative overflow-hidden">
+                                <div className="absolute top-0 right-0 p-3 bg-primary text-white text-[8px] font-black uppercase tracking-widest italic rounded-bl-xl">ID PREVIEW</div>
+                                <div className="space-y-6">
+                                    <div className="flex items-center gap-4">
+                                        <div className="p-3 bg-primary/20 rounded-2xl text-primary border border-primary/20">
+                                            <Heart size={24} fill="currentColor" />
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Identity Marker</p>
+                                            <p className="text-xl font-black text-white italic uppercase">{name}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-4">
+                                        <div className="p-3 bg-blue-500/20 rounded-2xl text-blue-500 border border-blue-500/20">
+                                            <Activity size={24} />
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Blood Group</p>
+                                            <p className="text-xl font-black text-white italic font-poppins">{bloodGroup}</p>
+                                        </div>
+                                    </div>
+                                    <div className="pt-4 border-t border-white/5">
+                                        <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest italic leading-relaxed">
+                                            This is how your basic profile appears when scanned. For additional data fields, secure a Premium ID.
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                {[
-                                    { icon: <Zap size={18} />, label: "Live Alerts" },
-                                    { icon: <Heart size={18} />, label: "Hospital Near" },
-                                    { icon: <Activity size={18} />, label: "NFC Pulse" },
-                                    { icon: <Download size={18} />, label: "PDF Card" }
-                                ].map((item, i) => (
-                                    <div key={i} className="bg-white/5 p-4 rounded-2xl flex items-center gap-3 border border-white/5 opacity-50">
-                                        <div className="text-primary">{item.icon}</div>
-                                        <span className="text-[10px] font-black uppercase italic tracking-widest">{item.label}</span>
-                                    </div>
-                                ))}
+                            <div className="bg-slate-900/50 p-10 rounded-[40px] border border-white/5">
+                                <Shield className="text-primary mb-6" size={40} />
+                                <h4 className="text-2xl font-black italic uppercase tracking-tighter mb-4 leading-none text-white">Full Protection</h4>
+                                <p className="text-slate-400 text-sm font-medium leading-relaxed mb-8">
+                                    Our Premium ID includes real-time location alerts, full medical history, and physical emergency gear.
+                                </p>
+                                <Link to="/create-profile">
+                                    <Button className="w-full py-6 rounded-2xl bg-primary text-white border-none font-black italic uppercase tracking-widest">Upgrade @ ₹99</Button>
+                                </Link>
                             </div>
                         </div>
                     </motion.div>
@@ -170,3 +238,4 @@ export default function ViralQR() {
         </div>
     );
 }
+
