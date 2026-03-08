@@ -102,7 +102,7 @@ export default function PaymentPage() {
             currency: "INR",
             name: "RESQR",
             description: `Payment for ${selectedProduct.title}`,
-            image: `${import.meta.env.BASE_URL}logo.png`,
+            image: `${window.location.origin}/logo.png`,
             handler: async function (response) {
                 try {
                     const activeSlug = localStorage.getItem('resqr_active_slug');
@@ -158,14 +158,19 @@ export default function PaymentPage() {
         };
 
         try {
+            console.log("Initializing Razorpay with key:", options.key);
+            if (!options.key) {
+                throw new Error("Razorpay Key ID is missing. Check your environment variables.");
+            }
             const rzp = new window.Razorpay(options);
             rzp.on('payment.failed', function (response) {
+                console.error("Razorpay Payment Failed:", response.error);
                 toast.error('Payment failed: ' + response.error.description);
             });
             rzp.open();
         } catch (error) {
-            console.error("Razorpay error:", error);
-            toast.error("Failed to initialize payment. Please try again.");
+            console.error("Razorpay Initialization Error:", error);
+            toast.error(`Initialization Error: ${error.message || "Please check console"}`);
         }
     };
 
