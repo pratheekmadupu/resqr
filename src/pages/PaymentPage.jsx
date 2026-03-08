@@ -96,7 +96,7 @@ export default function PaymentPage() {
         }
 
         const options = {
-            key: "rzp_test_SMfpyRR7wzDVEG", // Using Test Key for testing
+            key: import.meta.env.VITE_RAZORPAY_KEY_ID, // Using environment variable for Razorpay Key
             amount: selectedProduct.price * 100, // Amount in paise
             currency: "INR",
             name: "RESQR",
@@ -116,7 +116,7 @@ export default function PaymentPage() {
                 method: "upi" // Default to UPI as requested
             },
             notes: {
-                payment_type: "test_transaction",
+                payment_type: "live_transaction",
                 product_id: selectedProduct.id
             },
             config: {
