@@ -107,12 +107,31 @@ export default function PaymentPage() {
             description: `Payment for ${selectedProduct.title}`,
             image: `${window.location.origin}/logo.png`,
             handler: async function (response) {
+                const t = toast.loading("Verifying tactical payment...");
                 try {
+                    // 1. Verify payment with our new Backend
+                    const verifyResponse = await fetch('/api/verify', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            razorpay_order_id: response.razorpay_order_id || "",
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature
+                        })
+                    });
+
+                    const verifyData = await verifyResponse.json();
+
+                    if (!verifyResponse.ok) {
+                        toast.error(verifyData.message || "Verification failed", { id: t });
+                        return;
+                    }
+
+                    // 2. Update Profile
                     let activeSlug = localStorage.getItem('resqr_active_slug');
                     const currentUser = auth.currentUser;
 
                     if (!activeSlug && currentUser) {
-                        // Try to find the slug associated with this UID
                         const profilesRef = ref(db, 'profiles');
                         const profilesSnapshot = await get(profilesRef);
                         if (profilesSnapshot.exists()) {
@@ -130,30 +149,17 @@ export default function PaymentPage() {
                         await update(profileRef, {
                             payment_status: 'paid',
                             payment_id: response.razorpay_payment_id,
-                            order_id: response.razorpay_order_id,
+                            order_id: response.razorpay_order_id || "direct_pay",
                             payment_date: new Date().toISOString(),
                             last_updated: new Date().toISOString()
                         });
-                        console.log("Payment Success and Profile Updated for:", activeSlug);
-                    } else if (currentUser) {
-                        // Fallback: Create a slug based on email or UID if nothing else works
-                        const fallbackSlug = currentUser.email ? currentUser.email.split('@')[0] : currentUser.uid.substring(0, 8);
-                        const profileRef = ref(db, `profiles/${fallbackSlug}`);
-                        await update(profileRef, {
-                            payment_status: 'paid',
-                            payment_id: response.razorpay_payment_id,
-                            uid: currentUser.uid,
-                            email: currentUser.email
-                        });
-                        localStorage.setItem('resqr_active_slug', fallbackSlug);
                     }
 
-                    toast.success('Payment successful! Your Identity is now live.');
+                    toast.success('Payment verified! Identity Unlocked.', { id: t });
                     navigate('/success');
                 } catch (error) {
-                    console.error("Error updating profile after payment:", error);
-                    toast.error("Payment was successful but profile update failed. Please contact support.");
-                    navigate('/success');
+                    console.error("Payment flow error:", error);
+                    toast.error("Internal verification error. Please wait or contact support.", { id: t });
                 }
             },
             prefill: {

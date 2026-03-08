@@ -46,6 +46,7 @@ export default function ProfileCreation() {
                     ...formData,
                     email: auth.currentUser?.email || "",
                     uid: auth.currentUser?.uid || "",
+                    payment_status: 'pending', // New users start as pending
                     last_updated: new Date().toISOString()
                 };
 
@@ -55,7 +56,7 @@ export default function ProfileCreation() {
                 // Also save the active slug for the QR code to use locally
                 localStorage.setItem('resqr_active_slug', nameSlug);
 
-                toast.success('Profile created successfully!');
+                toast.success('Identity node initialized!');
 
                 if (auth.currentUser) {
                     navigate('/payment');
@@ -125,221 +126,212 @@ export default function ProfileCreation() {
                 <Card className="p-10 md:p-16 bg-medical-card border-white/5 shadow-2xl rounded-[50px] relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
 
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            key={step}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                        >
-                            {step === 1 && (
-                                <div className="space-y-10">
-                                    <div className="space-y-4">
-                                        <h2 className="text-3xl font-black text-white uppercase italic tracking-tighter font-poppins">Bio-Information</h2>
-                                        <p className="text-slate-500 font-bold text-sm italic">Let's start with your primary identity markers.</p>
+                    <div className="py-8">
+                        {step === 1 && (
+                            <div className="space-y-10">
+                                <div className="space-y-4">
+                                    <h2 className="text-3xl font-black text-white uppercase italic tracking-tighter font-poppins">Bio-Information</h2>
+                                    <p className="text-slate-500 font-bold text-sm italic">Let's start with your primary identity markers.</p>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1 italic">Legal Full Name</label>
+                                        <Input
+                                            name="name"
+                                            placeholder="e.g. Dr. John Watson"
+                                            value={formData.name}
+                                            onChange={handleChange}
+                                            className="bg-slate-950/50 border-white/5 rounded-2xl h-14 font-bold focus:ring-primary/20"
+                                        />
+                                    </div>
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1 italic">Blood Type</label>
+                                        <Select
+                                            name="bloodGroup"
+                                            value={formData.bloodGroup}
+                                            onChange={handleChange}
+                                            className="bg-slate-950/50 border-white/5 rounded-2xl h-14 font-bold focus:ring-primary/20"
+                                            options={[
+                                                { label: 'Select Group', value: '' },
+                                                { label: 'A Positive (A+)', value: 'A+' },
+                                                { label: 'A Negative (A-)', value: 'A-' },
+                                                { label: 'B Positive (B+)', value: 'B+' },
+                                                { label: 'B Negative (B-)', value: 'B-' },
+                                                { label: 'AB Positive (AB+)', value: 'AB+' },
+                                                { label: 'AB Negative (AB-)', value: 'AB-' },
+                                                { label: 'O Positive (O+)', value: 'O+' },
+                                                { label: 'O Negative (O-)', value: 'O-' },
+                                            ]}
+                                        />
+                                    </div>
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1 italic">Birth Date</label>
+                                        <Input
+                                            name="dob"
+                                            type="date"
+                                            value={formData.dob}
+                                            onChange={handleChange}
+                                            className="bg-slate-950/50 border-white/5 rounded-2xl h-14 font-bold focus:ring-primary/20 text-white"
+                                        />
+                                    </div>
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1 italic">Secure Contact No.</label>
+                                        <Input
+                                            name="phone"
+                                            placeholder="+91 00000 00000"
+                                            value={formData.phone}
+                                            onChange={handleChange}
+                                            className="bg-slate-950/50 border-white/5 rounded-2xl h-14 font-bold focus:ring-primary/20"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {step === 2 && (
+                            <div className="space-y-10">
+                                <div className="space-y-4">
+                                    <h2 className="text-3xl font-black text-white uppercase italic tracking-tighter font-poppins">Medical History</h2>
+                                    <p className="text-slate-500 font-bold text-sm italic">Critical data for emergency first responders.</p>
+                                </div>
+                                <div className="space-y-8">
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1 italic">Allergies & Reactions</label>
+                                        <Input
+                                            name="allergies"
+                                            placeholder="e.g. Penicillin, Latex, Bee Stings"
+                                            value={formData.allergies}
+                                            onChange={handleChange}
+                                            className="bg-slate-950/50 border-white/5 rounded-2xl h-14 font-bold focus:ring-primary/20"
+                                        />
+                                    </div>
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1 italic">Active Medications</label>
+                                        <Input
+                                            name="medications"
+                                            placeholder="e.g. Insulin, Beta-Blockers"
+                                            value={formData.medications}
+                                            onChange={handleChange}
+                                            className="bg-slate-950/50 border-white/5 rounded-2xl h-14 font-bold focus:ring-primary/20"
+                                        />
+                                    </div>
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1 italic">Chronic Conditions & Notes</label>
+                                        <textarea
+                                            name="medicalConditions"
+                                            rows="5"
+                                            className="w-full px-6 py-5 bg-slate-950/50 border border-white/5 rounded-3xl focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary/40 transition-all placeholder:text-slate-700 text-white font-bold"
+                                            placeholder="e.g. Type-1 Diabetes, Asthma, Previous Heart Surgery"
+                                            value={formData.medicalConditions}
+                                            onChange={handleChange}
+                                        ></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {step === 3 && (
+                            <div className="space-y-10">
+                                <div className="space-y-4">
+                                    <h2 className="text-3xl font-black text-white uppercase italic tracking-tighter font-poppins">Guardian Contacts</h2>
+                                    <p className="text-slate-500 font-bold text-sm italic">Who should we broadcast alerts to during a crisis?</p>
+                                </div>
+                                <div className="grid grid-cols-1 gap-10">
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1 italic">Primary Emergency Contact</label>
+                                        <Input
+                                            name="emergencyContactName"
+                                            placeholder="Legal Name of Contact"
+                                            value={formData.emergencyContactName}
+                                            onChange={handleChange}
+                                            className="bg-slate-950/50 border-white/5 rounded-2xl h-14 font-bold focus:ring-primary/20"
+                                        />
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                                         <div className="space-y-3">
-                                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1 italic">Legal Full Name</label>
+                                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1 italic">Secure Phone No.</label>
                                             <Input
-                                                name="name"
-                                                placeholder="e.g. Dr. John Watson"
-                                                value={formData.name}
-                                                onChange={handleChange}
-                                                className="bg-slate-950/50 border-white/5 rounded-2xl h-14 font-bold focus:ring-primary/20"
-                                            />
-                                        </div>
-                                        <div className="space-y-3">
-                                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1 italic">Blood Type</label>
-                                            <Select
-                                                name="bloodGroup"
-                                                value={formData.bloodGroup}
-                                                onChange={handleChange}
-                                                className="bg-slate-950/50 border-white/5 rounded-2xl h-14 font-bold focus:ring-primary/20"
-                                                options={[
-                                                    { label: 'Select Group', value: '' },
-                                                    { label: 'A Positive (A+)', value: 'A+' },
-                                                    { label: 'A Negative (A-)', value: 'A-' },
-                                                    { label: 'B Positive (B+)', value: 'B+' },
-                                                    { label: 'B Negative (B-)', value: 'B-' },
-                                                    { label: 'AB Positive (AB+)', value: 'AB+' },
-                                                    { label: 'AB Negative (AB-)', value: 'AB-' },
-                                                    { label: 'O Positive (O+)', value: 'O+' },
-                                                    { label: 'O Negative (O-)', value: 'O-' },
-                                                ]}
-                                            />
-                                        </div>
-                                        <div className="space-y-3">
-                                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1 italic">Birth Date</label>
-                                            <Input
-                                                name="dob"
-                                                type="date"
-                                                value={formData.dob}
-                                                onChange={handleChange}
-                                                className="bg-slate-950/50 border-white/5 rounded-2xl h-14 font-bold focus:ring-primary/20 text-white"
-                                            />
-                                        </div>
-                                        <div className="space-y-3">
-                                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1 italic">Secure Contact No.</label>
-                                            <Input
-                                                name="phone"
+                                                name="emergencyContactPhone"
                                                 placeholder="+91 00000 00000"
-                                                value={formData.phone}
+                                                value={formData.emergencyContactPhone}
                                                 onChange={handleChange}
                                                 className="bg-slate-950/50 border-white/5 rounded-2xl h-14 font-bold focus:ring-primary/20"
                                             />
                                         </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            {step === 2 && (
-                                <div className="space-y-10">
-                                    <div className="space-y-4">
-                                        <h2 className="text-3xl font-black text-white uppercase italic tracking-tighter font-poppins">Medical History</h2>
-                                        <p className="text-slate-500 font-bold text-sm italic">Critical data for emergency first responders.</p>
-                                    </div>
-                                    <div className="space-y-8">
                                         <div className="space-y-3">
-                                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1 italic">Allergies & Reactions</label>
+                                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1 italic">Legal Relation</label>
                                             <Input
-                                                name="allergies"
-                                                placeholder="e.g. Penicillin, Latex, Bee Stings"
-                                                value={formData.allergies}
+                                                name="emergencyContactRelation"
+                                                placeholder="e.g. Spouse, Parent, Brother"
+                                                value={formData.emergencyContactRelation}
                                                 onChange={handleChange}
                                                 className="bg-slate-950/50 border-white/5 rounded-2xl h-14 font-bold focus:ring-primary/20"
                                             />
                                         </div>
-                                        <div className="space-y-3">
-                                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1 italic">Active Medications</label>
-                                            <Input
-                                                name="medications"
-                                                placeholder="e.g. Insulin, Beta-Blockers"
-                                                value={formData.medications}
-                                                onChange={handleChange}
-                                                className="bg-slate-950/50 border-white/5 rounded-2xl h-14 font-bold focus:ring-primary/20"
-                                            />
-                                        </div>
-                                        <div className="space-y-3">
-                                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1 italic">Chronic Conditions & Notes</label>
-                                            <textarea
-                                                name="medicalConditions"
-                                                rows="5"
-                                                className="w-full px-6 py-5 bg-slate-950/50 border border-white/5 rounded-3xl focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary/40 transition-all placeholder:text-slate-700 text-white font-bold"
-                                                placeholder="e.g. Type-1 Diabetes, Asthma, Previous Heart Surgery"
-                                                value={formData.medicalConditions}
-                                                onChange={handleChange}
-                                            ></textarea>
-                                        </div>
                                     </div>
                                 </div>
-                            )}
+                            </div>
+                        )}
 
-                            {step === 3 && (
-                                <div className="space-y-10">
-                                    <div className="space-y-4">
-                                        <h2 className="text-3xl font-black text-white uppercase italic tracking-tighter font-poppins">Guardian Contacts</h2>
-                                        <p className="text-slate-500 font-bold text-sm italic">Who should we broadcast alerts to during a crisis?</p>
-                                    </div>
-                                    <div className="grid grid-cols-1 gap-10">
-                                        <div className="space-y-3">
-                                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1 italic">Primary Emergency Contact</label>
-                                            <Input
-                                                name="emergencyContactName"
-                                                placeholder="Legal Name of Contact"
-                                                value={formData.emergencyContactName}
-                                                onChange={handleChange}
-                                                className="bg-slate-950/50 border-white/5 rounded-2xl h-14 font-bold focus:ring-primary/20"
-                                            />
+                        {step === 4 && (
+                            <div className="space-y-10">
+                                <div className="space-y-4">
+                                    <h2 className="text-3xl font-black text-white uppercase italic tracking-tighter font-poppins">Identity Preview</h2>
+                                    <p className="text-slate-500 font-bold text-sm italic">Review your encrypted profile before activation.</p>
+                                </div>
+
+                                <div className="flex flex-col lg:flex-row gap-12 items-center bg-slate-950/50 rounded-[40px] p-10 border border-white/5 relative group">
+                                    <div className="absolute inset-0 bg-primary/5 blur-3xl rounded-full opacity-50 pointer-events-none" />
+
+                                    <div className="w-48 h-48 bg-slate-950/80 rounded-[40px] border-4 border-primary/20 flex flex-col items-center justify-center p-6 text-center space-y-4 shadow-2xl relative overflow-hidden shrink-0">
+                                        <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary relative z-10 shadow-lg shadow-primary/20">
+                                            <Lock size={32} />
                                         </div>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                            <div className="space-y-3">
-                                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1 italic">Secure Phone No.</label>
-                                                <Input
-                                                    name="emergencyContactPhone"
-                                                    placeholder="+91 00000 00000"
-                                                    value={formData.emergencyContactPhone}
-                                                    onChange={handleChange}
-                                                    className="bg-slate-950/50 border-white/5 rounded-2xl h-14 font-bold focus:ring-primary/20"
-                                                />
+                                        <span className="text-[10px] font-black text-white/50 uppercase tracking-[0.2em] relative z-10 italic leading-tight">
+                                            IDENTITY SECURED<br />
+                                            <span className="text-primary tracking-widest mt-1 inline-block uppercase">Hub Access Only</span>
+                                        </span>
+                                    </div>
+
+                                    <div className="flex-1 space-y-8 w-full relative z-10">
+                                        <div className="grid grid-cols-2 gap-8">
+                                            <div className="space-y-1">
+                                                <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">Identity Owner</span>
+                                                <p className="text-xl font-black text-white uppercase italic tracking-tight">{formData.name || 'Not provided'}</p>
                                             </div>
-                                            <div className="space-y-3">
-                                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1 italic">Legal Relation</label>
-                                                <Input
-                                                    name="emergencyContactRelation"
-                                                    placeholder="e.g. Spouse, Parent, Brother"
-                                                    value={formData.emergencyContactRelation}
-                                                    onChange={handleChange}
-                                                    className="bg-slate-950/50 border-white/5 rounded-2xl h-14 font-bold focus:ring-primary/20"
-                                                />
+                                            <div className="space-y-1">
+                                                <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">Blood Group</span>
+                                                <p className="text-xl font-black text-primary italic font-poppins">{formData.bloodGroup || 'Not provided'}</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="border-t border-white/5 pt-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+                                            <div className="space-y-1">
+                                                <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">Medical Summary</span>
+                                                <p className="text-sm font-bold text-slate-300 leading-relaxed uppercase">
+                                                    {formData.allergies ? `Allergies: ${formData.allergies}` : 'No known allergies'}
+                                                </p>
+                                            </div>
+                                            <div className="space-y-1 text-right">
+                                                <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">Emergency Hub</span>
+                                                <p className="text-sm font-bold text-white uppercase italic">
+                                                    {formData.emergencyContactName}<br />
+                                                    <span className="text-slate-500 text-[10px]">{formData.emergencyContactPhone}</span>
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            )}
 
-                            {step === 4 && (
-                                <div className="space-y-10">
-                                    <div className="space-y-4">
-                                        <h2 className="text-3xl font-black text-white uppercase italic tracking-tighter font-poppins">Identity Preview</h2>
-                                        <p className="text-slate-500 font-bold text-sm italic">Review your encrypted profile before activation.</p>
-                                    </div>
-
-                                    <div className="flex flex-col lg:flex-row gap-12 items-center bg-slate-950/50 rounded-[40px] p-10 border border-white/5 relative group">
-                                        <div className="absolute inset-0 bg-primary/5 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-
-                                        <div className="w-48 h-48 bg-slate-950/80 rounded-[40px] border-4 border-primary/20 flex flex-col items-center justify-center p-6 text-center space-y-4 shadow-2xl relative overflow-hidden group-hover:border-primary/40 transition-all shrink-0">
-                                            <div className="absolute inset-0 bg-primary/5 animate-pulse" />
-                                            <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary relative z-10 shadow-lg shadow-primary/20">
-                                                <Lock size={32} />
-                                            </div>
-                                            <span className="text-[10px] font-black text-white/50 uppercase tracking-[0.2em] relative z-10 italic leading-tight">
-                                                IDENTITY SECURED<br />
-                                                <span className="text-primary tracking-widest mt-1 inline-block">SECURE QR HUB</span>
-                                            </span>
-                                        </div>
-
-                                        <div className="flex-1 space-y-8 w-full relative z-10">
-                                            <div className="grid grid-cols-2 gap-8">
-                                                <div className="space-y-1">
-                                                    <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">Identity Owner</span>
-                                                    <p className="text-xl font-black text-white uppercase italic tracking-tight">{formData.name || 'Not provided'}</p>
-                                                </div>
-                                                <div className="space-y-1">
-                                                    <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">Blood Group</span>
-                                                    <p className="text-xl font-black text-primary italic font-poppins">{formData.bloodGroup || 'Not provided'}</p>
-                                                </div>
-                                            </div>
-
-                                            <div className="border-t border-white/5 pt-6 grid grid-cols-1 md:grid-cols-2 gap-8">
-                                                <div className="space-y-1">
-                                                    <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">Medical Summary</span>
-                                                    <p className="text-sm font-bold text-slate-300 leading-relaxed uppercase">
-                                                        {formData.allergies ? `Allergies: ${formData.allergies}` : 'No known allergies'}
-                                                    </p>
-                                                </div>
-                                                <div className="space-y-1 text-right">
-                                                    <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest italic">Emergency Hub</span>
-                                                    <p className="text-sm font-bold text-white uppercase italic">
-                                                        {formData.emergencyContactName}<br />
-                                                        <span className="text-slate-500 text-[10px]">{formData.emergencyContactPhone}</span>
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="bg-primary/5 p-6 rounded-2xl border border-primary/20 flex items-center gap-4">
-                                        <Shield className="text-primary shrink-0" size={24} />
-                                        <p className="text-[10px] font-bold text-primary uppercase tracking-[0.1em] leading-relaxed">
-                                            By proceeding, you agree that this information will be made available to any individual who scans your physical RESQR tag during an emergency.
-                                        </p>
-                                    </div>
+                                <div className="bg-primary/5 p-6 rounded-2xl border border-primary/20 flex items-center gap-4">
+                                    <Shield className="text-primary shrink-0" size={24} />
+                                    <p className="text-[10px] font-bold text-primary uppercase tracking-[0.1em] leading-relaxed">
+                                        By proceeding, you agree that this information will be made available to any individual who scans your physical RESQR tag during an emergency.
+                                    </p>
                                 </div>
-                            )}
-                        </motion.div>
-                    </AnimatePresence>
+                            </div>
+                        )}
+                    </div>
 
                     {/* Footer Actions */}
                     <div className="mt-16 flex items-center justify-between border-t border-white/5 pt-10">

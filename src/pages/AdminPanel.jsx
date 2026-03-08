@@ -642,7 +642,14 @@ export default function AdminPanel() {
                                                     {profile.id || profile.name?.toLowerCase().replace(/\s+/g, '-')}
                                                 </code>
                                             </td>
-                                            <td className="px-10 py-8 font-black text-white italic tracking-tight text-lg">{profile.name}</td>
+                                            <td className="px-10 py-8 font-black text-white italic tracking-tight text-lg">
+                                                {profile.name}
+                                                <div className="mt-2">
+                                                    <Badge className={`${profile.payment_status === 'paid' ? 'bg-green-500/10 text-green-500' : profile.payment_status === undefined ? 'bg-blue-500/10 text-blue-500' : 'bg-red-500/10 text-red-500'} border-none font-black italic tracking-widest text-[7px] px-2 py-0.5`}>
+                                                        {profile.payment_status === 'paid' ? 'SECURED' : profile.payment_status === undefined ? 'LEGACY' : 'UNSECURED'}
+                                                    </Badge>
+                                                </div>
+                                            </td>
                                             <td className="px-10 py-8">
                                                 <Badge className="bg-primary/20 text-primary border-none font-black italic px-4 py-1 text-sm font-poppins">{profile.bloodGroup}</Badge>
                                             </td>

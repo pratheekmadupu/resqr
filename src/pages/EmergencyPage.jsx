@@ -108,7 +108,7 @@ export default function EmergencyPage() {
         );
     }
 
-    if (user.payment_status !== 'paid' && user.name !== "DEMO") {
+    if (user.payment_status === 'pending' && user.name !== "DEMO") {
         return (
             <div className="min-h-screen bg-medical-bg text-white flex items-center justify-center p-8 font-manrope">
                 <div className="max-w-md w-full bg-medical-card rounded-[40px] p-12 text-center border border-white/5 relative overflow-hidden">
