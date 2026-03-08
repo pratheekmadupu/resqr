@@ -1,15 +1,27 @@
-import { useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
 import { motion } from 'framer-motion';
-import { Download, Printer, Share2, CheckCircle2, ChevronRight, LayoutDashboard } from 'lucide-react';
+import { Download, Printer, Share2, CheckCircle2, ChevronRight, LayoutDashboard, MessageSquare } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
 import { Link } from 'react-router-dom';
+import { db } from '../lib/firebase';
+import { ref, get } from 'firebase/database';
 import toast from 'react-hot-toast';
 
 export default function SuccessPage() {
     const qrRef = useRef();
+    const [profile, setProfile] = useState(null);
+
+    useEffect(() => {
+        const slug = localStorage.getItem('resqr_active_slug');
+        if (slug) {
+            get(ref(db, `profiles/${slug}`)).then(snapshot => {
+                if (snapshot.exists()) setProfile(snapshot.val());
+            });
+        }
+    }, []);
 
     const handleDownload = () => {
         const canvas = document.getElementById('success-qr-canvas') || qrRef.current.querySelector('canvas');
@@ -25,6 +37,18 @@ export default function SuccessPage() {
         link.click();
         document.body.removeChild(link);
         toast.success('QR TAG Downloaded!');
+    };
+
+    const handleWhatsAppShare = () => {
+        const qrLink = getQRValue();
+        const phone = profile?.phone || profile?.emergencyContactPhone || '';
+        const message = encodeURIComponent(`🚨 *RESQR IDENTITY ACTIVATED* \n\nYour life-saving medical profile is now LIVE. \n\n*Access Link:* ${qrLink}\n\nKeep this link safe or share it with family. In an emergency, first responders can scan your QR to save your life.`);
+
+        if (phone) {
+            window.open(`https://wa.me/${phone.replace(/\D/g, '')}?text=${message}`, '_blank');
+        } else {
+            window.open(`https://wa.me/?text=${message}`, '_blank');
+        }
     };
 
     const handlePrint = () => {
@@ -105,10 +129,13 @@ export default function SuccessPage() {
                     <Button className="w-full py-8 text-xl font-black italic rounded-[24px] shadow-2xl shadow-primary/20 bg-primary text-white border-none group hover:scale-[1.02] active:scale-95 transition-all uppercase tracking-tighter" onClick={handleDownload}>
                         <Download size={22} className="mr-2" /> DISPATCH TAG
                     </Button>
+                    <Button className="w-full py-8 text-xl font-black italic rounded-[24px] shadow-2xl shadow-green-500/20 bg-green-600 text-white border-none group hover:scale-[1.02] active:scale-95 transition-all uppercase tracking-tighter" onClick={handleWhatsAppShare}>
+                        <MessageSquare size={22} className="mr-2" /> SEND TO WHATSAPP
+                    </Button>
                     <Button variant="outline" className="w-full h-20 rounded-[24px] border-white/10 text-slate-300 font-black italic uppercase tracking-widest text-[11px] hover:bg-white/5" onClick={handlePrint}>
                         <Printer size={18} className="mr-2" /> Print Physical Card
                     </Button>
-                    <Button variant="ghost" className="col-span-1 sm:col-span-2 text-slate-500 font-black italic uppercase tracking-[0.3em] text-[10px] h-12" onClick={() => {
+                    <Button variant="ghost" className="text-slate-500 font-black italic uppercase tracking-[0.3em] text-[10px] h-12" onClick={() => {
                         navigator.clipboard.writeText(getQRValue());
                         toast.success('Broadcast Link Copied!');
                     }}>

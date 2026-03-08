@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
     User, QrCode, Bell, ChevronRight,
@@ -221,8 +221,8 @@ export default function Dashboard() {
                             Unit: <span className="text-primary">{userDisplayName.split(' ')[0]}</span>
                         </h1>
                         <p className="text-slate-500 font-bold uppercase tracking-[0.2em] text-[10px] italic mt-4 flex items-center gap-2">
-                            <span className={`w-2 h-2 rounded-full ${profile?.payment_status !== 'pending' ? 'bg-green-500' : 'bg-primary animate-pulse'} `} />
-                            {profile?.payment_status === 'pending' ? 'IDENTIFICATION READY FOR GENERATION' : 'ENCRYPTED PROTECTION ACTIVE'}
+                            <span className={`w-2 h-2 rounded-full ${profile?.payment_status !== 'pending' ? 'bg-green-500' : 'bg-red-500'} animate-pulse`} />
+                            {profile?.payment_status === 'paid' ? 'ENCRYPTED PROTECTION ACTIVE' : profile?.payment_status === undefined ? 'LEGACY VAULT ACTIVE' : 'IDENTIFICATION PENDING ACTIVATION'}
                         </p>
                     </div>
                     <div className="flex flex-wrap gap-4">
@@ -247,9 +247,11 @@ export default function Dashboard() {
                         <p className="text-slate-500 mb-12 max-w-xl mx-auto text-xl leading-relaxed font-bold italic uppercase tracking-tight">
                             Strategic medical data gap detected. Initialize your medical vault to ensure coverage.
                         </p>
-                        <Button size="lg" className="px-16 py-8 rounded-full font-black text-2xl shadow-2xl bg-primary text-white border-none uppercase italic tracking-tighter hover:scale-[1.05] transition-all" onClick={() => navigate('/create-profile')}>
-                            START INITIALIZATION
-                        </Button>
+                        <Link to="/create-profile">
+                            <Button size="lg" className="px-16 py-8 rounded-full font-black text-2xl shadow-2xl bg-primary text-white border-none uppercase italic tracking-tighter hover:scale-[1.05] transition-all">
+                                START INITIALIZATION
+                            </Button>
+                        </Link>
                     </Card>
                 ) : (
                     <>
@@ -281,10 +283,10 @@ export default function Dashboard() {
                                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] mt-2">Active Medical Identity</p>
                                             </div>
                                         </div>
-                                        <div className={`flex items-center gap-2 px-6 py-2 ${profile?.payment_status !== 'pending' ? 'bg-green-500/10 border-green-500/20 text-green-500' : 'bg-primary/10 border-primary/20 text-primary'} border rounded-full`}>
-                                            <span className={`w-2 h-2 rounded-full ${profile?.payment_status !== 'pending' ? 'bg-green-500 animate-pulse' : 'bg-primary'}`} />
+                                        <div className={`flex items-center gap-2 px-6 py-2 ${profile?.payment_status !== 'pending' ? 'bg-green-500/10 border-green-500/20 text-green-500' : 'bg-red-500/10 border-red-500/20 text-red-500'} border rounded-full`}>
+                                            <span className={`w-2 h-2 rounded-full ${profile?.payment_status !== 'pending' ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
                                             <span className="text-[10px] font-black uppercase tracking-[0.2em] italic">
-                                                {profile?.payment_status !== 'pending' ? 'ACTIVE' : 'READY'}
+                                                {profile?.payment_status === 'paid' ? 'SECURED' : profile?.payment_status === undefined ? 'LEGACY' : 'UNSECURED'}
                                             </span>
                                         </div>
                                     </div>
@@ -419,35 +421,60 @@ export default function Dashboard() {
                                     <Card className="text-center bg-medical-card border-primary/20 shadow-2xl rounded-[50px] p-12 relative group sticky top-24 overflow-hidden">
                                         <div className="absolute inset-0 bg-primary/5 blur-3xl rounded-full opacity-50" />
                                         <div className="w-24 h-24 bg-primary/10 rounded-[30px] flex items-center justify-center mx-auto mb-8 text-primary border border-primary/20 shadow-2xl relative z-10">
-                                            <QrCode size={40} />
+                                            <Lock size={40} />
                                         </div>
-                                        <h3 className="text-3xl font-black text-white mb-4 uppercase italic tracking-tighter font-poppins relative z-10">Identity <br />Ready</h3>
+                                        <h3 className="text-3xl font-black text-white mb-4 uppercase italic tracking-tighter font-poppins relative z-10">Identity <br />Locked</h3>
                                         <p className="text-slate-500 mb-10 text-xs font-bold uppercase tracking-widest italic relative z-10">
-                                            Bio-Information encrypted. Generate your unique tactical QR identity to activate your profile.
+                                            Activation required to generate your unique life-saving QR identity.
                                         </p>
                                         <div className="space-y-4 relative z-10">
                                             <Button
-                                                onClick={async () => {
-                                                    if (!activeSlug) return;
-                                                    const t = toast.loading("Generating Tactical Node...");
-                                                    try {
-                                                        const profileRef = ref(db, `profiles/${activeSlug}`);
-                                                        await update(profileRef, {
-                                                            payment_status: 'active',
-                                                            activation_date: new Date().toISOString()
-                                                        });
-                                                        toast.success("Identity Node Active!", { id: t });
-                                                    } catch (err) {
-                                                        toast.error("Generation failed.", { id: t });
-                                                    }
-                                                }}
+                                                onClick={() => navigate('/payment')}
                                                 className="w-full bg-primary text-white rounded-[24px] py-8 font-black text-xl shadow-2xl shadow-primary/30 border-none uppercase italic hover:scale-[1.05] transition-all"
                                             >
-                                                GENERATE QR
+                                                SECURE NOW ₹99
                                             </Button>
+                                            <button
+                                                onClick={async () => {
+                                                    if (!auth.currentUser) {
+                                                        toast.error("Please login to verify");
+                                                        return;
+                                                    }
+                                                    const t = toast.loading("Checking secure records...");
+                                                    try {
+                                                        const profilesRef = ref(db, 'profiles');
+                                                        const snapshot = await get(profilesRef);
+                                                        if (snapshot.exists()) {
+                                                            const profiles = snapshot.val();
+                                                            const currentUser = auth.currentUser;
+                                                            // Find any profile associated with this user that is NOT pending
+                                                            const validEntry = Object.entries(profiles).find(([s, data]) =>
+                                                                (data.payment_status !== 'pending' && data.payment_status !== 'active') &&
+                                                                (data.uid === currentUser.uid || (data.email && data.email === currentUser.email))
+                                                            );
+
+                                                            if (validEntry) {
+                                                                const newSlug = validEntry[0];
+                                                                localStorage.setItem('resqr_active_slug', newSlug);
+                                                                setActiveSlug(newSlug);
+                                                                toast.success("Identity Unlocked!", { id: t });
+                                                            } else {
+                                                                toast.error("No active/legacy account found for this user.", { id: t });
+                                                            }
+                                                        } else {
+                                                            toast.error("No records found.", { id: t });
+                                                        }
+                                                    } catch (err) {
+                                                        toast.error("System error during verification.", { id: t });
+                                                    }
+                                                }}
+                                                className="w-full py-4 text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] italic hover:text-primary transition-colors"
+                                            >
+                                                Already Paid? Verify Activation
+                                            </button>
                                         </div>
                                         <p className="mt-6 text-[8px] font-black text-slate-600 uppercase tracking-[0.3em] italic relative z-10">
-                                            Free Secure ID • Lifetime Validity
+                                            One-time payment • Lifetime Validity
                                         </p>
                                     </Card>
                                 )}
