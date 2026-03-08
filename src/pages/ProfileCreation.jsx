@@ -286,21 +286,15 @@ export default function ProfileCreation() {
                                     <div className="flex flex-col lg:flex-row gap-12 items-center bg-slate-950/50 rounded-[40px] p-10 border border-white/5 relative group">
                                         <div className="absolute inset-0 bg-primary/5 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
 
-                                        <div className="bg-white p-5 rounded-[32px] border-8 border-slate-900 shrink-0 shadow-2xl relative z-10">
-                                            <QRCodeCanvas
-                                                value={`${window.location.origin}/e/${formData.name.toLowerCase().trim().replace(/\s+/g, '-') || 'demo'}`}
-                                                size={180}
-                                                level="H"
-                                                includeMargin={true}
-                                                imageSettings={{
-                                                    src: `${import.meta.env.BASE_URL}resqr_icon.png`,
-                                                    x: undefined,
-                                                    y: undefined,
-                                                    height: 48,
-                                                    width: 48,
-                                                    excavate: true,
-                                                }}
-                                            />
+                                        <div className="w-48 h-48 bg-slate-950/80 rounded-[40px] border-4 border-primary/20 flex flex-col items-center justify-center p-6 text-center space-y-4 shadow-2xl relative overflow-hidden group-hover:border-primary/40 transition-all shrink-0">
+                                            <div className="absolute inset-0 bg-primary/5 animate-pulse" />
+                                            <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary relative z-10 shadow-lg shadow-primary/20">
+                                                <Lock size={32} />
+                                            </div>
+                                            <span className="text-[10px] font-black text-white/50 uppercase tracking-[0.2em] relative z-10 italic leading-tight">
+                                                IDENTITY SECURED<br />
+                                                <span className="text-primary tracking-widest mt-1 inline-block">SECURE QR HUB</span>
+                                            </span>
                                         </div>
 
                                         <div className="flex-1 space-y-8 w-full relative z-10">

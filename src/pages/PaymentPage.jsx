@@ -3,9 +3,10 @@ import { motion } from 'framer-motion';
 import { CreditCard, ShieldCheck, Lock, ChevronRight, Zap, Loader2 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
+import { Badge } from '../components/ui/Badge';
 import { useNavigate } from 'react-router-dom';
 import { db, auth } from '../lib/firebase';
-import { ref, onValue } from 'firebase/database';
+import { ref, onValue, update } from 'firebase/database';
 import { onAuthStateChanged } from 'firebase/auth';
 import toast from 'react-hot-toast';
 
@@ -102,12 +103,27 @@ export default function PaymentPage() {
             name: "RESQR",
             description: `Payment for ${selectedProduct.title}`,
             image: `${import.meta.env.BASE_URL}logo.png`,
-            handler: function (response) {
-                // In a production app, verify this payment on your backend
-                // Key Secret should ONLY be used on the server-side
-                console.log("Payment Success:", response);
-                toast.success('Payment successful!');
-                navigate('/success');
+            handler: async function (response) {
+                try {
+                    const activeSlug = localStorage.getItem('resqr_active_slug');
+                    if (activeSlug) {
+                        const profileRef = ref(db, `profiles/${activeSlug}`);
+                        await update(profileRef, {
+                            payment_status: 'paid',
+                            payment_id: response.razorpay_payment_id,
+                            order_id: response.razorpay_order_id,
+                            payment_date: new Date().toISOString()
+                        });
+                    }
+                    console.log("Payment Success and Profile Updated:", response);
+                    toast.success('Payment successful! Your Identity is now live.');
+                    navigate('/success');
+                } catch (error) {
+                    console.error("Error updating profile after payment:", error);
+                    toast.error("Payment was successful but profile update failed. Please contact support.");
+                    // Still navigate to success as they did pay
+                    navigate('/success');
+                }
             },
             prefill: {
                 name: "",

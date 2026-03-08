@@ -343,30 +343,52 @@ export default function Dashboard() {
                             </div>
 
                             <div className="space-y-10">
-                                <Card className="text-center bg-medical-card border-white/5 shadow-2xl rounded-[50px] p-12 relative group sticky top-24">
-                                    <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent" />
-                                    <div className="bg-slate-900 p-8 rounded-[48px] border-[16px] border-slate-950 inline-block mb-12 shadow-2xl relative">
-                                        <QRCodeCanvas
-                                            id="resqr-qr-canvas"
-                                            value={getQRValue()}
-                                            size={200}
-                                            level="H"
-                                            includeMargin={true}
-                                            imageSettings={{
-                                                src: `${import.meta.env.BASE_URL}resqr_icon.png`,
-                                                height: 40,
-                                                width: 40,
-                                                excavate: true,
-                                            }}
-                                        />
-                                    </div>
-                                    <div className="space-y-6">
-                                        <Button className="w-full bg-primary hover:bg-primary-dark text-white rounded-[24px] py-10 font-black text-2xl shadow-2xl border-none uppercase italic" onClick={() => window.open(getQRValue(), '_blank')}>
-                                            Public Vault <ExternalLink size={28} className="ml-3" />
+                                {profile?.payment_status === 'paid' ? (
+                                    <Card className="text-center bg-medical-card border-white/5 shadow-2xl rounded-[50px] p-12 relative group sticky top-24">
+                                        <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent" />
+                                        <div className="bg-slate-900 p-8 rounded-[48px] border-[16px] border-slate-950 inline-block mb-12 shadow-2xl relative">
+                                            <QRCodeCanvas
+                                                id="resqr-qr-canvas"
+                                                value={getQRValue()}
+                                                size={200}
+                                                level="H"
+                                                includeMargin={true}
+                                                imageSettings={{
+                                                    src: `${import.meta.env.BASE_URL}resqr_icon.png`,
+                                                    height: 40,
+                                                    width: 40,
+                                                    excavate: true,
+                                                }}
+                                            />
+                                        </div>
+                                        <div className="space-y-6">
+                                            <Button className="w-full bg-primary hover:bg-primary-dark text-white rounded-[24px] py-10 font-black text-2xl shadow-2xl border-none uppercase italic" onClick={() => window.open(getQRValue(), '_blank')}>
+                                                Public Vault <ExternalLink size={28} className="ml-3" />
+                                            </Button>
+                                            <Button variant="outline" className="w-full font-black py-4 rounded-2xl border-white/10 bg-white/5 text-slate-400 uppercase text-[9px] italic" onClick={handleDownload}>Save Tag to Device</Button>
+                                        </div>
+                                    </Card>
+                                ) : (
+                                    <Card className="text-center bg-medical-card border-primary/20 shadow-2xl rounded-[50px] p-12 relative group sticky top-24 overflow-hidden">
+                                        <div className="absolute inset-0 bg-primary/5 blur-3xl rounded-full opacity-50" />
+                                        <div className="w-24 h-24 bg-primary/10 rounded-[30px] flex items-center justify-center mx-auto mb-8 text-primary border border-primary/20 shadow-2xl relative z-10">
+                                            <Lock size={40} />
+                                        </div>
+                                        <h3 className="text-3xl font-black text-white mb-4 uppercase italic tracking-tighter font-poppins relative z-10">Identity <br />Locked</h3>
+                                        <p className="text-slate-500 mb-10 text-xs font-bold uppercase tracking-widest italic relative z-10">
+                                            Activation required to generate your unique life-saving QR identity.
+                                        </p>
+                                        <Button
+                                            onClick={() => window.location.href = '/payment'}
+                                            className="w-full bg-primary text-white rounded-[24px] py-8 font-black text-xl shadow-2xl shadow-primary/30 border-none uppercase italic relative z-10 hover:scale-[1.05] transition-all"
+                                        >
+                                            SECURE NOW ₹99
                                         </Button>
-                                        <Button variant="outline" className="w-full font-black py-4 rounded-2xl border-white/10 bg-white/5 text-slate-400 uppercase text-[9px] italic" onClick={handleDownload}>Save Tag to Device</Button>
-                                    </div>
-                                </Card>
+                                        <p className="mt-6 text-[8px] font-black text-slate-600 uppercase tracking-[0.3em] italic relative z-10">
+                                            One-time payment \u2022 Lifetime Validity
+                                        </p>
+                                    </Card>
+                                )}
 
                             </div>
                         </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Phone, MapPin, AlertCircle, Heart, Activity, Info, Loader2 } from 'lucide-react';
+import { Phone, MapPin, AlertCircle, Heart, Activity, Info, Loader2, Lock } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { motion } from 'framer-motion';
@@ -76,6 +76,7 @@ export default function EmergencyPage() {
                     setUser({
                         name: decodedUser.name.toUpperCase(),
                         bloodGroup: decodedUser.bloodGroup,
+                        payment_status: decodedUser.payment_status,
                         allergies: decodedUser.allergies || "None reported",
                         conditions: decodedUser.medicalConditions || "No chronic conditions reported",
                         emergencyContact: {
@@ -103,6 +104,24 @@ export default function EmergencyPage() {
         return (
             <div className="min-h-screen bg-slate-900 flex items-center justify-center">
                 <Loader2 className="text-primary animate-spin" size={48} />
+            </div>
+        );
+    }
+
+    if (user.payment_status !== 'paid' && user.name !== "DEMO") {
+        return (
+            <div className="min-h-screen bg-medical-bg text-white flex items-center justify-center p-8 font-manrope">
+                <div className="max-w-md w-full bg-medical-card rounded-[40px] p-12 text-center border border-white/5 relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent" />
+                    <div className="w-24 h-24 bg-primary/20 rounded-[30px] flex items-center justify-center mx-auto mb-10 text-primary border border-primary/20 shadow-2xl animate-pulse">
+                        <Lock size={40} />
+                    </div>
+                    <h2 className="text-4xl font-black italic uppercase tracking-tighter leading-none mb-6 font-poppins text-white">Profile Pending Activation</h2>
+                    <p className="text-slate-500 font-bold uppercase tracking-widest text-xs mb-10 italic">This medical profile has not been activated yet. Please ensure the identity owner has completed the secure activation process.</p>
+                    <div className="pt-8 border-t border-white/5 flex flex-col items-center gap-4 text-[9px] font-black text-slate-600 uppercase tracking-[0.4em] italic leading-tight">
+                        <span>Secured by Guardian Network</span>
+                    </div>
+                </div>
             </div>
         );
     }
