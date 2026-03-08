@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
     User, QrCode, Bell, ChevronRight,
@@ -17,6 +18,7 @@ import PromotedAd from '../components/PromotedAd';
 import toast from 'react-hot-toast';
 
 export default function Dashboard() {
+    const navigate = useNavigate();
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [loading, setLoading] = useState(true);
     const [profile, setProfile] = useState(null);
@@ -229,7 +231,7 @@ export default function Dashboard() {
                                 <Download size={24} className="mr-3" /> EXPORT IDENTITY
                             </Button>
                         )}
-                        <Button variant="outline" className="font-black border-white/10 bg-white/5 rounded-2xl px-8 py-6 text-slate-300 uppercase italic tracking-widest text-[11px]" onClick={() => profile ? setIsEditModalOpen(true) : window.location.href = '/create-profile'}>
+                        <Button variant="outline" className="font-black border-white/10 bg-white/5 rounded-2xl px-8 py-6 text-slate-300 uppercase italic tracking-widest text-[11px]" onClick={() => profile ? setIsEditModalOpen(true) : navigate('/create-profile')}>
                             {profile ? 'Sync Records' : 'Initialize Node'}
                         </Button>
                     </div>
@@ -245,7 +247,7 @@ export default function Dashboard() {
                         <p className="text-slate-500 mb-12 max-w-xl mx-auto text-xl leading-relaxed font-bold italic uppercase tracking-tight">
                             Strategic medical data gap detected. Initialize your medical vault to ensure coverage.
                         </p>
-                        <Button size="lg" className="px-16 py-8 rounded-full font-black text-2xl shadow-2xl bg-primary text-white border-none uppercase italic tracking-tighter hover:scale-[1.05] transition-all" onClick={() => window.location.href = '/create-profile'}>
+                        <Button size="lg" className="px-16 py-8 rounded-full font-black text-2xl shadow-2xl bg-primary text-white border-none uppercase italic tracking-tighter hover:scale-[1.05] transition-all" onClick={() => navigate('/create-profile')}>
                             START INITIALIZATION
                         </Button>
                     </Card>
@@ -423,7 +425,7 @@ export default function Dashboard() {
                                         </p>
                                         <div className="space-y-4 relative z-10">
                                             <Button
-                                                onClick={() => window.location.href = '/payment'}
+                                                onClick={() => navigate('/payment')}
                                                 className="w-full bg-primary text-white rounded-[24px] py-8 font-black text-xl shadow-2xl shadow-primary/30 border-none uppercase italic hover:scale-[1.05] transition-all"
                                             >
                                                 SECURE NOW ₹99

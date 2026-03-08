@@ -39,8 +39,10 @@ export default function PaymentPage() {
             } else {
                 list = DEFAULT_PRODUCTS;
             }
-            setProducts(list);
-            const best = list.find(p => p.best) || list[0];
+            console.log("Products loaded:", list);
+            setProducts(list.length > 0 ? list : DEFAULT_PRODUCTS);
+            const finalProducts = list.length > 0 ? list : DEFAULT_PRODUCTS;
+            const best = finalProducts.find(p => p.best) || finalProducts[0];
             setSelectedProduct(best);
             setLoading(false);
         }, (error) => {
@@ -54,13 +56,14 @@ export default function PaymentPage() {
         const timer = setTimeout(() => {
             setLoading(currentLoading => {
                 if (currentLoading) {
+                    console.warn("PaymentPage: Firebase load timed out, using fallback.");
                     setProducts(DEFAULT_PRODUCTS);
                     setSelectedProduct(DEFAULT_PRODUCTS.find(p => p.best) || DEFAULT_PRODUCTS[0]);
                     return false;
                 }
                 return currentLoading;
             });
-        }, 2000);
+        }, 3000);
 
         return () => {
             unsubscribeAuth();
