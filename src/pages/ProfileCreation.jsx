@@ -9,7 +9,7 @@ import { QRCodeCanvas } from 'qrcode.react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { db, auth } from '../lib/firebase';
-import { ref, set } from 'firebase/database';
+import { ref, set, update } from 'firebase/database';
 
 export default function ProfileCreation() {
     const [step, setStep] = useState(1);
@@ -45,9 +45,12 @@ export default function ProfileCreation() {
                 const profileData = {
                     ...formData,
                     email: auth.currentUser?.email || "",
-                    uid: auth.currentUser?.uid || ""
+                    uid: auth.currentUser?.uid || "",
+                    last_updated: new Date().toISOString()
                 };
-                await set(ref(db, 'profiles/' + nameSlug), profileData);
+
+                const profileRef = ref(db, 'profiles/' + nameSlug);
+                await update(profileRef, profileData);
 
                 // Also save the active slug for the QR code to use locally
                 localStorage.setItem('resqr_active_slug', nameSlug);

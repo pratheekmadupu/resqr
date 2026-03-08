@@ -11,8 +11,8 @@ import { Badge } from '../components/ui/Badge';
 import { QRCodeCanvas } from 'qrcode.react';
 import { Modal } from '../components/ui/Modal';
 import { Input } from '../components/ui/Input';
-import { db } from '../lib/firebase';
-import { ref, get, update } from 'firebase/database';
+import { db, auth } from '../lib/firebase';
+import { ref, get, update, onValue } from 'firebase/database';
 import PromotedAd from '../components/PromotedAd';
 import toast from 'react-hot-toast';
 
@@ -114,16 +114,40 @@ export default function Dashboard() {
     };
 
     useEffect(() => {
-        const fetchUserData = async () => {
-            if (!activeSlug) {
+        let isMounted = true;
+        let unsubscribe;
+
+        const resolveAndListen = async () => {
+            let slug = activeSlug;
+
+            if (!slug && auth.currentUser) {
+                try {
+                    const profilesRef = ref(db, 'profiles');
+                    const snapshot = await get(profilesRef);
+                    if (snapshot.exists() && isMounted) {
+                        const profiles = snapshot.val();
+                        const entry = Object.entries(profiles).find(([s, data]) => data.uid === auth.currentUser.uid);
+                        if (entry) {
+                            slug = entry[0];
+                            localStorage.setItem('resqr_active_slug', slug);
+                        }
+                    }
+                } catch (err) {
+                    console.error("Error resolving slug:", err);
+                }
+            }
+
+            if (!isMounted) return;
+
+            if (!slug) {
                 setLoading(false);
                 return;
             }
 
-            try {
-                const profileSnapshot = await get(ref(db, `profiles/${activeSlug}`));
-                if (profileSnapshot.exists()) {
-                    const profileData = profileSnapshot.val();
+            const profileRef = ref(db, `profiles/${slug}`);
+            unsubscribe = onValue(profileRef, (snapshot) => {
+                if (snapshot.exists() && isMounted) {
+                    const profileData = snapshot.val();
                     setProfile(profileData);
                     if (profileData.scans) {
                         const scanList = Object.entries(profileData.scans)
@@ -132,15 +156,20 @@ export default function Dashboard() {
                         setScans(scanList);
                     }
                 }
-            } catch (error) {
+                if (isMounted) setLoading(false);
+            }, (error) => {
                 console.error("Dashboard error:", error);
-            } finally {
-                setLoading(false);
-            }
+                if (isMounted) setLoading(false);
+            });
         };
 
-        fetchUserData();
-    }, [activeSlug]);
+        resolveAndListen();
+
+        return () => {
+            isMounted = false;
+            if (unsubscribe) unsubscribe();
+        };
+    }, [activeSlug, auth.currentUser]);
 
     const getQRValue = () => {
         if (!activeSlug) return `${window.location.origin}/e/demo`;
