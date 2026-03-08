@@ -18,8 +18,18 @@ export default function SuccessPage() {
         const slug = localStorage.getItem('resqr_active_slug');
         if (slug) {
             get(ref(db, `profiles/${slug}`)).then(snapshot => {
-                if (snapshot.exists()) setProfile(snapshot.val());
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    if (data.payment_status === 'pending') {
+                        toast.error("Activation required");
+                        window.location.href = '/payment';
+                        return;
+                    }
+                    setProfile(data);
+                }
             });
+        } else {
+            window.location.href = '/';
         }
     }, []);
 
