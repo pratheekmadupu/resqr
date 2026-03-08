@@ -97,7 +97,7 @@ export default function PaymentPage() {
         }
 
         const options = {
-            key: import.meta.env.VITE_RAZORPAY_KEY_ID, // Using environment variable for Razorpay Key
+            key: "rzp_live_SOcgE2ruRvreG4", // Hardcoded Live Key ID as requested
             amount: selectedProduct.price * 100, // Amount in paise
             currency: "INR",
             name: "RESQR",
