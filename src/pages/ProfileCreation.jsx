@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, ChevronRight, ChevronLeft, User, Activity, Bell, CheckCircle2 } from 'lucide-react';
+import { Shield, ChevronRight, ChevronLeft, User, Activity, Bell, CheckCircle2, Lock } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';

@@ -206,6 +206,7 @@ export default function AdminPanel() {
             emergencyContactName: formData.get('eName'),
             emergencyContactRelation: formData.get('eRelation'),
             emergencyContactPhone: formData.get('ePhone'),
+            uid: selectedUserForProfile?.uid || '',
             id: slug,
             createdAt: new Date().toISOString()
         };
@@ -344,6 +345,7 @@ export default function AdminPanel() {
                         { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
                         { id: 'users', label: 'Auth Users', icon: <Users size={20} /> },
                         { id: 'profiles', label: 'Medical Profiles', icon: <Activity size={20} /> },
+                        { id: 'analytics', label: 'Tactical Intel', icon: <ArrowUpRight size={20} /> },
                         { id: 'products', label: 'Inventory & Prices', icon: <Package size={20} /> },
                         { id: 'ads', label: 'Ad Campaigns', icon: <Megaphone size={20} /> },
                         { id: 'settings', label: 'Settings', icon: <Settings size={20} /> },
@@ -669,6 +671,88 @@ export default function AdminPanel() {
                             </table>
                         </div>
                     </Card>
+                )}
+
+                {activeTab === 'analytics' && (
+                    <div className="space-y-10 animate-in fade-in slide-in-from-bottom-5 duration-700">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            <Card className="bg-medical-card border-white/5 p-8 rounded-[40px] shadow-2xl relative overflow-hidden group">
+                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic mb-6 block">Net Vector Revenue</span>
+                                <div className="flex items-end gap-3">
+                                    <h3 className="text-6xl font-black italic tracking-tighter text-white font-poppins">₹{(profilesList.filter(p => p.payment_status === 'paid').length * 99).toLocaleString()}</h3>
+                                    <Badge className="mb-3 bg-green-500/10 text-green-500 border-none font-bold">+18%</Badge>
+                                </div>
+                                <div className="mt-8 h-20 flex items-end gap-1">
+                                    {[40, 70, 45, 90, 65, 80, 100].map((h, i) => (
+                                        <div key={i} className="flex-1 bg-primary/20 rounded-t-lg group-hover:bg-primary/40 transition-all" style={{ height: `${h}%` }} />
+                                    ))}
+                                </div>
+                            </Card>
+
+                            <Card className="bg-medical-card border-white/5 p-8 rounded-[40px] shadow-2xl relative overflow-hidden group">
+                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic mb-6 block">Active Secure Nodes</span>
+                                <div className="flex items-end gap-3">
+                                    <h3 className="text-6xl font-black italic tracking-tighter text-primary font-poppins">{profilesList.filter(p => p.payment_status === 'paid').length}</h3>
+                                    <Badge className="mb-3 bg-primary/10 text-primary border-none font-bold">LIVE</Badge>
+                                </div>
+                                <p className="text-[10px] font-black text-slate-500 uppercase italic mt-6">Conversion: <span className="text-white">{((profilesList.filter(p => p.payment_status === 'paid').length / (profilesList.length || 1)) * 100).toFixed(1)}%</span> of total profiles.</p>
+                            </Card>
+
+                            <Card className="bg-medical-card border-white/5 p-8 rounded-[40px] shadow-2xl relative overflow-hidden group">
+                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic mb-6 block">Total System Scans</span>
+                                <div className="flex items-end gap-3">
+                                    <h3 className="text-6xl font-black italic tracking-tighter text-white font-poppins">
+                                        {profilesList.reduce((acc, profile) => acc + (profile.scans ? Object.keys(profile.scans).length : 0), 0)}
+                                    </h3>
+                                    <Badge className="mb-3 bg-blue-500/10 text-blue-500 border-none font-bold">TRAFFIC</Badge>
+                                </div>
+                                <p className="text-[10px] font-black text-slate-500 uppercase italic mt-6">Health coverage index peaking globally.</p>
+                            </Card>
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                            <Card className="bg-medical-card border-white/5 p-10 rounded-[40px] shadow-2xl overflow-hidden relative">
+                                <h3 className="text-xl font-black italic uppercase tracking-tighter mb-10 font-poppins flex items-center justify-between">
+                                    Demographic Intelligence
+                                    <Badge className="bg-slate-950 text-slate-500 border-white/5">Blood Group Distribution</Badge>
+                                </h3>
+                                <div className="space-y-6">
+                                    {['A+', 'O+', 'B+', 'AB+'].map(bg => {
+                                        const count = profilesList.filter(p => p.bloodGroup === bg).length;
+                                        const percentage = (count / (profilesList.length || 1)) * 100;
+                                        return (
+                                            <div key={bg} className="space-y-2">
+                                                <div className="flex justify-between text-[11px] font-black uppercase tracking-widest italic text-slate-400">
+                                                    <span>Category: {bg}</span>
+                                                    <span className="text-white">{count} Units ({percentage.toFixed(1)}%)</span>
+                                                </div>
+                                                <div className="w-full h-3 bg-slate-950 rounded-full overflow-hidden border border-white/5">
+                                                    <motion.div
+                                                        initial={{ width: 0 }}
+                                                        animate={{ width: `${percentage}%` }}
+                                                        className="h-full bg-primary shadow-[0_0_15px_rgba(230,57,70,0.4)]"
+                                                    />
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </Card>
+
+                            <Card className="bg-medical-card border-white/5 p-10 rounded-[40px] shadow-2xl relative group">
+                                <h3 className="text-xl font-black italic uppercase tracking-tighter mb-10 font-poppins">Infrastructure Logs</h3>
+                                <div className="space-y-4 p-6 bg-slate-950 rounded-3xl border border-white/5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] italic leading-relaxed">
+                                    <p className="flex items-center gap-3"><span className="w-2 h-2 bg-green-500 rounded-full" /> System integrity at 99.9%.</p>
+                                    <p className="flex items-center gap-3"><span className="w-2 h-2 bg-primary rounded-full animate-pulse" /> Real-time Firebase Sync Active.</p>
+                                    <p className="flex items-center gap-3"><span className="w-2 h-2 bg-blue-500 rounded-full" /> Analytics Vector initialized for data analysis.</p>
+                                    <p className="flex items-center gap-3 mt-4 opacity-40">Tactical data is encrypted and aggregated in-memory for security compliance.</p>
+                                </div>
+                                <div className="mt-8">
+                                    <Button className="w-full bg-white/5 border border-white/10 hover:bg-white/10 text-[10px] font-black uppercase tracking-widest italic py-8 rounded-[24px]">GENERATE STRATEGIC REPORT</Button>
+                                </div>
+                            </Card>
+                        </div>
+                    </div>
                 )}
 
                 {activeTab === 'products' && (

@@ -221,8 +221,8 @@ export default function Dashboard() {
                             Unit: <span className="text-primary">{userDisplayName.split(' ')[0]}</span>
                         </h1>
                         <p className="text-slate-500 font-bold uppercase tracking-[0.2em] text-[10px] italic mt-4 flex items-center gap-2">
-                            <span className={`w-2 h-2 rounded-full ${profile ? 'bg-green-500' : 'bg-red-500'} animate-pulse`} />
-                            {profile ? 'ENCRYPTED PROTECTION ACTIVE' : 'SYSTEM OFFLINE: PROFILE REQUIRED'}
+                            <span className={`w-2 h-2 rounded-full ${profile?.payment_status === 'paid' ? 'bg-green-500' : 'bg-red-500'} animate-pulse`} />
+                            {profile?.payment_status === 'paid' ? 'ENCRYPTED PROTECTION ACTIVE' : 'IDENTIFICATION PENDING ACTIVATION'}
                         </p>
                     </div>
                     <div className="flex flex-wrap gap-4">
@@ -281,9 +281,11 @@ export default function Dashboard() {
                                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] mt-2">Active Medical Identity</p>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-2 px-6 py-2 bg-green-500/10 border border-green-500/20 rounded-full">
-                                            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                                            <span className="text-[10px] font-black text-green-500 uppercase tracking-[0.2em] italic">SECURED</span>
+                                        <div className={`flex items-center gap-2 px-6 py-2 ${profile?.payment_status === 'paid' ? 'bg-green-500/10 border-green-500/20 text-green-500' : 'bg-red-500/10 border-red-500/20 text-red-500'} border rounded-full`}>
+                                            <span className={`w-2 h-2 rounded-full ${profile?.payment_status === 'paid' ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
+                                            <span className="text-[10px] font-black uppercase tracking-[0.2em] italic">
+                                                {profile?.payment_status === 'paid' ? 'SECURED' : 'UNSECURED'}
+                                            </span>
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
@@ -442,21 +444,34 @@ export default function Dashboard() {
                                                         const snapshot = await get(profilesRef);
                                                         if (snapshot.exists()) {
                                                             const profiles = snapshot.val();
+                                                            const currentUser = auth.currentUser;
+                                                            // Search by UID or Email as fallback
                                                             const paidEntry = Object.entries(profiles).find(([s, data]) =>
-                                                                data.uid === auth.currentUser.uid && data.payment_status === 'paid'
+                                                                (data.payment_status === 'paid') &&
+                                                                (data.uid === currentUser.uid || (data.email && data.email === currentUser.email))
                                                             );
+
+                                                            // Log this verification attempt for "Backend Analysis"
+                                                            push(ref(db, 'analytics/activations'), {
+                                                                uid: currentUser.uid,
+                                                                email: currentUser.email,
+                                                                timestamp: new Date().toISOString(),
+                                                                success: !!paidEntry
+                                                            });
 
                                                             if (paidEntry) {
                                                                 const newSlug = paidEntry[0];
                                                                 localStorage.setItem('resqr_active_slug', newSlug);
                                                                 setActiveSlug(newSlug);
-                                                                toast.success("Activation Verified!", { id: t });
+                                                                toast.success("Activation Verified! Identity Unlocked.", { id: t });
                                                             } else {
                                                                 toast.error("No active payment found for this account.", { id: t });
                                                             }
+                                                        } else {
+                                                            toast.error("No records found.", { id: t });
                                                         }
                                                     } catch (err) {
-                                                        toast.error("Verification failed. Please try again.", { id: t });
+                                                        toast.error("System error during verification.", { id: t });
                                                     }
                                                 }}
                                                 className="w-full py-4 text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] italic hover:text-primary transition-colors"
@@ -560,6 +575,6 @@ export default function Dashboard() {
                     </div>
                 </div>
             </Modal>
-        </div>
+        </div >
     );
 }
