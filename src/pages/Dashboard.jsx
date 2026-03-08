@@ -25,7 +25,7 @@ export default function Dashboard() {
     const qrRef = useRef(null);
 
     // Defensive calculations
-    const activeSlug = typeof window !== 'undefined' ? localStorage.getItem('resqr_active_slug') : null;
+    const [activeSlug, setActiveSlug] = useState(typeof window !== 'undefined' ? localStorage.getItem('resqr_active_slug') : null);
     const userDisplayName = String(profile?.name || 'User');
     const userBloodGroup = String(profile?.bloodGroup || '--');
     const userContactName = String(profile?.emergencyContactName || '--');
@@ -119,21 +119,35 @@ export default function Dashboard() {
 
         const resolveAndListen = async () => {
             let slug = activeSlug;
+            const currentUser = auth.currentUser;
 
-            if (!slug && auth.currentUser) {
+            if (currentUser) {
                 try {
                     const profilesRef = ref(db, 'profiles');
                     const snapshot = await get(profilesRef);
                     if (snapshot.exists() && isMounted) {
                         const profiles = snapshot.val();
-                        const entry = Object.entries(profiles).find(([s, data]) => data.uid === auth.currentUser.uid);
-                        if (entry) {
-                            slug = entry[0];
+                        const allUserProfiles = Object.entries(profiles).filter(([s, data]) => data.uid === currentUser.uid);
+
+                        // Self-healing: If we have a paid profile somewhere else, switch to it!
+                        const paidProfile = allUserProfiles.find(([s, data]) => data.payment_status === 'paid');
+
+                        if (paidProfile) {
+                            if (slug !== paidProfile[0]) {
+                                console.log("Self-healing: Switching to paid profile", paidProfile[0]);
+                                slug = paidProfile[0];
+                                localStorage.setItem('resqr_active_slug', slug);
+                                setActiveSlug(slug);
+                            }
+                        } else if (!slug && allUserProfiles.length > 0) {
+                            // Fallback if none are paid but we have profiles
+                            slug = allUserProfiles[0][0];
                             localStorage.setItem('resqr_active_slug', slug);
+                            setActiveSlug(slug);
                         }
                     }
                 } catch (err) {
-                    console.error("Error resolving slug:", err);
+                    console.error("Error resolving/healing slug:", err);
                 }
             }
 
@@ -407,12 +421,47 @@ export default function Dashboard() {
                                         <p className="text-slate-500 mb-10 text-xs font-bold uppercase tracking-widest italic relative z-10">
                                             Activation required to generate your unique life-saving QR identity.
                                         </p>
-                                        <Button
-                                            onClick={() => window.location.href = '/payment'}
-                                            className="w-full bg-primary text-white rounded-[24px] py-8 font-black text-xl shadow-2xl shadow-primary/30 border-none uppercase italic relative z-10 hover:scale-[1.05] transition-all"
-                                        >
-                                            SECURE NOW ₹99
-                                        </Button>
+                                        <div className="space-y-4 relative z-10">
+                                            <Button
+                                                onClick={() => window.location.href = '/payment'}
+                                                className="w-full bg-primary text-white rounded-[24px] py-8 font-black text-xl shadow-2xl shadow-primary/30 border-none uppercase italic hover:scale-[1.05] transition-all"
+                                            >
+                                                SECURE NOW ₹99
+                                            </Button>
+                                            <button
+                                                onClick={async () => {
+                                                    if (!auth.currentUser) {
+                                                        toast.error("Please login to verify");
+                                                        return;
+                                                    }
+                                                    const t = toast.loading("Checking secure records...");
+                                                    try {
+                                                        const profilesRef = ref(db, 'profiles');
+                                                        const snapshot = await get(profilesRef);
+                                                        if (snapshot.exists()) {
+                                                            const profiles = snapshot.val();
+                                                            const paidEntry = Object.entries(profiles).find(([s, data]) =>
+                                                                data.uid === auth.currentUser.uid && data.payment_status === 'paid'
+                                                            );
+
+                                                            if (paidEntry) {
+                                                                const newSlug = paidEntry[0];
+                                                                localStorage.setItem('resqr_active_slug', newSlug);
+                                                                setActiveSlug(newSlug);
+                                                                toast.success("Activation Verified!", { id: t });
+                                                            } else {
+                                                                toast.error("No active payment found for this account.", { id: t });
+                                                            }
+                                                        }
+                                                    } catch (err) {
+                                                        toast.error("Verification failed. Please try again.", { id: t });
+                                                    }
+                                                }}
+                                                className="w-full py-4 text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] italic hover:text-primary transition-colors"
+                                            >
+                                                Already Paid? Verify Activation
+                                            </button>
+                                        </div>
                                         <p className="mt-6 text-[8px] font-black text-slate-600 uppercase tracking-[0.3em] italic relative z-10">
                                             One-time payment \u2022 Lifetime Validity
                                         </p>
