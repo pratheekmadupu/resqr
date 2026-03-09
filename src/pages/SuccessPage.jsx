@@ -49,15 +49,42 @@ export default function SuccessPage() {
         toast.success('QR TAG Downloaded!');
     };
 
-    const handleWhatsAppShare = () => {
-        const qrLink = getQRValue();
-        const phone = profile?.phone || profile?.emergencyContactPhone || '';
-        const message = encodeURIComponent(`🚨 *RESQR IDENTITY ACTIVATED* \n\nYour life-saving medical profile is now LIVE. \n\n*Access Link:* ${qrLink}\n\nKeep this link safe or share it with family. In an emergency, first responders can scan your QR to save your life.`);
+    const handleWhatsAppShare = async () => {
+        const canvas = document.getElementById('success-qr-canvas') || (qrRef.current && qrRef.current.querySelector('canvas'));
+        if (!canvas) {
+            toast.error('QR image preparing...');
+            return;
+        }
 
-        if (phone) {
-            window.open(`https://wa.me/${phone.replace(/\D/g, '')}?text=${message}`, '_blank');
-        } else {
-            window.open(`https://wa.me/?text=${message}`, '_blank');
+        try {
+            const dataUrl = canvas.toDataURL('image/png');
+            const blob = await (await fetch(dataUrl)).blob();
+            const file = new File([blob], `RESQR_ID_${getUserName().replace(/\s+/g, '_')}.png`, { type: 'image/png' });
+
+            // Check if native sharing is available (mostly mobile)
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                await navigator.share({
+                    files: [file],
+                    title: 'RESQR EMERGENCY IDENTITY',
+                    text: `🚨 *RESQR IDENTITY ACTIVATED*\n\nYour medical profile is now LIVE.\n\n*Access Link:* ${getQRValue()}\n\nIn an emergency, scan this QR to see critical data.`,
+                });
+            } else {
+                // Desktop/Legacy Fallback (URL Link)
+                const phone = profile?.phone || profile?.emergencyContactPhone || '';
+                const message = encodeURIComponent(`🚨 *RESQR IDENTITY ACTIVATED* \n\nYour life-saving medical profile is now LIVE. \n\n*Access Link:* ${getQRValue()}\n\nKeep this link safe. In an emergency, first responders can scan your QR to save your life.`);
+
+                const waUrl = phone
+                    ? `https://wa.me/${phone.replace(/\D/g, '')}?text=${message}`
+                    : `https://wa.me/?text=${message}`;
+
+                window.open(waUrl, '_blank');
+                toast('Sent as text link (Image sharing not supported on this browser)', { icon: 'ℹ️' });
+            }
+        } catch (error) {
+            if (error.name !== 'AbortError') {
+                console.error('Share error:', error);
+                toast.error('Activation relay failed');
+            }
         }
     };
 

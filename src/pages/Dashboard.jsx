@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import {
     User, QrCode, Bell, ChevronRight,
     Edit3, ExternalLink, Download, Clock, Loader2, Shield,
-    Eye, CheckCircle2, Lock, Phone, MapPin
+    Eye, CheckCircle2, Lock, Phone, MapPin, Building2, Navigation
 } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -24,6 +24,8 @@ export default function Dashboard() {
     const [profile, setProfile] = useState(null);
     const [editData, setEditData] = useState({});
     const [scans, setScans] = useState([]);
+    const [nearestHospital, setNearestHospital] = useState(null);
+    const [findingHospital, setFindingHospital] = useState(false);
     const qrRef = useRef(null);
 
     // Defensive calculations
@@ -187,6 +189,34 @@ export default function Dashboard() {
         };
     }, [activeSlug, auth.currentUser]);
 
+    useEffect(() => {
+        const fetchHospital = async () => {
+            if (!navigator.geolocation) return;
+            setFindingHospital(true);
+            navigator.geolocation.getCurrentPosition(async (position) => {
+                const { latitude, longitude } = position.coords;
+                try {
+                    const query = `[out:json];node["amenity"="hospital"](around:10000,${latitude},${longitude});out 1;`;
+                    const response = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`);
+                    const data = await response.json();
+                    if (data.elements && data.elements.length > 0) {
+                        const h = data.elements[0];
+                        setNearestHospital({
+                            name: h.tags.name || "Nearby Medical Center",
+                            lat: h.lat,
+                            lng: h.lon
+                        });
+                    }
+                } catch (e) {
+                    console.error("Dashboard hospital error", e);
+                } finally {
+                    setFindingHospital(false);
+                }
+            }, () => setFindingHospital(false));
+        };
+        fetchHospital();
+    }, []);
+
     const getQRValue = () => {
         if (!activeSlug) return `${window.location.origin}/e/demo`;
         return `${window.location.origin}/e/${activeSlug}`;
@@ -342,6 +372,34 @@ export default function Dashboard() {
                                                     </div>
                                                     <span className="text-xs font-black uppercase tracking-widest text-slate-900 italic">Blockchain Verified</span>
                                                 </div>
+
+                                                {/* NEAREST HOSPITAL MINI-CARD */}
+                                                <div className="p-6 bg-slate-900 rounded-[30px] border border-white/5 relative overflow-hidden group/hosp">
+                                                    <div className="flex items-center gap-4 mb-4 relative z-10">
+                                                        <Building2 className="text-primary" size={18} />
+                                                        <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest italic">Nearest Facility</span>
+                                                    </div>
+                                                    {findingHospital ? (
+                                                        <div className="animate-pulse flex items-center gap-2">
+                                                            <Loader2 size={12} className="animate-spin text-slate-600" />
+                                                            <span className="text-[10px] text-slate-600 uppercase font-black italic">Locating...</span>
+                                                        </div>
+                                                    ) : nearestHospital ? (
+                                                        <div className="relative z-10">
+                                                            <p className="text-xs font-black text-white uppercase italic tracking-tight mb-3 truncate">{nearestHospital.name}</p>
+                                                            <button
+                                                                onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${nearestHospital.lat},${nearestHospital.lng}`, '_blank')}
+                                                                className="text-[8px] font-black text-primary uppercase tracking-[0.2em] italic flex items-center gap-2 hover:underline"
+                                                            >
+                                                                <Navigation size={10} /> ROUTE NOW
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <p className="text-[9px] text-slate-700 uppercase font-black italic">No facility detected</p>
+                                                    )}
+                                                    <Building2 size={80} className="absolute -right-4 -bottom-4 opacity-[0.03] text-white rotate-12" />
+                                                </div>
+
                                                 <div className="flex items-center gap-5 p-6 bg-blue-400 rounded-[30px] border border-blue-500/20 transition-colors">
                                                     <div className="w-10 h-10 rounded-2xl bg-slate-900 flex items-center justify-center text-white">
                                                         <Lock size={20} />

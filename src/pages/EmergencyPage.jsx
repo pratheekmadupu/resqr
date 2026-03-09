@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Phone, MapPin, AlertCircle, Heart, Activity, Info, Loader2, Lock } from 'lucide-react';
+import { Phone, MapPin, AlertCircle, Heart, Activity, Info, Loader2, Lock, Navigation, Building2 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { motion } from 'framer-motion';
@@ -12,6 +12,9 @@ export default function EmergencyPage() {
     const { id } = useParams();
     const [loading, setLoading] = useState(true);
     const [scanRecorded, setScanRecorded] = useState(false);
+    const [coords, setCoords] = useState(null);
+    const [nearestHospital, setNearestHospital] = useState(null);
+    const [findingHospital, setFindingHospital] = useState(false);
     const [user, setUser] = useState({
         name: "LOADING...",
         bloodGroup: "--",
@@ -39,6 +42,7 @@ export default function EmergencyPage() {
                     lat: position.coords.latitude,
                     lng: position.coords.longitude
                 };
+                setCoords(coords);
                 locationName = `Precise Location: ${coords.lat.toFixed(4)}, ${coords.lng.toFixed(4)}`;
             } catch (err) {
                 console.log("Could not get precise location, logging general scan.");
@@ -66,6 +70,44 @@ export default function EmergencyPage() {
             console.error("Scan recording failed", e);
         }
     };
+
+    useEffect(() => {
+        const fetchNearestHospital = async () => {
+            if (!coords) return;
+            setFindingHospital(true);
+            try {
+                // Using Overpass API to find nearest hospital
+                const query = `[out:json];node["amenity"="hospital"](around:10000,${coords.lat},${coords.lng});out 1;`;
+                const response = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`);
+                const data = await response.json();
+
+                if (data.elements && data.elements.length > 0) {
+                    const hospital = data.elements[0];
+                    setNearestHospital({
+                        name: hospital.tags.name || "Nearby Medical Center",
+                        lat: hospital.lat,
+                        lng: hospital.lon,
+                        dist: "Closest detected"
+                    });
+                } else {
+                    // Fallback to a simple search if Overpass doesn't return named nodes
+                    setNearestHospital({
+                        name: "Emergency Medical Facility",
+                        searchQuery: "hospital",
+                        dist: "Nearby"
+                    });
+                }
+            } catch (err) {
+                console.error("Failed to fetch nearest hospital", err);
+            } finally {
+                setFindingHospital(false);
+            }
+        };
+
+        if (coords && !nearestHospital) {
+            fetchNearestHospital();
+        }
+    }, [coords, nearestHospital]);
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -222,6 +264,57 @@ export default function EmergencyPage() {
                         <p className="text-2xl font-black text-primary uppercase italic p-8 bg-slate-950/50 rounded-3xl border border-primary/20 shadow-inner">
                             {user.allergies}
                         </p>
+                    </div>
+
+                    {/* NEAREST HOSPITAL SECTION */}
+                    <div className="bg-medical-card p-10 rounded-[40px] shadow-2xl border border-white/5 relative overflow-hidden group">
+                        <div className="flex items-center gap-4 mb-8">
+                            <div className="p-3 bg-emerald-500/20 rounded-2xl text-emerald-500 border border-emerald-500/20 shadow-lg shadow-emerald-500/20">
+                                <Building2 size={22} />
+                            </div>
+                            <h3 className="text-xl font-black text-white italic uppercase tracking-tighter leading-none">Nearest Emergency Facility</h3>
+                        </div>
+
+                        {findingHospital ? (
+                            <div className="flex items-center gap-4 p-6 bg-slate-950/50 rounded-3xl border border-white/5 animate-pulse">
+                                <Loader2 className="animate-spin text-slate-500" size={20} />
+                                <span className="text-xs font-black uppercase tracking-widest text-slate-500 italic">Scanning Area for Hospitals...</span>
+                            </div>
+                        ) : nearestHospital ? (
+                            <div className="space-y-6">
+                                <div className="p-8 bg-slate-950 border border-white/5 rounded-3xl shadow-inner group-hover:border-emerald-500/30 transition-all">
+                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] block mb-3 italic">Facility Name</span>
+                                    <h4 className="text-2xl font-black text-white uppercase italic tracking-tight mb-6">
+                                        {nearestHospital.name}
+                                    </h4>
+                                    <button
+                                        onClick={() => {
+                                            const url = nearestHospital.lat
+                                                ? `https://www.google.com/maps/dir/?api=1&origin=${coords.lat},${coords.lng}&destination=${nearestHospital.lat},${nearestHospital.lng}&travelmode=driving`
+                                                : `https://www.google.com/maps/search/hospital/@${coords.lat},${coords.lng}`;
+                                            window.open(url, '_blank');
+                                        }}
+                                        className="w-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 border border-emerald-500/30 p-5 rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-95 group/btn"
+                                    >
+                                        <Navigation size={18} className="group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" />
+                                        <span className="text-xs font-black uppercase tracking-widest italic">Route to Facility</span>
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="p-8 bg-slate-950 border border-white/5 rounded-3xl text-center">
+                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic mb-4">Location required for facility check</p>
+                                <button
+                                    onClick={recordScan}
+                                    className="text-xs font-black text-primary uppercase italic tracking-widest hover:underline"
+                                >
+                                    Enable GPS for Nearest Hospital
+                                </button>
+                            </div>
+                        )}
+                        <div className="absolute -right-8 -bottom-8 opacity-[0.02] pointer-events-none">
+                            <Building2 size={200} />
+                        </div>
                     </div>
 
                     {/* RE-ADDED FAMILY CONTACT SECTION */}
