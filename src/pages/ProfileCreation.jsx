@@ -38,10 +38,24 @@ export default function ProfileCreation() {
         if (step < 4) setStep(step + 1);
         else {
             try {
-                // Create a clean slug from the name (e.g., "John Doe" -> "john-doe")
-                const nameSlug = formData.name.toLowerCase().trim().replace(/\s+/g, '-');
+                if (!formData.name.trim()) {
+                    toast.error('Legal Name is required for identity initialization.');
+                    setStep(1);
+                    return;
+                }
+                if (!formData.bloodGroup) {
+                    toast.error('Blood Group is required for medical safety.');
+                    setStep(1);
+                    return;
+                }
 
-                // Save to Firebase Realtime Database
+                // Create a clean slug from the name (e.g., "John Doe" -> "john-doe")
+                const nameSlug = formData.name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-');
+
+                // Also save the active slug and form data for the QR code to use locally/fallback
+                localStorage.setItem('resqr_active_slug', nameSlug);
+                localStorage.setItem('resqr_pending_profile', JSON.stringify(formData));
+
                 const profileData = {
                     ...formData,
                     email: auth.currentUser?.email || "",
@@ -50,22 +64,23 @@ export default function ProfileCreation() {
                     last_updated: new Date().toISOString()
                 };
 
-                const profileRef = ref(db, 'profiles/' + nameSlug);
-                await update(profileRef, profileData);
-
-                // Also save the active slug for the QR code to use locally
-                localStorage.setItem('resqr_active_slug', nameSlug);
-
-                toast.success('Identity node initialized!');
-
                 if (auth.currentUser) {
+                    const profileRef = ref(db, 'profiles/' + nameSlug);
+                    await update(profileRef, profileData);
+                    toast.success('Identity node initialized!');
                     navigate('/payment');
                 } else {
+                    toast.success('Profile cached. Please login to secure your identity.');
                     navigate('/login?redirect_to=/payment');
                 }
             } catch (error) {
                 console.error("Error saving profile:", error);
-                toast.error('Failed to save profile. Please try again.');
+                // Even if firebase fails (e.g. permissions), we have it in localStorage now
+                if (!auth.currentUser) {
+                    navigate('/login?redirect_to=/payment');
+                } else {
+                    toast.error('System synchronization failed. Retrying...');
+                }
             }
         }
     };

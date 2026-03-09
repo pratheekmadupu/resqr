@@ -23,10 +23,33 @@ export default function PaymentPage() {
     ];
 
     useEffect(() => {
-        const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+        const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
             if (!user) {
                 toast.error("Please login to proceed to payment.");
                 navigate('/login?redirect_to=/payment');
+            } else {
+                // If we have a pending profile from ProfileCreation while logged out, sync it now!
+                const pendingProfileJson = localStorage.getItem('resqr_pending_profile');
+                if (pendingProfileJson) {
+                    try {
+                        const formData = JSON.parse(pendingProfileJson);
+                        const nameSlug = localStorage.getItem('resqr_active_slug') ||
+                            formData.name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-');
+
+                        const profileRef = ref(db, 'profiles/' + nameSlug);
+                        await update(profileRef, {
+                            ...formData,
+                            email: user.email,
+                            uid: user.uid,
+                            payment_status: 'pending',
+                            last_updated: new Date().toISOString()
+                        });
+                        console.log("Successfully synced pending profile for", user.email);
+                        localStorage.removeItem('resqr_pending_profile');
+                    } catch (err) {
+                        console.error("Failed to sync pending profile:", err);
+                    }
+                }
             }
         });
 
