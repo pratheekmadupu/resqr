@@ -24,7 +24,7 @@ export default function Dashboard() {
     const [profile, setProfile] = useState(null);
     const [editData, setEditData] = useState({});
     const [scans, setScans] = useState([]);
-    const [nearestHospital, setNearestHospital] = useState(null);
+    const [hospitals, setHospitals] = useState([]);
     const [findingHospital, setFindingHospital] = useState(false);
     const qrRef = useRef(null);
 
@@ -196,16 +196,16 @@ export default function Dashboard() {
             navigator.geolocation.getCurrentPosition(async (position) => {
                 const { latitude, longitude } = position.coords;
                 try {
-                    const query = `[out:json];node["amenity"="hospital"](around:10000,${latitude},${longitude});out 1;`;
+                    const query = `[out:json];node["amenity"="hospital"](around:15000,${latitude},${longitude});out 3;`;
                     const response = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`);
                     const data = await response.json();
                     if (data.elements && data.elements.length > 0) {
-                        const h = data.elements[0];
-                        setNearestHospital({
-                            name: h.tags.name || "Nearby Medical Center",
+                        const hList = data.elements.map(h => ({
+                            name: h.tags.name || "Medical Center",
                             lat: h.lat,
                             lng: h.lon
-                        });
+                        }));
+                        setHospitals(hList);
                     }
                 } catch (e) {
                     console.error("Dashboard hospital error", e);
@@ -373,30 +373,34 @@ export default function Dashboard() {
                                                     <span className="text-xs font-black uppercase tracking-widest text-slate-900 italic">Blockchain Verified</span>
                                                 </div>
 
-                                                {/* NEAREST HOSPITAL MINI-CARD */}
+                                                {/* NEAREST HOSPITALS MINI-CARD */}
                                                 <div className="p-6 bg-slate-900 rounded-[30px] border border-white/5 relative overflow-hidden group/hosp">
                                                     <div className="flex items-center gap-4 mb-4 relative z-10">
                                                         <Building2 className="text-primary" size={18} />
-                                                        <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest italic">Nearest Facility</span>
+                                                        <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest italic">Facility Perimeter</span>
                                                     </div>
-                                                    {findingHospital ? (
-                                                        <div className="animate-pulse flex items-center gap-2">
-                                                            <Loader2 size={12} className="animate-spin text-slate-600" />
-                                                            <span className="text-[10px] text-slate-600 uppercase font-black italic">Locating...</span>
-                                                        </div>
-                                                    ) : nearestHospital ? (
-                                                        <div className="relative z-10">
-                                                            <p className="text-xs font-black text-white uppercase italic tracking-tight mb-3 truncate">{nearestHospital.name}</p>
-                                                            <button
-                                                                onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${nearestHospital.lat},${nearestHospital.lng}`, '_blank')}
-                                                                className="text-[8px] font-black text-primary uppercase tracking-[0.2em] italic flex items-center gap-2 hover:underline"
-                                                            >
-                                                                <Navigation size={10} /> ROUTE NOW
-                                                            </button>
-                                                        </div>
-                                                    ) : (
-                                                        <p className="text-[9px] text-slate-700 uppercase font-black italic">No facility detected</p>
-                                                    )}
+                                                    <div className="space-y-4 max-h-[120px] overflow-y-auto custom-scrollbar relative z-10">
+                                                        {findingHospital ? (
+                                                            <div className="animate-pulse flex items-center gap-2">
+                                                                <Loader2 size={12} className="animate-spin text-slate-600" />
+                                                                <span className="text-[10px] text-slate-600 uppercase font-black italic">Scanning...</span>
+                                                            </div>
+                                                        ) : hospitals.length > 0 ? (
+                                                            hospitals.map((hospital, hIdx) => (
+                                                                <div key={hIdx} className="flex items-center justify-between gap-2 border-b border-white/5 pb-2 last:border-0 last:pb-0">
+                                                                    <p className="text-[10px] font-black text-white uppercase italic tracking-tight truncate flex-1">{hospital.name}</p>
+                                                                    <button
+                                                                        onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${hospital.lat},${hospital.lng}`, '_blank')}
+                                                                        className="text-primary hover:text-white transition-colors"
+                                                                    >
+                                                                        <Navigation size={12} />
+                                                                    </button>
+                                                                </div>
+                                                            ))
+                                                        ) : (
+                                                            <p className="text-[9px] text-slate-700 uppercase font-black italic">No data detected</p>
+                                                        )}
+                                                    </div>
                                                     <Building2 size={80} className="absolute -right-4 -bottom-4 opacity-[0.03] text-white rotate-12" />
                                                 </div>
 

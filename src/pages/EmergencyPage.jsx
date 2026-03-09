@@ -13,7 +13,7 @@ export default function EmergencyPage() {
     const [loading, setLoading] = useState(true);
     const [scanRecorded, setScanRecorded] = useState(false);
     const [coords, setCoords] = useState(null);
-    const [nearestHospital, setNearestHospital] = useState(null);
+    const [hospitals, setHospitals] = useState([]);
     const [findingHospital, setFindingHospital] = useState(false);
     const [user, setUser] = useState({
         name: "LOADING...",
@@ -72,42 +72,42 @@ export default function EmergencyPage() {
     };
 
     useEffect(() => {
-        const fetchNearestHospital = async () => {
+        const fetchNearestHospitals = async () => {
             if (!coords) return;
             setFindingHospital(true);
             try {
-                // Using Overpass API to find nearest hospital
-                const query = `[out:json];node["amenity"="hospital"](around:10000,${coords.lat},${coords.lng});out 1;`;
+                // Using Overpass API to find nearest hospitals
+                // node["amenity"="hospital"](around:10000,lat,lng); -> 10km radius
+                const query = `[out:json];node["amenity"="hospital"](around:15000,${coords.lat},${coords.lng});out 5;`;
                 const response = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`);
                 const data = await response.json();
 
                 if (data.elements && data.elements.length > 0) {
-                    const hospital = data.elements[0];
-                    setNearestHospital({
-                        name: hospital.tags.name || "Nearby Medical Center",
-                        lat: hospital.lat,
-                        lng: hospital.lon,
-                        dist: "Closest detected"
-                    });
+                    const hospitalList = data.elements.map(h => ({
+                        name: h.tags.name || "Unnamed Medical Center",
+                        lat: h.lat,
+                        lng: h.lon,
+                        addr: h.tags['addr:street'] || h.tags['addr:full'] || "Secondary Facility"
+                    }));
+                    setHospitals(hospitalList);
                 } else {
-                    // Fallback to a simple search if Overpass doesn't return named nodes
-                    setNearestHospital({
+                    setHospitals([{
                         name: "Emergency Medical Facility",
                         searchQuery: "hospital",
                         dist: "Nearby"
-                    });
+                    }]);
                 }
             } catch (err) {
-                console.error("Failed to fetch nearest hospital", err);
+                console.error("Failed to fetch nearest hospitals", err);
             } finally {
                 setFindingHospital(false);
             }
         };
 
-        if (coords && !nearestHospital) {
-            fetchNearestHospital();
+        if (coords && hospitals.length === 0) {
+            fetchNearestHospitals();
         }
-    }, [coords, nearestHospital]);
+    }, [coords, hospitals.length]);
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -278,37 +278,43 @@ export default function EmergencyPage() {
                         {findingHospital ? (
                             <div className="flex items-center gap-4 p-6 bg-slate-950/50 rounded-3xl border border-white/5 animate-pulse">
                                 <Loader2 className="animate-spin text-slate-500" size={20} />
-                                <span className="text-xs font-black uppercase tracking-widest text-slate-500 italic">Scanning Area for Hospitals...</span>
+                                <span className="text-xs font-black uppercase tracking-widest text-slate-500 italic">Scanning Local Perimeter...</span>
                             </div>
-                        ) : nearestHospital ? (
-                            <div className="space-y-6">
-                                <div className="p-8 bg-slate-950 border border-white/5 rounded-3xl shadow-inner group-hover:border-emerald-500/30 transition-all">
-                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] block mb-3 italic">Facility Name</span>
-                                    <h4 className="text-2xl font-black text-white uppercase italic tracking-tight mb-6">
-                                        {nearestHospital.name}
-                                    </h4>
-                                    <button
-                                        onClick={() => {
-                                            const url = nearestHospital.lat
-                                                ? `https://www.google.com/maps/dir/?api=1&origin=${coords.lat},${coords.lng}&destination=${nearestHospital.lat},${nearestHospital.lng}&travelmode=driving`
-                                                : `https://www.google.com/maps/search/hospital/@${coords.lat},${coords.lng}`;
-                                            window.open(url, '_blank');
-                                        }}
-                                        className="w-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 border border-emerald-500/30 p-5 rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-95 group/btn"
-                                    >
-                                        <Navigation size={18} className="group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" />
-                                        <span className="text-xs font-black uppercase tracking-widest italic">Route to Facility</span>
-                                    </button>
-                                </div>
+                        ) : hospitals.length > 0 ? (
+                            <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                                {hospitals.map((hospital, idx) => (
+                                    <div key={idx} className="p-6 bg-slate-950 border border-white/5 rounded-3xl shadow-inner hover:border-emerald-500/30 transition-all group/h">
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div className="flex-1">
+                                                <span className="text-[8px] font-black text-slate-600 uppercase tracking-[0.4em] block mb-1 italic">Facility Node {idx + 1}</span>
+                                                <h4 className="text-lg font-black text-white uppercase italic tracking-tight leading-none group-hover/h:text-emerald-400 transition-colors">
+                                                    {hospital.name}
+                                                </h4>
+                                                {hospital.addr && <p className="text-[9px] text-slate-500 mt-2 uppercase font-bold italic tracking-wider">{hospital.addr}</p>}
+                                            </div>
+                                            <button
+                                                onClick={() => {
+                                                    const url = hospital.lat
+                                                        ? `https://www.google.com/maps/dir/?api=1&origin=${coords.lat},${coords.lng}&destination=${hospital.lat},${hospital.lng}&travelmode=driving`
+                                                        : `https://www.google.com/maps/search/hospital/@${coords.lat},${coords.lng}`;
+                                                    window.open(url, '_blank');
+                                                }}
+                                                className="bg-emerald-500/10 hover:bg-emerald-500 text-emerald-500 hover:text-white p-3 rounded-xl transition-all active:scale-90"
+                                            >
+                                                <Navigation size={18} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         ) : (
                             <div className="p-8 bg-slate-950 border border-white/5 rounded-3xl text-center">
-                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic mb-4">Location required for facility check</p>
+                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic mb-4">Initial Position Lock Required</p>
                                 <button
                                     onClick={recordScan}
                                     className="text-xs font-black text-primary uppercase italic tracking-widest hover:underline"
                                 >
-                                    Enable GPS for Nearest Hospital
+                                    Force GPS Initialization
                                 </button>
                             </div>
                         )}
