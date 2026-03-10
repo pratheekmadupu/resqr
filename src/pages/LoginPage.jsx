@@ -127,7 +127,11 @@ export default function LoginPage() {
                     </Link>
                     <div className="mt-8 space-y-3">
                         <h1 className="text-4xl md:text-5xl font-black text-white italic uppercase tracking-tighter leading-none font-poppins">
-                            {isLogin ? 'Secure <span className="text-primary">Access</span>' : 'Join <span className="text-primary">RESQR</span>'}
+                            {isLogin ? (
+                                <>Secure <span className="text-primary">Access</span></>
+                            ) : (
+                                <>Join <span className="text-primary">RESQR</span></>
+                            )}
                         </h1>
                         <p className="text-slate-500 font-bold uppercase tracking-[0.2em] text-[10px] italic">
                             {isLogin ? 'Building a safer world through identity' : 'Protect yourself and your family today'}

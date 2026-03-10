@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Shield, User, LayoutDashboard, Settings, LogOut } from 'lucide-react';
+import { Menu, X, Shield, User, LayoutDashboard, Settings, LogOut, Home, Info, QrCode, CreditCard } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Button } from './ui/Button';
 import { auth } from '../lib/firebase';
@@ -31,14 +31,14 @@ export default function Navbar() {
     if (isEmergency) return null;
 
     const navLinks = [
-        { name: 'Home', path: '/' },
-        { name: 'About Us', path: '/about' },
-        { name: 'Free QR', path: '/free-qr' },
-        { name: 'Pricing', path: '/#pricing' },
+        { name: 'Home', path: '/', icon: <Home size={16} /> },
+        { name: 'About Us', path: '/about', icon: <Info size={16} /> },
+        { name: 'Free QR', path: '/free-qr', icon: <QrCode size={16} /> },
+        { name: 'Pricing', path: '/#pricing', icon: <CreditCard size={16} /> },
     ];
 
     if (user) {
-        navLinks.push({ name: 'Dashboard', path: '/dashboard' });
+        navLinks.push({ name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={16} /> });
     }
 
     return (
@@ -50,16 +50,20 @@ export default function Navbar() {
                     </Link>
 
                     {/* Desktop Links */}
-                    <div className="hidden md:flex items-center gap-10">
-                        {navLinks.map((link) => (
-                            <Link
-                                key={link.name}
-                                to={link.path}
-                                className="text-[13px] font-black text-slate-100/60 hover:text-primary transition-all uppercase tracking-[0.2em]"
-                            >
-                                {link.name}
-                            </Link>
-                        ))}
+                    <div className="hidden md:flex items-center gap-8">
+                        {navLinks.map((link) => {
+                            const isActive = location.pathname === link.path || (link.path === '/#pricing' && location.pathname === '/');
+                            return (
+                                <Link
+                                    key={link.name}
+                                    to={link.path}
+                                    className={`flex items-center gap-2 text-[12px] font-black transition-all uppercase tracking-[0.2em] ${isActive ? 'text-primary' : 'text-slate-100/60 hover:text-primary'}`}
+                                >
+                                    <span className={isActive ? 'text-primary' : 'text-slate-100/40'}>{link.icon}</span>
+                                    {link.name}
+                                </Link>
+                            );
+                        })}
                         {user ? (
                             <div className="flex items-center gap-6 border-l border-white/5 pl-8">
                                 <span className="text-[12px] font-black text-slate-100 hidden lg:block uppercase tracking-wider">
@@ -88,16 +92,20 @@ export default function Navbar() {
             {/* Mobile Menu */}
             {isOpen && (
                 <div className="md:hidden bg-medical-bg border-b border-white/5 py-8 px-6 space-y-6 shadow-2xl">
-                    {navLinks.map((link) => (
-                        <Link
-                            key={link.name}
-                            to={link.path}
-                            className="block text-base font-black text-slate-100/60 uppercase tracking-widest hover:text-primary transition-colors"
-                            onClick={() => setIsOpen(false)}
-                        >
-                            {link.name}
-                        </Link>
-                    ))}
+                    {navLinks.map((link) => {
+                        const isActive = location.pathname === link.path || (link.path === '/#pricing' && location.pathname === '/');
+                        return (
+                            <Link
+                                key={link.name}
+                                to={link.path}
+                                className={`flex items-center gap-4 text-base font-black uppercase tracking-widest transition-colors ${isActive ? 'text-primary' : 'text-slate-100/60 hover:text-primary'}`}
+                                onClick={() => setIsOpen(false)}
+                            >
+                                <span className={isActive ? 'text-primary' : 'text-slate-100/40'}>{link.icon}</span>
+                                {link.name}
+                            </Link>
+                        );
+                    })}
                     {user ? (
                         <Button size="lg" className="w-full bg-white/5 text-white border-white/5 rounded-xl font-black italic" onClick={handleLogout}>
                             LOGOUT

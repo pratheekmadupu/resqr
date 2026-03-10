@@ -9,30 +9,33 @@ import {
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { Link } from 'react-router-dom';
-import { db } from '../lib/firebase';
-import { ref, onValue } from 'firebase/database';
+import { db, auth } from '../lib/firebase';
+import { ref, onValue, get } from 'firebase/database';
 import PromotedAd from '../components/PromotedAd';
 import { Modal } from '../components/ui/Modal';
 import { Play } from 'lucide-react';
 
 export default function LandingPage() {
     const [products, setProducts] = useState([]);
-    const [userCount, setUserCount] = useState('10,000+');
+    const [userCount, setUserCount] = useState('...');
     const [loading, setLoading] = useState(true);
     const [isDemoOpen, setIsDemoOpen] = useState(false);
+    const [hasPaid, setHasPaid] = useState(false);
 
     const defaultProducts = [
         { title: "Digital QR", price: "99", features: ["Digital Dashboard", "Instant Access", "Lifetime Validity"], best: true }
     ];
 
     useEffect(() => {
-        // Fetch Authenticated User Count
-        const usersRef = ref(db, 'users');
-        const unsubUsers = onValue(usersRef, (snapshot) => {
+        // Fetch Registered User Count (Profiles)
+        const profilesRef = ref(db, 'profiles');
+        const unsubUsers = onValue(profilesRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 const count = Object.keys(data).length;
-                setUserCount((count + 10000).toLocaleString() + '+');
+                setUserCount(count.toLocaleString());
+            } else {
+                setUserCount('0');
             }
         });
 
@@ -53,6 +56,30 @@ export default function LandingPage() {
             unsubUsers();
             unsubProducts();
         };
+    }, []);
+
+    useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                try {
+                    const profilesRef = ref(db, 'profiles');
+                    const snapshot = await get(profilesRef);
+                    if (snapshot.exists()) {
+                        const profiles = snapshot.val();
+                        const userPaid = Object.values(profiles).some(p =>
+                            (p.uid === user.uid || p.email === user.email) &&
+                            (p.payment_status === 'paid' || p.payment_status === undefined)
+                        );
+                        setHasPaid(userPaid);
+                    }
+                } catch (err) {
+                    console.error("Error checking payment status:", err);
+                }
+            } else {
+                setHasPaid(false);
+            }
+        });
+        return () => unsubscribe();
     }, []);
 
     const fadeInUp = {
@@ -99,18 +126,28 @@ export default function LandingPage() {
                             </p>
 
                             <div className="flex flex-wrap gap-4">
-                                <Link to="/create-profile">
-                                    <Button size="lg" className="px-10 py-6 rounded-3xl text-lg shadow-xl shadow-primary/20 bg-primary text-white border-none font-black italic uppercase tracking-tighter">
-                                        SECURE PREMIUM ID
-                                    </Button>
-                                </Link>
-                                <Link to="/free-qr">
-                                    <Button
-                                        variant="outline" size="lg" className="px-10 py-6 rounded-3xl text-lg border-white/10 bg-white/5 text-white hover:bg-white/10 font-black italic uppercase tracking-tighter"
-                                    >
-                                        Try FREE QR
-                                    </Button>
-                                </Link>
+                                {hasPaid ? (
+                                    <Link to="/dashboard">
+                                        <Button size="lg" className="px-10 py-6 rounded-3xl text-lg shadow-xl shadow-primary/20 bg-primary text-white border-none font-black italic uppercase tracking-tighter">
+                                            VIEW MY DASHBOARD
+                                        </Button>
+                                    </Link>
+                                ) : (
+                                    <>
+                                        <Link to="/create-profile">
+                                            <Button size="lg" className="px-10 py-6 rounded-3xl text-lg shadow-xl shadow-primary/20 bg-primary text-white border-none font-black italic uppercase tracking-tighter">
+                                                SECURE PREMIUM ID
+                                            </Button>
+                                        </Link>
+                                        <Link to="/free-qr">
+                                            <Button
+                                                variant="outline" size="lg" className="px-10 py-6 rounded-3xl text-lg border-white/10 bg-white/5 text-white hover:bg-white/10 font-black italic uppercase tracking-tighter"
+                                            >
+                                                Try FREE QR
+                                            </Button>
+                                        </Link>
+                                    </>
+                                )}
                             </div>
 
                             <div className="mt-12 flex items-center gap-6">
@@ -183,25 +220,96 @@ export default function LandingPage() {
                 </div>
             </section>
 
-            {/* VIRAL SECTION - STARTUP GROWTH */}
-            <section className="bg-primary/5 py-12 border-b border-primary/10">
-                <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
-                    <div className="flex items-center gap-6">
-                        <div className="w-16 h-16 bg-primary/20 rounded-2xl flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-                            <QrCode size={32} />
+            {/* Conditionally reveal purchase sections */}
+            {!hasPaid && (
+                <>
+                    {/* VIRAL SECTION - STARTUP GROWTH */}
+                    <section className="bg-primary/5 py-12 border-b border-primary/10">
+                        <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
+                            <div className="flex items-center gap-6">
+                                <div className="w-16 h-16 bg-primary/20 rounded-2xl flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                                    <QrCode size={32} />
+                                </div>
+                                <div>
+                                    <h3 className="text-2xl font-black italic uppercase tracking-tighter text-white">Need immediate protection?</h3>
+                                    <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Create a basic temporary ID in under 30 seconds for free.</p>
+                                </div>
+                            </div>
+                            <Link to="/free-qr">
+                                <Button className="px-12 py-6 rounded-2xl bg-white text-primary hover:bg-slate-100 border-none font-black italic uppercase tracking-widest shadow-xl">
+                                    Generate Free QR ID
+                                </Button>
+                            </Link>
                         </div>
-                        <div>
-                            <h3 className="text-2xl font-black italic uppercase tracking-tighter text-white">Need immediate protection?</h3>
-                            <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Create a basic temporary ID in under 30 seconds for free.</p>
+                    </section>
+
+                    {/* Product Store Preview Section */}
+                    <section id="pricing" className="py-24 bg-medical-bg">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="text-center mb-20">
+                                <Badge className="bg-white/10 text-slate-400 border-none mb-4 px-6 py-1 font-black italic">PRICING</Badge>
+                                <h2 className="text-4xl md:text-5xl font-black text-white font-poppins mb-6 italic uppercase tracking-tighter">Choose Your Protection</h2>
+                                <p className="text-slate-400 max-w-2xl mx-auto text-lg font-medium">Lifetime validity. No subscriptions. One-time investment for life-saving safety.</p>
+                            </div>
+
+                            {loading ? (
+                                <div className="flex items-center justify-center h-64">
+                                    <Loader2 className="text-primary animate-spin" size={48} />
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                                    {products.map((plan, i) => (
+                                        <motion.div
+                                            key={i}
+                                            {...fadeInUp}
+                                            transition={{ delay: i * 0.1 }}
+                                            className={`relative p-10 rounded-[60px] border-2 transition-all hover:shadow-2xl flex flex-col hover:scale-[1.02] ${plan.best ? 'border-primary bg-medical-card shadow-2xl shadow-primary/10 ring-8 ring-primary/5' : 'border-white/5 bg-medical-card'}`}
+                                        >
+                                            {plan.best && (
+                                                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary text-white px-8 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-primary/30">
+                                                    Most Popular
+                                                </div>
+                                            )}
+
+                                            <div className="mb-10">
+                                                <h3 className="text-2xl font-black mb-4 uppercase text-white font-poppins italic tracking-tight">{plan.title}</h3>
+                                                <div className="flex items-baseline gap-2">
+                                                    <span className="text-6xl font-black text-white italic">₹{plan.price}</span>
+                                                    <span className="text-slate-500 text-[10px] font-black uppercase tracking-widest">/lifetime</span>
+                                                </div>
+                                            </div>
+
+                                            <ul className="space-y-5 mb-12 flex-grow">
+                                                {[
+                                                    "Lifetime Profile",
+                                                    "Unlimited Edits",
+                                                    ...(plan.features || [])
+                                                ].map((feature, i) => (
+                                                    <li key={i} className="flex items-center gap-4">
+                                                        <div className="w-6 h-6 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0">
+                                                            <CheckCircle2 className="text-emerald-500" size={14} />
+                                                        </div>
+                                                        <span className="text-slate-400 text-sm font-bold uppercase tracking-tight">{feature}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+
+                                            <Link to="/create-profile">
+                                                <Button
+                                                    variant={plan.best ? 'primary' : 'outline'}
+                                                    className={`w-full rounded-full py-8 text-lg font-black italic shadow-2xl transition-all border-none ${plan.best ? 'bg-primary text-white shadow-primary/20' : 'bg-white/5 text-white hover:bg-white/10 shadow-black/20'}`}
+                                                >
+                                                    GET STARTED
+                                                </Button>
+                                            </Link>
+                                        </motion.div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
-                    </div>
-                    <Link to="/free-qr">
-                        <Button className="px-12 py-6 rounded-2xl bg-white text-primary hover:bg-slate-100 border-none font-black italic uppercase tracking-widest shadow-xl">
-                            Generate Free QR ID
-                        </Button>
-                    </Link>
-                </div>
-            </section>
+                    </section>
+                </>
+            )}
 
             {/* How It Works Section */}
             <section id="how-it-works" className="py-24 bg-slate-950/40 relative border-y border-white/5">
@@ -350,7 +458,7 @@ export default function LandingPage() {
                                     </div>
                                     <h3 className="text-4xl font-black mb-4 italic uppercase tracking-tighter">100% SECURE</h3>
                                     <p className="text-slate-400 mb-10 text-lg font-medium leading-relaxed">
-                                        Over 10,000 users trust RESQR to store their critical medical data securely.
+                                        {userCount} users trust RESQR to store their critical medical data securely.
                                         We NEVER sell your data.
                                     </p>
                                     <div className="flex justify-center gap-6">
@@ -368,72 +476,6 @@ export default function LandingPage() {
                 </div>
             </section>
 
-            {/* Product Store Preview Section */}
-            <section id="pricing" className="py-24 bg-medical-bg">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-20">
-                        <Badge className="bg-white/10 text-slate-400 border-none mb-4 px-6 py-1 font-black italic">PRICING</Badge>
-                        <h2 className="text-4xl md:text-5xl font-black text-white font-poppins mb-6 italic uppercase tracking-tighter">Choose Your Protection</h2>
-                        <p className="text-slate-400 max-w-2xl mx-auto text-lg font-medium">Lifetime validity. No subscriptions. One-time investment for life-saving safety.</p>
-                    </div>
-
-                    {loading ? (
-                        <div className="flex items-center justify-center h-64">
-                            <Loader2 className="text-primary animate-spin" size={48} />
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                            {products.map((plan, i) => (
-                                <motion.div
-                                    key={i}
-                                    {...fadeInUp}
-                                    transition={{ delay: i * 0.1 }}
-                                    className={`relative p-10 rounded-[60px] border-2 transition-all hover:shadow-2xl flex flex-col hover:scale-[1.02] ${plan.best ? 'border-primary bg-medical-card shadow-2xl shadow-primary/10 ring-8 ring-primary/5' : 'border-white/5 bg-medical-card'}`}
-                                >
-                                    {plan.best && (
-                                        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary text-white px-8 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-primary/30">
-                                            Most Popular
-                                        </div>
-                                    )}
-
-                                    <div className="mb-10">
-                                        <h3 className="text-2xl font-black mb-4 uppercase text-white font-poppins italic tracking-tight">{plan.title}</h3>
-                                        <div className="flex items-baseline gap-2">
-                                            <span className="text-6xl font-black text-white italic">₹{plan.price}</span>
-                                            <span className="text-slate-500 text-[10px] font-black uppercase tracking-widest">/lifetime</span>
-                                        </div>
-                                    </div>
-
-                                    <ul className="space-y-5 mb-12 flex-grow">
-                                        {[
-                                            "Lifetime Profile",
-                                            "Unlimited Edits",
-                                            ...(plan.features || [])
-                                        ].map((feature, i) => (
-                                            <li key={i} className="flex items-center gap-4">
-                                                <div className="w-6 h-6 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0">
-                                                    <CheckCircle2 className="text-emerald-500" size={14} />
-                                                </div>
-                                                <span className="text-slate-400 text-sm font-bold uppercase tracking-tight">{feature}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
-
-                                    <Link to="/create-profile">
-                                        <Button
-                                            variant={plan.best ? 'primary' : 'outline'}
-                                            className={`w-full rounded-full py-8 text-lg font-black italic shadow-2xl transition-all border-none ${plan.best ? 'bg-primary text-white shadow-primary/20' : 'bg-white/5 text-white hover:bg-white/10 shadow-black/20'}`}
-                                        >
-                                            GET STARTED
-                                        </Button>
-                                    </Link>
-                                </motion.div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-            </section>
-
             {/* Emergency Features High-Level */}
             <section className="py-24 bg-slate-950 border-t border-white/5 text-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -448,9 +490,11 @@ export default function LandingPage() {
                             <QrCode size={48} className="text-blue-400 mb-8 group-hover:scale-110 transition-transform" />
                             <h3 className="text-2xl font-black italic uppercase tracking-tighter mb-4 font-poppins text-white">Advanced QR Identity</h3>
                             <p className="text-slate-500 text-sm leading-relaxed mb-8 font-medium">Get a unique, high-resolution QR identity card that you can print on any personal gear or keep on your smartphone for instant access.</p>
-                            <Link to="/create-profile">
-                                <Badge className="bg-blue-400/20 text-blue-400 border-none text-[10px] uppercase font-black px-4 py-1 italic hover:bg-blue-400/30 transition-all cursor-pointer">SECURE NOW</Badge>
-                            </Link>
+                            {!hasPaid && (
+                                <Link to="/create-profile">
+                                    <Badge className="bg-blue-400/20 text-blue-400 border-none text-[10px] uppercase font-black px-4 py-1 italic hover:bg-blue-400/30 transition-all cursor-pointer">SECURE NOW</Badge>
+                                </Link>
+                            )}
                         </div>
                         <div className="bg-medical-card p-12 rounded-[40px] border border-white/5 backdrop-blur-sm group hover:border-emerald-500/20 transition-all">
                             <Smartphone size={48} className="text-emerald-400 mb-8 group-hover:scale-110 transition-transform" />
@@ -470,21 +514,29 @@ export default function LandingPage() {
                 <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
                     <h2 className="text-6xl md:text-8xl font-black text-white font-poppins mb-10 leading-none italic uppercase tracking-tighter">Prepare for <br /> the <span className="text-primary italic-display">Unexpected.</span></h2>
                     <p className="text-slate-400 text-2xl mb-16 font-medium leading-relaxed">
-                        Join thousands of proactive individuals who trust RESQR to bridge the gap in emergency communication.
+                        Join the growing community of proactive individuals who trust RESQR to bridge the gap in emergency communication.
                     </p>
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-10">
-                        <Link to="/create-profile">
-                            <Button size="lg" className="px-16 py-10 rounded-full text-3xl font-black italic uppercase shadow-2xl shadow-primary/30 transition-transform active:scale-95 bg-primary text-white border-none">
-                                SECURE YOUR FAMILY
-                            </Button>
-                        </Link>
+                        {hasPaid ? (
+                            <Link to="/dashboard">
+                                <Button size="lg" className="px-16 py-10 rounded-full text-3xl font-black italic uppercase shadow-2xl shadow-primary/30 transition-transform active:scale-95 bg-primary text-white border-none">
+                                    VIEW DASHBOARD
+                                </Button>
+                            </Link>
+                        ) : (
+                            <Link to="/create-profile">
+                                <Button size="lg" className="px-16 py-10 rounded-full text-3xl font-black italic uppercase shadow-2xl shadow-primary/30 transition-transform active:scale-95 bg-primary text-white border-none">
+                                    SECURE YOUR FAMILY
+                                </Button>
+                            </Link>
+                        )}
                         <div className="text-left bg-medical-card p-6 rounded-[30px] border border-white/5 flex items-center gap-6 shadow-2xl">
                             <div className="flex -space-x-4">
                                 {[1, 2, 3].map(i => (
                                     <div key={i} className="w-12 h-12 rounded-full border-4 border-slate-900 bg-slate-800" />
                                 ))}
                             </div>
-                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] leading-tight">12.5k+ PROFILES <br /> ACTIVE WORLDWIDE</span>
+                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] leading-tight">{userCount} PROFILES <br /> ACTIVE WORLDWIDE</span>
                         </div>
                     </div>
 
@@ -549,4 +601,3 @@ export default function LandingPage() {
         </div>
     );
 }
-
