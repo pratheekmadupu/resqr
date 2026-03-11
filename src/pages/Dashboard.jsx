@@ -124,7 +124,7 @@ export default function Dashboard() {
         // If it's not the first time changing allergies OR they changed other things
         const needsPayment = (hasChangedAllergies && usedFreebie) || (!isAllergiesOnly);
 
-        if (needsPayment && profile.payment_status === 'paid') {
+        if (needsPayment && profile.payment_status !== 'pending') {
             // Initiate 50 rupees payment
             const res = await loadRazorpayScript();
             if (!res) {

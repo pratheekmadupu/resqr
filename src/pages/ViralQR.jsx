@@ -163,16 +163,21 @@ export default function ViralQR() {
                         className="grid grid-cols-1 md:grid-cols-2 gap-12"
                     >
                         <div className="bg-medical-card p-12 rounded-[60px] border-2 border-primary/20 shadow-2xl shadow-primary/10 relative overflow-hidden text-center">
-                            <div className="bg-slate-950 p-6 rounded-[30px] inline-block mb-10 border border-white/5">
+                            <div className="bg-white p-6 rounded-[30px] inline-block mb-10 border border-white/5 text-center">
+                                <p className="text-[12px] font-black text-primary uppercase tracking-[0.4em] mb-4 italic">resqr</p>
                                 <QRCodeSVG
                                     id="viral-qr-svg"
                                     value={`${window.location.origin}/free-qr?name=${encodeURIComponent(name)}&bg=${encodeURIComponent(bloodGroup)}`}
                                     size={250}
-                                    bgColor={"#020617"}
+                                    bgColor={"#ffffff"}
                                     fgColor={"#e63946"}
                                     level={"H"}
-                                    includeMargin={true}
+                                    includeMargin={false}
                                 />
+                                <div className="mt-4">
+                                    <p className="text-[12px] font-black text-slate-900 uppercase tracking-widest italic leading-tight">emergency qr</p>
+                                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest truncate max-w-[200px]">{name}</p>
+                                </div>
                             </div>
                             <h3 className="text-3xl font-black italic uppercase tracking-tighter mb-2 text-white">{name}</h3>
                             <Badge className="bg-primary/20 text-primary border-none mb-10 px-6 py-2 text-xl font-poppins">{bloodGroup}</Badge>
