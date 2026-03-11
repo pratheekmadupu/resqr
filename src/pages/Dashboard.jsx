@@ -38,14 +38,44 @@ export default function Dashboard() {
 
     const handleDownload = () => {
         try {
-            const canvas = document.getElementById('resqr-qr-canvas') ||
+            const qrCanvas = document.getElementById('resqr-qr-canvas') ||
                 qrRef.current?.querySelector('canvas') ||
                 document.querySelector('#qr-preview canvas');
 
-            if (!canvas) {
+            if (!qrCanvas) {
                 toast.error('Preview not ready');
                 return;
             }
+
+            // Create a temporary canvas to add labels
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const padding = 60;
+            const topLabelHeight = 40;
+            const bottomLabelHeight = 40;
+
+            canvas.width = qrCanvas.width + (padding * 2);
+            canvas.height = qrCanvas.height + padding + topLabelHeight + bottomLabelHeight;
+
+            // Background
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw labels
+            ctx.fillStyle = '#e11d48'; // primary red
+            ctx.font = 'bold 24px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('RESQR', canvas.width / 2, padding + 20);
+
+            // Bottom Labels
+            ctx.fillStyle = '#000000';
+            ctx.font = 'bold 16px Arial';
+            ctx.fillText('EMERGENCY QR', canvas.width / 2, canvas.height - bottomLabelHeight - 10);
+            ctx.font = 'normal 14px Arial';
+            ctx.fillText(userDisplayName.toUpperCase(), canvas.width / 2, canvas.height - 20);
+
+            // Draw QR Code
+            ctx.drawImage(qrCanvas, padding, padding + topLabelHeight);
 
             const url = canvas.toDataURL('image/png');
             const link = document.createElement('a');
@@ -78,17 +108,85 @@ export default function Dashboard() {
 
     const handleUpdateProfile = async () => {
         if (!activeSlug) return;
-        try {
-            const updates = {};
-            updates[`profiles/${activeSlug}`] = { ...profile, ...editData };
-            await update(ref(db), updates);
-            setProfile({ ...profile, ...editData });
-            toast.success('Vault Updated');
-            setIsEditModalOpen(false);
-        } catch (error) {
-            console.error("Update error:", error);
-            toast.error('Update Failed');
+
+        // Check for paid updates: 
+        // 1. If profile has 'allergies_changed' set to true, it means they already used their freebie.
+        // 2. Or if they are changing other things.
+
+        const isAllergiesOnly = Object.keys(editData).every(key => {
+            if (key === 'allergies') return true;
+            return editData[key] === profile[key];
+        });
+
+        const hasChangedAllergies = editData.allergies !== profile.allergies;
+        const usedFreebie = profile.allergies_changed === true;
+
+        // If it's not the first time changing allergies OR they changed other things
+        const needsPayment = (hasChangedAllergies && usedFreebie) || (!isAllergiesOnly);
+
+        if (needsPayment && profile.payment_status === 'paid') {
+            // Initiate 50 rupees payment
+            const res = await loadRazorpayScript();
+            if (!res) {
+                toast.error("Payment system unavailable");
+                return;
+            }
+
+            const options = {
+                key: "rzp_live_SOcgE2ruRvreG4",
+                amount: 50 * 100,
+                currency: "INR",
+                name: "RESQR",
+                description: "Vault Detail Update Fee",
+                handler: async function (response) {
+                    const t = toast.loading("Updating Vault...");
+                    try {
+                        const updates = {};
+                        const finalData = { ...profile, ...editData };
+                        if (hasChangedAllergies) finalData.allergies_changed = true;
+                        updates[`profiles/${activeSlug}`] = finalData;
+                        await update(ref(db), updates);
+                        setProfile(finalData);
+                        toast.success('Vault Updated', { id: t });
+                        setIsEditModalOpen(false);
+                    } catch (error) {
+                        toast.error('Update Failed', { id: t });
+                    }
+                },
+                prefill: { email: auth.currentUser?.email }
+            };
+            const rzp = new window.Razorpay(options);
+            rzp.open();
+        } else {
+            // Free update (first time allergies or simple free profile)
+            try {
+                const updates = {};
+                const finalData = { ...profile, ...editData };
+                if (hasChangedAllergies) finalData.allergies_changed = true;
+                updates[`profiles/${activeSlug}`] = finalData;
+                await update(ref(db), updates);
+                setProfile(finalData);
+                toast.success('Vault Updated');
+                setIsEditModalOpen(false);
+            } catch (error) {
+                console.error("Update error:", error);
+                toast.error('Update Failed');
+            }
         }
+    };
+
+    const loadRazorpayScript = () => {
+        return new Promise((resolve) => {
+            if (window.Razorpay) {
+                resolve(true);
+                return;
+            }
+            const script = document.createElement('script');
+            script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+            script.onload = () => resolve(true);
+            script.onerror = () => resolve(false);
+            document.body.appendChild(script);
+        });
     };
 
     const handleCallFamily = () => {
@@ -457,13 +555,14 @@ export default function Dashboard() {
                                 {profile?.payment_status !== 'pending' ? (
                                     <Card className="text-center bg-medical-card border-white/5 shadow-2xl rounded-[50px] p-12 relative group sticky top-24">
                                         <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent" />
-                                        <div className="bg-slate-900 p-8 rounded-[48px] border-[16px] border-slate-950 inline-block mb-12 shadow-2xl relative">
+                                        <div className="bg-white p-8 rounded-[48px] border-[16px] border-slate-950 inline-block mb-12 shadow-2xl relative text-center">
+                                            <p className="text-[10px] font-black text-primary uppercase tracking-[0.4em] mb-4 italic">resqr</p>
                                             <QRCodeCanvas
                                                 id="resqr-qr-canvas"
                                                 value={getQRValue()}
                                                 size={200}
                                                 level="H"
-                                                includeMargin={true}
+                                                includeMargin={false}
                                                 imageSettings={{
                                                     src: `${import.meta.env.BASE_URL}resqr_icon.png`,
                                                     height: 40,
@@ -471,6 +570,10 @@ export default function Dashboard() {
                                                     excavate: true,
                                                 }}
                                             />
+                                            <div className="mt-4">
+                                                <p className="text-[10px] font-black text-slate-900 uppercase tracking-widest italic leading-tight">emergency qr</p>
+                                                <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest truncate max-w-[200px]">{userDisplayName}</p>
+                                            </div>
                                         </div>
                                         <div className="space-y-6">
                                             <Button className="w-full bg-primary hover:bg-primary-dark text-white rounded-[24px] py-10 font-black text-2xl shadow-2xl border-none uppercase italic" onClick={() => window.open(getQRValue(), '_blank')}>

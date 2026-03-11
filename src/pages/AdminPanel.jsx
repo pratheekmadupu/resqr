@@ -14,6 +14,7 @@ import { ref, onValue, set, push, remove, update } from 'firebase/database';
 import toast from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
 import { onAuthStateChanged, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink } from 'firebase/auth';
+import { QRCodeCanvas } from 'qrcode.react';
 
 export default function AdminPanel() {
     const [activeTab, setActiveTab] = useState('dashboard');
@@ -628,6 +629,7 @@ export default function AdminPanel() {
                                         <th className="px-10 py-6 text-slate-400">Operator Name</th>
                                         <th className="px-10 py-6 text-slate-400">Vector Group</th>
                                         <th className="px-10 py-6 text-slate-400">Primary Comm Link</th>
+                                        <th className="px-10 py-6 text-slate-400">QR Preview</th>
                                         <th className="px-10 py-6 text-right text-slate-400">Tactical Actions</th>
                                     </tr>
                                 </thead>
@@ -654,6 +656,27 @@ export default function AdminPanel() {
                                                 <Badge className="bg-primary/20 text-primary border-none font-black italic px-4 py-1 text-sm font-poppins">{profile.bloodGroup}</Badge>
                                             </td>
                                             <td className="px-10 py-8 text-[11px] font-black text-slate-500 uppercase italic tracking-widest">{profile.phone}</td>
+                                            <td className="px-10 py-8">
+                                                <div className="bg-white p-2 rounded-lg inline-block border border-white/10 shadow-sm text-center">
+                                                    <p className="text-[6px] font-black text-primary uppercase tracking-widest mb-1 italic">resqr</p>
+                                                    <QRCodeCanvas
+                                                        value={`${window.location.origin}/e/${profile.id || profile.name?.toLowerCase().replace(/\s+/g, '-')}`}
+                                                        size={60}
+                                                        level="H"
+                                                        includeMargin={false}
+                                                        imageSettings={{
+                                                            src: `/resqr_icon.png`,
+                                                            height: 12,
+                                                            width: 12,
+                                                            excavate: true,
+                                                        }}
+                                                    />
+                                                    <div className="mt-1">
+                                                        <p className="text-[5px] font-black text-slate-900 uppercase tracking-tighter italic leading-none">emergency qr</p>
+                                                        <p className="text-[4px] font-bold text-slate-500 uppercase tracking-tighter truncate max-w-[60px]">{profile.name}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
                                             <td className="px-10 py-8 text-right">
                                                 <div className="flex items-center justify-end gap-3">
                                                     <Link
