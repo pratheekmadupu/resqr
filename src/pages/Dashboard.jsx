@@ -133,16 +133,23 @@ export default function Dashboard() {
             }
 
             const options = {
-                key: "rzp_live_SOcgE2ruRvreG4",
+                key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_live_SOcgE2ruRvreG4",
                 amount: 50 * 100,
                 currency: "INR",
                 name: "RESQR",
                 description: "Vault Detail Update Fee",
+                image: `${window.location.origin}/logo.png`,
                 handler: async function (response) {
                     const t = toast.loading("Updating Vault...");
                     try {
                         const updates = {};
-                        const finalData = { ...profile, ...editData };
+                        const finalData = {
+                            ...profile,
+                            ...editData,
+                            payment_status: 'paid', // Ensure status stays paid
+                            last_update_payment_id: response.razorpay_payment_id,
+                            last_updated: new Date().toISOString()
+                        };
                         if (hasChangedAllergies) finalData.allergies_changed = true;
                         updates[`profiles/${activeSlug}`] = finalData;
                         await update(ref(db), updates);
@@ -153,7 +160,13 @@ export default function Dashboard() {
                         toast.error('Update Failed', { id: t });
                     }
                 },
-                prefill: { email: auth.currentUser?.email }
+                prefill: {
+                    email: auth.currentUser?.email,
+                    method: "upi"
+                },
+                theme: {
+                    color: "#e11d48"
+                }
             };
             const rzp = new window.Razorpay(options);
             rzp.open();

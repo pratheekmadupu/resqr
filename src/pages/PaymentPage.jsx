@@ -123,7 +123,7 @@ export default function PaymentPage() {
         }
 
         const options = {
-            key: "rzp_live_SOcgE2ruRvreG4", // Hardcoded Live Key ID as requested
+            key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_live_SOcgE2ruRvreG4", // Use env or fallback
             amount: selectedProduct.price * 100, // Amount in paise
             currency: "INR",
             name: "RESQR",
