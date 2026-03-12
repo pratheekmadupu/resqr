@@ -16,7 +16,7 @@ export default function PaymentPage() {
     const [loading, setLoading] = useState(true);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const DEFAULT_PRODUCTS = [
-        { id: 'digital', title: 'Digital QR', price: 99, best: true },
+        { id: 'digital', title: 'Digital QR', price: 50, best: true },
         { id: 'band', title: 'QR Band', price: 299, best: false },
         { id: 'bracelet', title: 'QR Bracelet', price: 399, best: false },
         { id: 'keychain', title: 'Key Chain', price: 199, base: false }
@@ -223,7 +223,6 @@ export default function PaymentPage() {
                 color: "#e11d48" // matches primary red
             }
         };
-
         try {
             console.log("Initializing Razorpay with key:", options.key);
             if (!options.key) {
@@ -267,6 +266,54 @@ export default function PaymentPage() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
                     <div className="lg:col-span-8 space-y-8">
+                        {/* MANUAL UPI SECTION - NEW */}
+                        <Card className="p-10 bg-primary/5 border-primary/20 rounded-[40px] shadow-2xl relative overflow-hidden ring-4 ring-primary/5">
+                            <div className="absolute top-0 right-0 p-4 bg-primary text-white text-[10px] font-black uppercase tracking-widest italic rounded-bl-3xl">Special Offer</div>
+                            <div className="flex flex-col md:flex-row items-center gap-10">
+                                <div className="bg-white p-4 rounded-3xl shadow-xl">
+                                    <div className="text-center mb-2">
+                                        <p className="text-[10px] font-black text-primary uppercase italic">Scan to Pay ₹50</p>
+                                    </div>
+                                    <div className="w-48 h-48 bg-slate-100 flex items-center justify-center rounded-xl overflow-hidden">
+                                        {/* Dynamic UPI QR for ₹50 */}
+                                        <img 
+                                            src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent('upi://pay?pa=resqr.official@okicici&pn=RESQR&am=50&cu=INR')}`}
+                                            alt="UPI QR Code"
+                                            className="w-full h-full p-2"
+                                        />
+                                    </div>
+                                    <div className="mt-3 flex items-center justify-center gap-2">
+                                        <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/UPI-Logo.png" alt="UPI" className="h-4 object-contain" />
+                                    </div>
+                                </div>
+                                <div className="flex-1 space-y-6">
+                                    <div className="inline-block px-4 py-1.5 bg-primary/20 rounded-full text-primary font-black uppercase italic text-[10px] tracking-widest">Manual Activation</div>
+                                    <h2 className="text-3xl font-black italic uppercase tracking-tighter text-white leading-tight">Pay ₹50 directly via any UPI App</h2>
+                                    <p className="text-slate-400 text-sm font-medium leading-relaxed">
+                                        1. Scan the QR or pay to <span className="text-white font-bold">resqr.official@okicici</span><br />
+                                        2. Pay exactly <span className="text-white font-bold italic underline">₹50</span><br />
+                                        3. Your profile activates automatically within 1 hour after verification.
+                                    </p>
+                                    <div className="pt-2">
+                                        <Button 
+                                            variant="outline" 
+                                            className="h-14 px-8 rounded-2xl border-white/10 text-white font-black italic uppercase tracking-widest text-[11px] hover:bg-white/10"
+                                            onClick={() => {
+                                                navigator.clipboard.writeText('resqr.official@okicici');
+                                                toast.success('UPI ID Copied!');
+                                            }}
+                                        >
+                                            Copy UPI ID
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+                        </Card>
+
+                        <div className="p-4 text-center">
+                            <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em] italic">OR USE INSTANT GATEWAY</p>
+                        </div>
+
                         <Card className="p-10 bg-medical-card border-white/5 rounded-[40px] shadow-2xl relative overflow-hidden">
                             <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
                             <h3 className="text-[10px] font-black text-slate-500 uppercase italic tracking-[0.4em] mb-10">01. Select Your Gear Variant</h3>
