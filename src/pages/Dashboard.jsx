@@ -139,6 +139,12 @@ export default function Dashboard() {
                 name: "RESQR",
                 description: "Vault Detail Update Fee",
                 image: `${window.location.origin}/logo.png`,
+                modal: {
+                    ondismiss: function() {
+                        toast.dismiss();
+                        toast.error("Payment Cancelled");
+                    }
+                },
                 handler: async function (response) {
                     const t = toast.loading("Updating Vault...");
                     try {
@@ -743,7 +749,22 @@ export default function Dashboard() {
 
                     <div className="pt-6 flex gap-4">
                         <Button variant="outline" className="flex-1 rounded-2xl h-14 font-bold border-white/10 text-slate-400 hover:text-white" onClick={() => setIsEditModalOpen(false)}>ABORT SYNC</Button>
-                        <Button className="flex-1 rounded-2xl h-14 font-black bg-primary text-white shadow-lg shadow-primary/20 italic" onClick={handleUpdateProfile}>COMMIT CHANGES</Button>
+                        <Button 
+                            className="flex-1 rounded-2xl h-14 font-black bg-primary text-white shadow-lg shadow-primary/20 italic" 
+                            onClick={handleUpdateProfile}
+                        >
+                            {(() => {
+                                const isAllergiesOnly = Object.keys(editData).every(key => {
+                                    if (key === 'allergies') return true;
+                                    return editData[key] === profile[key];
+                                });
+                                const hasChangedAllergies = editData.allergies !== profile.allergies;
+                                const usedFreebie = profile.allergies_changed === true;
+                                const needsPayment = (hasChangedAllergies && usedFreebie) || (!isAllergiesOnly);
+                                
+                                return (needsPayment && profile.payment_status !== 'pending') ? 'PAY ₹50 & UPDATE' : 'COMMIT CHANGES';
+                            })()}
+                        </Button>
                     </div>
                 </div>
             </Modal>
