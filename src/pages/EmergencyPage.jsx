@@ -369,6 +369,15 @@ export default function EmergencyPage() {
                         <MapPin size={28} fill="white" className="relative z-10" />
                         <span className="text-2xl font-black uppercase italic tracking-tighter relative z-10">Send GPS to {user.emergencyContact.relation || 'Guardian'}</span>
                     </button>
+
+                    <button
+                        onClick={() => window.location.href = 'tel:108'}
+                        className="w-full sm:col-span-2 bg-red-600 hover:bg-red-700 text-white p-10 rounded-[35px] flex items-center justify-center gap-5 transition-all active:scale-95 shadow-2xl shadow-red-900/40 relative overflow-hidden group"
+                    >
+                        <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <Phone size={28} fill="white" className="relative z-10" />
+                        <span className="text-2xl font-black uppercase italic tracking-tighter relative z-10">Call Ambulance (108)</span>
+                    </button>
                 </div>
 
                 <footer className="text-center py-20 opacity-30">
