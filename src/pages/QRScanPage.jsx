@@ -11,6 +11,9 @@ export default function QRScanPage() {
     const [loading, setLoading] = useState(true);
     const [profile, setProfile] = useState(null);
     const [scanRecorded, setScanRecorded] = useState(false);
+    const [hospitals, setHospitals] = useState([]);
+    const [findingHospital, setFindingHospital] = useState(false);
+    const [coords, setCoords] = useState(null);
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -85,12 +88,34 @@ export default function QRScanPage() {
                 coords: coords
             };
 
+            setCoords(coords);
             await push(ref(db, `users/${userId}/profiles/${pid}/scans`), scanData);
             setScanRecorded(true);
         } catch (e) {
             console.error("Failed to record scan", e);
         }
     };
+
+    useEffect(() => {
+        const fetchNearestHospitals = async () => {
+            if (!coords) return;
+            setFindingHospital(true);
+            try {
+                const query = `[out:json];node["amenity"="hospital"](around:15000,${coords.lat},${coords.lng});out 5;`;
+                const response = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`);
+                const data = await response.json();
+                if (data.elements && data.elements.length > 0) {
+                    setHospitals(data.elements.map(h => ({
+                        name: h.tags.name || "Emergency Medical Center",
+                        lat: h.lat,
+                        lng: h.lon,
+                        addr: h.tags['addr:street'] || "Medical Facility"
+                    })));
+                }
+            } catch (err) { console.error(err); } finally { setFindingHospital(false); }
+        };
+        if (coords && category === 'people') fetchNearestHospitals();
+    }, [coords, category]);
 
     if (loading) {
         return (
@@ -116,7 +141,7 @@ export default function QRScanPage() {
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="text-center mb-10">
                 <Badge className="bg-red-500/20 text-red-500 border-none px-6 py-2 mb-6 tracking-widest uppercase italic font-black">
-                    EMERGENCY MEDICAL PROFILE
+                    MEDICAL ID CARD
                 </Badge>
                 <h1 className="text-5xl font-black uppercase text-white tracking-tighter italic">{data.name}</h1>
             </div>
@@ -135,10 +160,39 @@ export default function QRScanPage() {
             </div>
 
             <div className="bg-red-500/10 border border-red-500/20 p-8 rounded-[30px]">
-                <h3 className="text-red-500 font-black uppercase tracking-widest text-xs mb-4 flex items-center gap-2">
-                    <AlertCircle size={16} /> Critical Information
+                <h3 className="text-red-500 font-black uppercase tracking-widest text-[10px] mb-4 flex items-center gap-2">
+                    <AlertCircle size={16} /> Critical Allergies
                 </h3>
-                <p className="text-xl text-white font-bold">{data.allergies || 'No critical allergies or conditions listed.'}</p>
+                <p className="text-xl text-white font-bold italic">{data.allergies || 'NONE REPORTED'}</p>
+            </div>
+
+            {/* NEAREST HOSPITAL SECTION - FROM OLD PROFILE */}
+            <div className="bg-slate-900 border border-white/5 p-8 rounded-[30px]">
+                <h3 className="text-slate-500 font-black uppercase tracking-widest text-[10px] mb-6 flex items-center gap-2">
+                    <AlertCircle size={16} /> Nearest Medical Facilities
+                </h3>
+                {findingHospital ? (
+                    <div className="flex items-center gap-3 animate-pulse">
+                        <Loader2 className="animate-spin text-red-500" size={16} />
+                        <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest italic">Scanning Perimiter...</span>
+                    </div>
+                ) : hospitals.length > 0 ? (
+                    <div className="space-y-4">
+                        {hospitals.slice(0, 2).map((h, i) => (
+                            <div key={i} className="flex justify-between items-center bg-slate-950 p-4 rounded-2xl border border-white/5">
+                                <div className="min-w-0">
+                                    <p className="text-white font-black uppercase italic text-sm truncate">{h.name}</p>
+                                    <p className="text-[8px] text-slate-500 uppercase font-bold">{h.addr}</p>
+                                </div>
+                                <button onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${h.lat},${h.lng}`)} className="bg-red-500/10 text-red-500 p-2 rounded-lg">
+                                    <Share2 size={16} />
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <p className="text-[10px] text-slate-600 font-black uppercase tracking-widest italic">Positioning Identity...</p>
+                )}
             </div>
 
             <div className="bg-slate-900 border border-white/5 p-8 rounded-[30px]">

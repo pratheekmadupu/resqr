@@ -27,7 +27,7 @@ export default function ProfileCreation() {
     });
 
     const categories = [
-        { id: 'people', title: 'People', icon: <User size={32} />, color: 'bg-red-500', desc: 'Emergency medical profile' },
+        { id: 'people', title: 'Medical ID', icon: <User size={32} />, color: 'bg-red-500', desc: 'Emergency medical profile' },
         { id: 'pets', title: 'Pets', icon: <Dog size={32} />, color: 'bg-emerald-500', desc: 'Lost pet identification' },
         { id: 'valuables', title: 'Valuables', icon: <Briefcase size={32} />, color: 'bg-blue-500', desc: 'Lost & found bags, laptops' },
         { id: 'vehicles', title: 'Vehicles', icon: <Car size={32} />, color: 'bg-yellow-500', desc: 'Owner contact, parking alerts' }

@@ -232,19 +232,37 @@ export default function Dashboard() {
                 </header>
 
                 {profiles.length === 0 ? (
-                    <Card className="p-24 text-center border-white/5 bg-slate-900 rounded-[60px] relative overflow-hidden group">
-                        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-50" />
-                        <div className="w-28 h-28 bg-primary/20 rounded-[40px] flex items-center justify-center mx-auto mb-10 text-primary border border-primary/20 shadow-2xl group-hover:scale-110 transition-transform">
-                            <QrCode size={56} />
+                    <div className="space-y-12 animate-in fade-in duration-700">
+                        <div className="text-center mb-16">
+                            <h2 className="text-4xl md:text-5xl font-black text-white italic uppercase tracking-tighter leading-none font-poppins mb-6">
+                                INITIALIZE <span className="text-primary">SECURE</span> NODE
+                            </h2>
+                            <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] italic">Choose a category to generate your first Guardian tag.</p>
                         </div>
-                        <h2 className="text-5xl md:text-6xl font-black text-white mb-6 italic uppercase tracking-tighter font-poppins leading-none">No Active <br /><span className="text-primary">Profiles</span></h2>
-                        <p className="text-slate-500 mb-12 max-w-xl mx-auto text-xl leading-relaxed font-bold italic uppercase tracking-tight">
-                            Generate unique QR tags for your medical safety, pets, items, or vehicles. start now.
-                        </p>
-                        <Button size="lg" className="px-16 py-8 rounded-full font-black text-2xl shadow-2xl bg-primary text-white border-none uppercase italic tracking-tighter hover:scale-[1.05] transition-all" onClick={() => navigate('/create-profile')}>
-                            INITIALIZE FIRST QR
-                        </Button>
-                    </Card>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {[
+                                { id: 'people', title: 'Medical ID', icon: <User size={32} />, color: 'text-red-500', bg: 'bg-red-500/10', desc: 'Critical Medical Vault' },
+                                { id: 'pets', title: 'Pets', icon: <Dog size={32} />, color: 'text-emerald-500', bg: 'bg-emerald-500/10', desc: 'Secure Pet Retrieval' },
+                                { id: 'valuables', title: 'Valuables', icon: <Briefcase size={32} />, color: 'text-blue-500', bg: 'bg-blue-500/10', desc: 'Lost Item Recovery' },
+                                { id: 'vehicles', title: 'Vehicles', icon: <Car size={32} />, color: 'text-yellow-500', bg: 'bg-yellow-500/10', desc: 'Parking & Security' }
+                            ].map((c) => (
+                                <button 
+                                    key={c.id} 
+                                    onClick={() => navigate('/create-profile')}
+                                    className="bg-slate-900 border border-white/5 p-8 rounded-[40px] flex flex-col items-center text-center group hover:border-white/20 transition-all hover:-translate-y-2"
+                                >
+                                    <div className={`${c.bg} ${c.color} w-20 h-20 rounded-[24px] flex items-center justify-center mb-6 shadow-2xl transition-transform group-hover:scale-110`}>
+                                        {c.icon}
+                                    </div>
+                                    <h3 className="text-xl font-black text-white uppercase tracking-tighter italic">{c.title}</h3>
+                                    <p className="text-slate-500 text-[10px] font-bold mt-2 uppercase tracking-widest">{c.desc}</p>
+                                    <div className="mt-6 text-primary font-black text-[10px] uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
+                                        Create Now +
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {profiles.map(profile => {
@@ -252,6 +270,13 @@ export default function Dashboard() {
                             const isPets = profile.category === 'pets';
                             const isValuables = profile.category === 'valuables';
                             const isVehicles = profile.category === 'vehicles';
+
+                            const categoryNames = {
+                                people: 'Medical ID',
+                                pets: 'Pets',
+                                valuables: 'Valuables',
+                                vehicles: 'Vehicles'
+                            };
 
                             const Icon = isPeople ? User : isPets ? Dog : isValuables ? Briefcase : Car;
                             const color = isPeople ? 'text-red-500' : isPets ? 'text-emerald-500' : isValuables ? 'text-blue-500' : 'text-yellow-500';
@@ -271,7 +296,9 @@ export default function Dashboard() {
                                         <div className={`p-4 rounded-2xl ${bgSoft} ${color} border border-white/5`}>
                                             <Icon size={28} />
                                         </div>
-                                        <Badge className={`uppercase italic font-black text-[9px] tracking-widest bg-slate-950 ${color}`}>{profile.category}</Badge>
+                                        <Badge className={`uppercase italic font-black text-[9px] tracking-widest bg-slate-950 px-4 py-1 border-none ${color}`}>
+                                            {categoryNames[profile.category] || profile.category}
+                                        </Badge>
                                     </div>
                                     
                                     <div className="mb-8">
