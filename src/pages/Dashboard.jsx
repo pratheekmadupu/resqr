@@ -298,16 +298,16 @@ export default function Dashboard() {
                             <div className="bg-[#E63946] text-white text-center py-4 text-[10px] font-black uppercase tracking-[0.4em] italic">
                                 Live Identity Tag
                             </div>
-                            <div className="p-10 flex flex-col items-center">
-                                <div className="bg-white p-6 rounded-[35px] shadow-2xl relative">
+                            <div className="p-8 flex flex-col items-center">
+                                <div className="bg-white p-6 rounded-[35px] shadow-2xl relative inline-block mx-auto">
                                     <QRCodeCanvas
                                         id={`qr-${activeProfile?.id}`}
                                         value={`${window.location.origin}/qr/${activeProfile?.id}`}
-                                        size={220}
+                                        size={180}
                                         level="H"
                                         includeMargin={true}
                                         imageSettings={{ 
-                                            src: `${import.meta.env.BASE_URL}resqr_icon.png`, 
+                                            src: `/resqr_icon.png`, 
                                             height: 40, 
                                             width: 40, 
                                             excavate: true 
@@ -318,8 +318,8 @@ export default function Dashboard() {
                                     <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] max-w-[200px] mx-auto leading-relaxed">
                                         This QR links directly to your public emergency profile.
                                     </p>
-                                    <Link to={`/qr/${activeProfile?.id}`} target="_blank">
-                                        <Button className="w-full h-16 bg-[#050B18] text-white font-black italic uppercase tracking-widest rounded-2xl border-white/5 hover:bg-[#0a1225] flex items-center justify-center gap-3 mt-4">
+                                    <Link to={`/qr/${activeProfile?.id}`} target="_blank" className="w-full">
+                                        <Button className="w-full h-16 bg-[#050B18] text-white font-black italic uppercase tracking-widest rounded-2xl border border-white/5 hover:bg-[#0a1225] flex items-center justify-center gap-3">
                                             Preview Page <ExternalLink size={18} />
                                         </Button>
                                     </Link>

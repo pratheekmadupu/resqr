@@ -114,8 +114,8 @@ export default function QRScanPage() {
                 }
             } catch (err) { console.error(err); } finally { setFindingHospital(false); }
         };
-        if (coords && category === 'people') fetchNearestHospitals();
-    }, [coords, category]);
+        if (coords && profile?.category === 'people') fetchNearestHospitals();
+    }, [coords, profile]);
 
     if (loading) {
         return (
