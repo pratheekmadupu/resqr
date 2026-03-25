@@ -46,7 +46,7 @@ export default function Navbar() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between py-4 items-center">
                     <Link to="/" className="flex items-center gap-2">
-                        <img src={`${import.meta.env.BASE_URL}logo.png`} alt="RESQR Logo" style={{ height: '64px', width: 'auto' }} />
+                        <img src={`${import.meta.env.BASE_URL}logo3.jpeg`} alt="RESQR Logo" className="h-16 md:h-20 lg:h-24 w-auto rounded-lg shadow-sm" />
                     </Link>
 
                     {/* Desktop Links */}
