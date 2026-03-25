@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import Dashboard from './pages/Dashboard';
 import ProfileCreation from './pages/ProfileCreation';
@@ -16,10 +16,13 @@ import AboutUs from './pages/AboutUs';
 import ViralQR from './pages/ViralQR';
 
 function App() {
+    const location = useLocation();
+    const isScanPage = location.pathname.startsWith('/e/') || location.pathname.startsWith('/qr/');
+
     return (
         <div className="min-h-screen flex flex-col bg-slate-950 text-white">
-            <Navbar />
-            <main className="flex-grow">
+            {!isScanPage && <Navbar />}
+            <main className={`flex-grow ${isScanPage ? 'pt-0' : ''}`}>
                 <Routes>
                     <Route path="/" element={<LandingPage />} />
                     <Route path="/about" element={<AboutUs />} />
@@ -38,7 +41,7 @@ function App() {
                     <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
             </main>
-            <Footer />
+            {!isScanPage && <Footer />}
         </div>
     );
 }

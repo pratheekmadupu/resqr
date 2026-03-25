@@ -380,8 +380,8 @@ export default function QRScanPage() {
     );
 
     return (
-        <div className="min-h-screen bg-slate-950 py-12 px-4 selection:bg-primary/30">
-            <div className="max-w-md mx-auto relative">
+        <div className="min-h-screen bg-slate-950 py-4 px-4 selection:bg-primary/30">
+            <div className="max-w-2xl mx-auto relative">
                 <div className="flex justify-center mb-10 opacity-50">
                     <img src={`${import.meta.env.BASE_URL}logo.png`} alt="RESQR" className="h-8 w-auto grayscale" />
                 </div>
