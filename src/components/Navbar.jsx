@@ -31,7 +31,7 @@ export default function Navbar() {
     if (isEmergency) return null;
 
     const navLinks = [
-        { name: 'Home', path: '/', icon: <Home size={16} /> },
+        { name: 'Home', path: '/', icon: <img src="/logo3.jpeg" alt="Home" className="w-5 h-5 rounded-md object-cover" /> },
         { name: 'About Us', path: '/about', icon: <Info size={16} /> },
         { name: 'Free QR', path: '/free-qr', icon: <QrCode size={16} /> },
         { name: 'Pricing', path: '/#pricing', icon: <CreditCard size={16} /> },
