@@ -256,10 +256,10 @@ export default function Dashboard() {
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             {[
-                                { id: 'people', title: 'Medical ID', icon: <User size={32} />, color: 'text-red-500', bg: 'bg-red-500/10', desc: 'Critical Medical Vault' },
-                                { id: 'pets', title: 'Pets', icon: <Dog size={32} />, color: 'text-emerald-500', bg: 'bg-emerald-500/10', desc: 'Secure Pet Retrieval' },
-                                { id: 'valuables', title: 'Valuables', icon: <Briefcase size={32} />, color: 'text-blue-500', bg: 'bg-blue-500/10', desc: 'Lost Item Recovery' },
-                                { id: 'vehicles', title: 'Vehicles', icon: <Car size={32} />, color: 'text-yellow-500', bg: 'bg-yellow-500/10', desc: 'Parking & Security' }
+                                { id: 'people', title: 'People', icon: <User />, desc: 'Emergency Medical Profile', color: 'text-red-500', bg: 'bg-red-500/10' },
+                                { id: 'pets', title: 'Pets', icon: <Dog />, desc: 'Lost Pet Identification', color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+                                { id: 'valuables', title: 'Valuables', icon: <Briefcase />, desc: 'Lost & Found Recovery', color: 'text-blue-500', bg: 'bg-blue-500/10' },
+                                { id: 'vehicles', title: 'Vehicles', icon: <Car />, desc: 'Emergency Owner Contact', color: 'text-yellow-500', bg: 'bg-yellow-500/10' }
                             ].map((c) => (
                                 <button 
                                     key={c.id} 
@@ -287,7 +287,7 @@ export default function Dashboard() {
                             const isVehicles = profile.category === 'vehicles';
 
                             const categoryNames = {
-                                people: 'Medical ID',
+                                people: 'People',
                                 pets: 'Pets',
                                 valuables: 'Valuables',
                                 vehicles: 'Vehicles'

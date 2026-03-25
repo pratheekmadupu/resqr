@@ -23,7 +23,7 @@ export default function LandingPage() {
     const [hasPaid, setHasPaid] = useState(false);
 
     const defaultProducts = [
-        { title: "Digital QR", price: "50", features: ["Digital Dashboard", "Instant Access", "Lifetime Validity"], best: true }
+        { title: "Digital QR", price: "99", features: ["Digital Dashboard", "Instant Access", "Lifetime Validity"], best: true }
     ];
 
     useEffect(() => {

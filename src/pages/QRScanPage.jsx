@@ -141,7 +141,7 @@ export default function QRScanPage() {
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="text-center mb-10">
                 <Badge className="bg-red-500/20 text-red-500 border-none px-6 py-2 mb-6 tracking-widest uppercase italic font-black">
-                    MEDICAL ID CARD
+                    EMERGENCY MEDICAL PROFILE
                 </Badge>
                 <h1 className="text-5xl font-black uppercase text-white tracking-tighter italic">{data.name}</h1>
             </div>
@@ -234,7 +234,7 @@ export default function QRScanPage() {
                         if (navigator.geolocation) {
                             navigator.geolocation.getCurrentPosition((pos) => {
                                 const msg = `Emergency! Location: https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
-                                window.location.href = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+                                window.location.href = `https://wa.me/${data.emergencyContactPhone?.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`;
                             });
                         }
                     }}
