@@ -5,6 +5,7 @@ import ProfileCreation from './pages/ProfileCreation';
 import PaymentPage from './pages/PaymentPage';
 import SuccessPage from './pages/SuccessPage';
 import EmergencyPage from './pages/EmergencyPage';
+import QRScanPage from './pages/QRScanPage';
 import AdminPanel from './pages/AdminPanel';
 import LoginPage from './pages/LoginPage';
 import Navbar from './components/Navbar';
@@ -29,6 +30,7 @@ function App() {
                     <Route path="/payment" element={<PaymentPage />} />
                     <Route path="/success" element={<SuccessPage />} />
                     <Route path="/e/:id" element={<EmergencyPage />} />
+                    <Route path="/qr/:profileId" element={<QRScanPage />} />
                     <Route path="/admin" element={<AdminPanel />} />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/contact" element={<ContactUs />} />
