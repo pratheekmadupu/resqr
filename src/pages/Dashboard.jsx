@@ -44,25 +44,40 @@ export default function Dashboard() {
                 const snap = await get(legacyRef);
                 if (snap.exists()) {
                     const allLegacy = snap.val();
-                    const myLegacy = Object.entries(allLegacy).filter(([id, d]) => d.uid === uid);
+                    const userEmail = auth.currentUser.email?.toLowerCase();
                     
-                    for (const [oldId, data] of myLegacy) {
-                        const newId = `${uid}_${oldId}`;
-                        const newProfileRef = ref(db, `users/${uid}/profiles/${newId}`);
-                        
-                        // Check if already migrated
-                        const checkSnap = await get(newProfileRef);
-                        if (!checkSnap.exists()) {
-                            await update(newProfileRef, {
-                                category: 'people',
-                                data: { ...data, name: data.name || 'Migrated Profile' },
-                                payment_status: data.payment_status || 'paid',
-                                migrated: true,
-                                createdAt: new Date().toISOString(),
-                            });
+                    // Match by UID or Email
+                    const myLegacy = Object.entries(allLegacy).filter(([id, d]) => {
+                        return d.uid === uid || (d.email && d.email.toLowerCase() === userEmail);
+                    });
+                    
+                    if (myLegacy.length > 0) {
+                        console.log(`Found ${myLegacy.length} legacy profiles for migration.`);
+                        for (const [oldId, data] of myLegacy) {
+                            const newId = `${uid}_${oldId}`;
+                            const newProfileRef = ref(db, `users/${uid}/profiles/${newId}`);
+                            
+                            const checkSnap = await get(newProfileRef);
+                            if (!checkSnap.exists()) {
+                                await update(newProfileRef, {
+                                    category: 'people',
+                                    data: { 
+                                        ...data, 
+                                        name: data.name || 'Medical Profile',
+                                        bloodGroup: data.bloodGroup || '--',
+                                        healthIssues: data.medicalConditions || data.healthIssues || 'None reported',
+                                        emergencyContactName: data.emergencyContactName || data.eName || '',
+                                        emergencyContactPhone: data.emergencyContactPhone || data.ePhone || '',
+                                        emergencyContactRelation: data.emergencyContactRelation || data.eRelation || 'Emergency Contact'
+                                    },
+                                    payment_status: data.payment_status || 'paid',
+                                    migrated: true,
+                                    legacyId: oldId,
+                                    createdAt: data.createdAt || new Date().toISOString(),
+                                });
+                                console.log(`Migrated profile: ${oldId} -> ${newId}`);
+                            }
                         }
-                        // We do not delete legacy immediately to prevent breaking existing printed QRs
-                        // They will just forward to the legacy path which we handle in QRScanPage
                     }
                 }
             } catch (err) {
