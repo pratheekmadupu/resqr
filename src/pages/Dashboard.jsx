@@ -127,8 +127,9 @@ export default function Dashboard() {
             ctx.fillText('POWERED BY RESQR.CO.IN', CANVAS_W / 2, CANVAS_H - 50);
 
             const link = document.createElement('a');
+            const fileName = `RESQR_${username || activeProfile.id.split('_').pop()}`.toUpperCase();
             link.href = downloadCanvas.toDataURL('image/png', 1.0);
-            link.download = `RESQR_TAG_${activeProfile.id}.png`;
+            link.download = `${fileName}.png`;
             link.click();
             toast.success("Tag Downloaded", { id: t });
         } catch (err) { toast.error('Download failed'); }
