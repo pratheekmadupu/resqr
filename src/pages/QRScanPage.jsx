@@ -111,7 +111,7 @@ export default function QRScanPage() {
             <div className="max-w-xl mx-auto space-y-8 pb-32">
                 
                 <div className="flex flex-col items-center mb-8 text-center">
-                     <img src="/logo.png" alt="RESQR" className="h-10 w-auto mb-4 grayscale brightness-200" />
+                     <img src="/logo.png" alt="RESQR" className="h-10 w-auto mb-4" />
                      <Badge className="bg-red-500/10 text-red-500 border-none px-6 py-1.5 tracking-[0.4em] uppercase italic font-black text-[9px]">Emergency Responder System</Badge>
                      <p className="text-slate-600 text-[8px] font-black uppercase tracking-[0.5em] mt-2 italic">Official Identity Record</p>
                 </div>
