@@ -256,7 +256,7 @@ export default function Dashboard() {
                     </button>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pb-20">
                          {profiles.length > 1 && profiles.map(p => (
-                             <button key={p.id} onClick={() => setSelectedProfileId(p.id)} className={`h-16 rounded-2xl border transition-all font-black uppercase italic tracking-widest text-[10px] ${p.id === selectedProfileId ? 'bg-primary border-primary text-white' : 'bg-[#11192A] border-white/5 text-slate-500 hover:border-white/20'}`}>
+                             <button key={p.id} onClick={() => { setSelectedProfileId(p.id); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className={`h-16 rounded-2xl border transition-all font-black uppercase italic tracking-widest text-[10px] ${p.id === selectedProfileId ? 'bg-primary border-primary text-white' : 'bg-[#11192A] border-white/5 text-slate-500 hover:border-white/20'}`}>
                                  {p.data?.name || 'Identity Node'}
                              </button>
                          ))}

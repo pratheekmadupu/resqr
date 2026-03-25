@@ -14,6 +14,15 @@ import ContactUs from './pages/ContactUs';
 import LegalPage from './pages/LegalPage';
 import AboutUs from './pages/AboutUs';
 import ViralQR from './pages/ViralQR';
+import { useEffect } from 'react';
+
+function ScrollToTop() {
+    const { pathname } = useLocation();
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: 'instant' });
+    }, [pathname]);
+    return null;
+}
 
 function App() {
     const location = useLocation();
@@ -21,6 +30,7 @@ function App() {
 
     return (
         <div className="min-h-screen flex flex-col bg-slate-950 text-white">
+            <ScrollToTop />
             {!isScanPage && <Navbar />}
             <main className={`flex-grow ${isScanPage ? 'pt-0' : ''}`}>
                 <Routes>
