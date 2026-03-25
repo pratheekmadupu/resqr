@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
     User, Dog, Briefcase, Car, Plus, QrCode, Download, Edit3, 
-    Trash2, Clock, Loader2, Shield, Eye, Lock, RefreshCw, X
+    Trash2, Clock, Loader2, Shield, Eye, Lock, RefreshCw, X, ExternalLink
 } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -25,7 +25,16 @@ export default function Dashboard() {
     const [editData, setEditData] = useState({});
     
     const [viewScansProfile, setViewScansProfile] = useState(null);
+    const [selectedProfileId, setSelectedProfileId] = useState(null);
     const qrRef = useRef(null);
+
+    const activeProfile = profiles.find(p => p.id === selectedProfileId) || profiles[0];
+
+    useEffect(() => {
+        if (profiles.length > 0 && !selectedProfileId) {
+            setSelectedProfileId(profiles[0].id);
+        }
+    }, [profiles]);
 
     // Initial load & migrate
     useEffect(() => {
@@ -151,16 +160,14 @@ export default function Dashboard() {
             ctx.drawImage(canvas, padding, padding);
             
             // Draw Text
-            ctx.fillStyle = '#000000';
-            ctx.font = 'bold 24px Arial';
+            ctx.fillStyle = '#E63946'; // RESQR RED
+            ctx.font = 'black 48px Arial';
             ctx.textAlign = 'center';
-            ctx.fillText('RESQR IDENTITY', downloadCanvas.width / 2, padding / 2 + 10);
+            ctx.fillText('RESQR', downloadCanvas.width / 2, padding / 2 + 20);
             
-            ctx.font = 'bold 20px Arial';
-            ctx.fillText(name.toUpperCase(), downloadCanvas.width / 2, downloadCanvas.height - 40);
-            ctx.font = 'normal 14px Arial';
-            ctx.fillStyle = '#666666';
-            ctx.fillText('SCAN TO ACCESS MEDICAL PROFILE', downloadCanvas.width / 2, downloadCanvas.height - 15);
+            ctx.font = 'bold 18px Arial';
+            ctx.fillStyle = '#1A1A1A';
+            ctx.fillText('SCAN IN EMERGENCY', downloadCanvas.width / 2, downloadCanvas.height - 25);
 
             const url = downloadCanvas.toDataURL('image/png');
             const link = document.createElement('a');
@@ -182,21 +189,25 @@ export default function Dashboard() {
         setEditData(profile.data || {});
     };
 
-    const handleSaveEdit = async () => {
+    const handleSaveInline = async () => {
         try {
-            const t = toast.loading("Updating records...");
+            const t = toast.loading("Saving changes...");
             const updates = {};
-            updates[`users/${auth.currentUser.uid}/profiles/${editProfile.id}/data`] = editData;
-            updates[`users/${auth.currentUser.uid}/profiles/${editProfile.id}/last_updated`] = new Date().toISOString();
+            updates[`users/${auth.currentUser.uid}/profiles/${activeProfile.id}/data`] = editData;
+            updates[`users/${auth.currentUser.uid}/profiles/${activeProfile.id}/last_updated`] = new Date().toISOString();
             
             await update(ref(db), updates);
-            toast.success("Profile updated", { id: t });
-            setEditProfile(null);
+            toast.success("Security Node Updated", { id: t });
         } catch (error) {
-            toast.error("Update failed");
-            console.error(error);
+            toast.error("Save failed");
         }
     };
+
+    useEffect(() => {
+        if (activeProfile) {
+            setEditData(activeProfile.data || {});
+        }
+    }, [selectedProfileId, profiles]);
 
     const handleEditChange = (e) => {
         setEditData({ ...editData, [e.target.name]: e.target.value });
@@ -249,7 +260,9 @@ export default function Dashboard() {
                 </header>
 
                 {profiles.length === 0 ? (
+                    // ... [Empty State Code remains or is improved]
                     <div className="space-y-12 animate-in fade-in duration-700">
+                        {/* [Rest of the empty state from previous step] */}
                         <div className="text-center mb-12">
                             <h2 className="text-4xl font-black text-white italic uppercase tracking-tighter leading-none font-poppins mb-4">
                                 START NEW QR
@@ -263,122 +276,145 @@ export default function Dashboard() {
                                 { id: 'valuables', title: 'Valuables', icon: <Briefcase />, desc: 'Lost & Found Recovery', color: 'text-blue-500', bg: 'bg-blue-500/10' },
                                 { id: 'vehicles', title: 'Vehicles', icon: <Car />, desc: 'Emergency Owner Contact', color: 'text-yellow-500', bg: 'bg-yellow-500/10' }
                             ].map((c) => (
-                                <button 
-                                    key={c.id} 
-                                    onClick={() => navigate('/create-profile')}
-                                    className="bg-slate-900 border border-white/5 p-8 rounded-[40px] flex flex-col items-center text-center group hover:border-white/20 transition-all hover:-translate-y-2"
-                                >
-                                    <div className={`${c.bg} ${c.color} w-20 h-20 rounded-[24px] flex items-center justify-center mb-6 shadow-2xl transition-transform group-hover:scale-110`}>
-                                        {c.icon}
-                                    </div>
+                                <button key={c.id} onClick={() => navigate('/create-profile')} className="bg-slate-900 border border-white/5 p-8 rounded-[40px] flex flex-col items-center text-center group hover:border-white/20 transition-all hover:-translate-y-2">
+                                    <div className={`${c.bg} ${c.color} w-20 h-20 rounded-[24px] flex items-center justify-center mb-6 shadow-2xl transition-transform group-hover:scale-110`}>{c.icon}</div>
                                     <h3 className="text-xl font-black text-white uppercase tracking-tighter italic">{c.title}</h3>
                                     <p className="text-slate-500 text-[10px] font-bold mt-2 uppercase tracking-widest">{c.desc}</p>
-                                    <div className="mt-6 text-primary font-black text-[10px] uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
-                                        Create Now +
-                                    </div>
                                 </button>
                             ))}
                         </div>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {profiles.map(profile => {
-                            const isPeople = profile.category === 'people';
-                            const isPets = profile.category === 'pets';
-                            const isValuables = profile.category === 'valuables';
-                            const isVehicles = profile.category === 'vehicles';
+                    <div className="flex flex-col lg:flex-row gap-10">
+                        {/* Sidebar List (If multiple) */}
+                        {profiles.length > 1 && (
+                            <div className="w-full lg:w-72 space-y-4">
+                                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 px-4">Your Identities</h3>
+                                <div className="space-y-2">
+                                    {profiles.map(p => (
+                                        <button 
+                                            key={p.id}
+                                            onClick={() => setSelectedProfileId(p.id)}
+                                            className={`w-full text-left p-4 rounded-2xl flex items-center gap-4 transition-all ${selectedProfileId === p.id ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'bg-slate-900 text-slate-400 hover:bg-slate-800'}`}
+                                        >
+                                            <div className="shrink-0"><QrCode size={16} /></div>
+                                            <div className="min-w-0">
+                                                <p className="text-[10px] font-bold uppercase tracking-widest truncate">{p.data.name || p.data.petName || p.data.vehicleNumber}</p>
+                                                <p className={`text-[8px] uppercase font-black italic opacity-60`}>{p.category}</p>
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
-                            const categoryNames = {
-                                people: 'People',
-                                pets: 'Pets',
-                                valuables: 'Valuables',
-                                vehicles: 'Vehicles'
-                            };
-
-                            const Icon = isPeople ? User : isPets ? Dog : isValuables ? Briefcase : Car;
-                            const color = isPeople ? 'text-red-500' : isPets ? 'text-emerald-500' : isValuables ? 'text-blue-500' : 'text-yellow-500';
-                            const bgColor = isPeople ? 'bg-red-500' : isPets ? 'bg-emerald-500' : isValuables ? 'bg-blue-500' : 'bg-yellow-500';
-                            const bgSoft = isPeople ? 'bg-red-500/10' : isPets ? 'bg-emerald-500/10' : isValuables ? 'bg-blue-500/10' : 'bg-yellow-500/10';
-                            
-                            const title = isPeople ? profile.data.name : isPets ? profile.data.petName : isValuables ? profile.data.itemName : profile.data.vehicleNumber;
-                            const subtitle = isPeople ? profile.data.bloodGroup : isPets ? profile.data.petType : isValuables ? 'Valuables' : profile.data.ownerName;
-
-                            const qrUrl = `${window.location.origin}/qr/${profile.id}`;
-
-                            return (
-                                <Card key={profile.id} className="bg-slate-900 border-white/5 shadow-2xl rounded-[40px] p-8 relative overflow-hidden flex flex-col">
-                                    <div className={`absolute top-0 left-0 w-full h-1 ${bgColor}`} />
-                                    
-                                    <div className="flex justify-between items-start mb-6">
-                                        <div className={`p-4 rounded-2xl ${bgSoft} ${color} border border-white/5`}>
-                                            <Icon size={28} />
+                        <div className="flex-1 flex flex-col xl:flex-row gap-10 bg-slate-900/50 p-8 rounded-[50px] border border-white/5">
+                            {/* LEFT: EDIT FORM */}
+                            {activeProfile && (
+                                <div className="flex-1 space-y-8">
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <Badge className="bg-primary/20 text-primary border-none px-4 py-1 font-black italic text-[9px] mb-2 uppercase tracking-widest">Managing {activeProfile.category}</Badge>
+                                            <h2 className="text-4xl font-black italic uppercase tracking-tighter">{activeProfile.data.name || activeProfile.data.petName || activeProfile.data.vehicleNumber}</h2>
                                         </div>
-                                        <Badge className={`uppercase italic font-black text-[9px] tracking-widest bg-slate-950 px-4 py-1 border-none ${color}`}>
-                                            {categoryNames[profile.category] || profile.category}
-                                        </Badge>
-                                    </div>
-                                    
-                                    <div className="mb-8">
-                                        <h3 className="text-3xl font-black text-white uppercase italic tracking-tighter font-poppins">{title}</h3>
-                                        <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mt-1">{subtitle}</p>
+                                        <div className="flex gap-2">
+                                            <button onClick={() => handleDelete(activeProfile.id)} className="p-3 text-slate-500 hover:text-red-500 bg-slate-950 rounded-xl border border-white/5 transition-all"><Trash2 size={18} /></button>
+                                        </div>
                                     </div>
 
-                                    {/* HIDDEN QR CODE FOR RENDER/DOWNLOAD */}
-                                    <div className="hidden">
-                                        <QRCodeCanvas
-                                            id={`qr-${profile.id}`}
-                                            value={qrUrl}
-                                            size={300}
-                                            level="H"
-                                            includeMargin={true}
-                                            imageSettings={{
-                                                src: `${import.meta.env.BASE_URL}resqr_icon.png`,
-                                                x: undefined,
-                                                y: undefined,
-                                                height: 60,
-                                                width: 60,
-                                                excavate: true,
-                                            }}
-                                        />
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-4 mt-auto">
-                                        <a href={qrUrl} target="_blank" rel="noopener noreferrer" className="w-full">
-                                            <Button variant="outline" className="w-full bg-white/5 border-white/10 hover:bg-white/10 hover:text-white rounded-2xl text-[10px] font-black uppercase tracking-widest h-12 italic">
-                                                <Eye size={14} className="mr-2" /> View Public
-                                            </Button>
-                                        </a>
-                                        <Button 
-                                            onClick={() => handleDownload(profile.id, title)}
-                                            className="w-full bg-slate-950 border-white/10 hover:bg-slate-800 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest h-12 shadow-lg italic"
-                                        >
-                                            <Download size={14} className="mr-2" /> Download QR
-                                        </Button>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-950 p-8 rounded-[30px] border border-white/5 shadow-inner">
+                                        {activeProfile.category === 'people' && (
+                                            <>
+                                                <Input label="Identity Name" name="name" value={editData.name || ''} onChange={handleEditChange} />
+                                                <Input label="Blood Vector" name="bloodGroup" value={editData.bloodGroup || ''} onChange={handleEditChange} />
+                                                <div className="md:col-span-2">
+                                                    <Input label="Strategic Health Conditions" name="healthIssues" value={editData.healthIssues || ''} onChange={handleEditChange} />
+                                                </div>
+                                                <div className="md:col-span-2">
+                                                    <Input label="Critical Allergies" name="allergies" value={editData.allergies || ''} onChange={handleEditChange} />
+                                                </div>
+                                                <Input label="Guardian Contact" name="emergencyContactName" value={editData.emergencyContactName || ''} onChange={handleEditChange} />
+                                                <Input label="Comms Link (Phone)" name="emergencyContactPhone" value={editData.emergencyContactPhone || ''} onChange={handleEditChange} />
+                                            </>
+                                        )}
+                                        {/* Other categories would follow same pattern */}
+                                        {activeProfile.category !== 'people' && (
+                                            <p className="text-slate-500 italic text-sm">Dynamic editor for {activeProfile.category} is active. Update details below.</p>
+                                        )}
+                                        {activeProfile.category === 'pets' && (
+                                             <>
+                                                <Input label="Pet Name" name="petName" value={editData.petName || ''} onChange={handleEditChange} />
+                                                <Input label="Owner Phone" name="ownerContact" value={editData.ownerContact || ''} onChange={handleEditChange} />
+                                             </>
+                                        )}
+                                        {activeProfile.category === 'valuables' && (
+                                             <>
+                                                <Input label="Valuable Item" name="itemName" value={editData.itemName || ''} onChange={handleEditChange} />
+                                                <Input label="Recovery Message" name="message" value={editData.message || ''} onChange={handleEditChange} />
+                                             </>
+                                        )}
+                                        {activeProfile.category === 'vehicles' && (
+                                             <>
+                                                <Input label="License Plate" name="vehicleNumber" value={editData.vehicleNumber || ''} onChange={handleEditChange} />
+                                                <Input label="Owner Name" name="ownerName" value={editData.ownerName || ''} onChange={handleEditChange} />
+                                             </>
+                                        )}
                                         
-                                        <Button 
-                                            onClick={() => openEditModal(profile)}
-                                            className="w-full bg-primary/20 text-primary hover:bg-primary/30 rounded-2xl text-[10px] font-black uppercase tracking-widest h-12 italic border-none"
-                                        >
-                                            <Edit3 size={14} className="mr-2" /> Edit Info
-                                        </Button>
-
-                                        <Button 
-                                            onClick={() => setViewScansProfile(profile)}
-                                            className="w-full bg-indigo-500/20 text-indigo-400 hover:bg-indigo-500/30 rounded-2xl text-[10px] font-black uppercase tracking-widest h-12 italic border-none"
-                                        >
-                                            <Clock size={14} className="mr-2" /> Scans ({profile.scans ? Object.keys(profile.scans).length : 0})
-                                        </Button>
+                                        <div className="md:col-span-2 pt-4">
+                                            <Button onClick={handleSaveInline} className="w-full bg-primary py-6 rounded-2xl font-black italic tracking-widest text-sm shadow-xl shadow-primary/20 border-none">
+                                                SAVE IDENTITY UPDATE
+                                            </Button>
+                                        </div>
                                     </div>
 
-                                    <button 
-                                        onClick={() => handleDelete(profile.id)}
-                                        className="absolute top-8 right-8 text-slate-600 hover:text-red-500 transition-colors"
-                                    >
-                                        <Trash2 size={20} />
-                                    </button>
-                                </Card>
-                            );
-                        })}
+                                    <div className="flex flex-wrap gap-4">
+                                        <Button onClick={() => handleDownload(activeProfile.id, activeProfile.data.name || 'QR')} className="flex-1 bg-white/5 text-white hover:bg-white/10 rounded-2xl py-6 font-black uppercase italic tracking-widest text-xs border border-white/5">
+                                            <Download size={18} className="mr-3" /> Download Physical QR
+                                        </Button>
+                                        <Button onClick={() => setViewScansProfile(activeProfile)} className="flex-1 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 rounded-2xl py-6 font-black uppercase italic tracking-widest text-xs border border-indigo-500/20">
+                                            <Clock size={18} className="mr-3" /> View Scan History
+                                        </Button>
+                                        <div className="hidden">
+                                            <QRCodeCanvas
+                                                id={`qr-${activeProfile.id}`}
+                                                value={`${window.location.origin}/qr/${activeProfile.id}`}
+                                                size={500}
+                                                level="H"
+                                                includeMargin={true}
+                                                imageSettings={{
+                                                    src: `${import.meta.env.BASE_URL}resqr_icon.png`,
+                                                    height: 100,
+                                                    width: 100,
+                                                    excavate: true,
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* RIGHT: LIVE PREVIEW FRAME */}
+                            <div className="w-full xl:w-[400px] flex flex-col items-center">
+                                <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-600 mb-6">Live Responder View</h4>
+                                <div className="relative w-full aspect-[9/19] max-w-[320px] bg-slate-950 rounded-[60px] border-[8px] border-slate-800 shadow-2xl overflow-hidden ring-1 ring-white/10">
+                                    {/* Notch */}
+                                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-slate-800 rounded-b-2xl z-20" />
+                                    {/* Dynamic Iframe for Preview */}
+                                    <iframe 
+                                        src={`${window.location.origin}/qr/${activeProfile?.id}`}
+                                        className="w-full h-full border-none pointer-events-none"
+                                        title="QR Preview"
+                                    />
+                                    {/* Link Overlay */}
+                                    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20">
+                                        <Link to={`/qr/${activeProfile?.id}`} target="_blank" className="bg-primary/90 backdrop-blur-md text-white text-[9px] font-black uppercase tracking-widest px-4 py-2 rounded-full border border-white/20 shadow-xl flex items-center gap-2">
+                                            <ExternalLink size={10} /> Open Live Profile
+                                        </Link>
+                                    </div>
+                                </div>
+                                <p className="text-[9px] text-slate-600 font-bold mt-6 text-center uppercase tracking-widest max-w-[200px]">This is exactly what responders see when they scan your tag.</p>
+                            </div>
+                        </div>
                     </div>
                 )}
 
