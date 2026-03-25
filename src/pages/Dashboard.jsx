@@ -105,7 +105,7 @@ export default function Dashboard() {
             ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
 
             const logo = new Image();
-            logo.src = '/logo.png';
+            logo.src = '/logo2.png';
             await new Promise((resolve) => { logo.onload = resolve; });
             const logoW = 500;
             const logoH = (logo.height / logo.width) * logoW;
@@ -216,7 +216,7 @@ export default function Dashboard() {
                     <div className="space-y-6">
                         <div className="bg-[#11192A] rounded-[50px] border border-white/5 overflow-hidden flex flex-col shadow-2xl">
                             <div className="bg-white p-12 flex flex-col items-center">
-                                <img src="/logo.png" alt="RESQR" className="h-10 w-auto mb-10" />
+                                <img src="/logo2.png" alt="RESQR" className="h-14 w-auto mb-10" />
                                 <div className="bg-white p-4 rounded-[25px] shadow-2xl relative mb-10">
                                     <QRCodeCanvas id={`qr-${activeProfile?.id}`} value={qrValue} size={180} level="H" includeMargin={false} imageSettings={{ src: "/resqr_icon.png", height: 40, width: 40, excavate: true }} />
                                 </div>
