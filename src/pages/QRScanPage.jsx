@@ -123,58 +123,58 @@ export default function QRScanPage() {
                 
                 <div className="flex flex-col items-center mb-8 text-center animate-in fade-in duration-700">
                      <img src="/logo.png" alt="RESQR" className="h-10 w-auto mb-4" />
-                     <Badge className="bg-red-500/10 text-red-500 border-none px-6 py-1.5 tracking-[0.4em] uppercase italic font-black text-[9px]">Emergency Responder System</Badge>
+                     <Badge className="bg-red-500/10 text-red-500 border-none px-4 md:px-6 py-1.5 tracking-[0.2em] md:tracking-[0.4em] uppercase italic font-black text-[8px] md:text-[9px]">Emergency Responder System</Badge>
                      <p className="text-slate-700 text-[8px] font-black uppercase tracking-[0.5em] mt-2 italic">Official Identity Record</p>
                 </div>
 
                 {category === 'people' && (
                     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-700">
                         <div className="bg-[#11192A] rounded-[48px] border border-white/5 overflow-hidden shadow-2xl">
-                            <div className="p-10 text-center relative overflow-hidden">
+                            <div className="p-4 md:p-10 text-center relative overflow-hidden flex flex-col justify-center items-center min-h-[140px] md:min-h-[160px] w-full">
                                 <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] mb-4 font-poppins">Legal Representative</p>
-                                <h1 className="text-6xl font-black uppercase text-white tracking-tighter italic font-poppins">{data.name}</h1>
+                                <h1 className="text-[min(8.5vw,3.75rem)] sm:text-5xl md:text-6xl font-black uppercase text-white tracking-tighter italic font-poppins break-words leading-none w-full px-1">{data.name}</h1>
                                 <div className="absolute top-4 right-4"><div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /></div>
                             </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
-                            <div className="bg-[#11192A] rounded-[40px] border border-white/5 p-8 flex flex-col items-center justify-center shadow-xl">
+                            <div className="bg-[#11192A] rounded-[40px] border border-white/5 p-5 md:p-8 flex flex-col items-center justify-center shadow-xl">
                                 <Heart size={24} className="text-red-500 mb-4" />
                                 <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1 font-poppins">Blood Vector</p>
-                                <p className="text-5xl font-black italic text-red-500 font-poppins tracking-tighter leading-none">{data.bloodGroup || 'B-'}</p>
+                                <p className="text-3xl sm:text-5xl font-black italic text-red-500 font-poppins tracking-tighter leading-none">{data.bloodGroup || 'B-'}</p>
                             </div>
-                            <div className="bg-[#11192A] rounded-[40px] border border-white/5 p-8 flex flex-col items-center justify-center text-center shadow-xl">
+                            <div className="bg-[#11192A] rounded-[40px] border border-white/5 p-5 md:p-8 flex flex-col items-center justify-center text-center shadow-xl">
                                 <Activity size={24} className="text-indigo-500 mb-4" />
                                 <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1 font-poppins">Primary State</p>
-                                <h2 className="text-lg font-black italic text-white uppercase font-poppins line-clamp-1">{data.healthIssues || 'STABLE'}</h2>
+                                <h2 className="text-sm sm:text-lg font-black italic text-white uppercase font-poppins line-clamp-2 md:line-clamp-1 max-w-full break-words">{data.healthIssues || 'STABLE'}</h2>
                             </div>
                         </div>
 
-                        <div className="bg-[#080F1D] rounded-[40px] border border-red-500/20 shadow-xl p-8 group">
+                        <div className="bg-[#080F1D] rounded-[40px] border border-red-500/20 shadow-xl p-6 md:p-8 group">
                             <div className="flex items-center gap-3 mb-4">
                                 <AlertCircle size={18} className="text-red-500" />
                                 <span className="text-[9px] font-black text-red-500 uppercase tracking-[0.3em] font-poppins italic">Critical Allergies / Alerts</span>
                             </div>
-                            <h2 className="text-2xl font-black italic text-white uppercase font-poppins leading-tight">{data.allergies || 'NO KNOWN VULNERABILITIES'}</h2>
+                            <h2 className="text-xl md:text-2xl font-black italic text-white uppercase font-poppins leading-tight break-words">{data.allergies || 'NO KNOWN VULNERABILITIES'}</h2>
                         </div>
 
                         <div className="bg-[#11192A] rounded-[48px] border border-white/5 overflow-hidden shadow-xl">
-                            <div className="p-10 flex items-center justify-between">
-                                <div className="space-y-4">
+                            <div className="p-6 md:p-10 flex flex-row items-center justify-between gap-4">
+                                <div className="space-y-4 min-w-0 flex-1">
                                     <div className="flex items-center gap-3">
                                         <Users size={18} className="text-indigo-500" />
                                         <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.4em] italic font-poppins">Family Relation</p>
                                     </div>
-                                    <div>
-                                        <h4 className="text-4xl font-black italic text-white uppercase font-poppins mb-1 leading-none">{data.emergencyContactName}</h4>
+                                    <div className="min-w-0">
+                                        <h4 className="text-2xl sm:text-4xl font-black italic text-white uppercase font-poppins mb-1 leading-none break-words line-clamp-2">{data.emergencyContactName}</h4>
                                         <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest italic">{data.emergencyContactRelation || 'PRIMARY GUARDIAN'}</p>
                                     </div>
                                 </div>
-                                <div className="text-right flex flex-col items-center">
-                                    <button onClick={() => window.location.href = `tel:${data.emergencyContactPhone}`} className="h-20 w-20 bg-emerald-500 text-white rounded-[25px] flex items-center justify-center shadow-xl shadow-emerald-500/20 active:scale-95 transition-all">
-                                        <Phone size={32} />
+                                 <div className="text-right flex flex-col items-center shrink-0">
+                                    <button onClick={() => window.location.href = `tel:${data.emergencyContactPhone}`} className="h-14 w-14 md:h-20 md:w-20 bg-emerald-500 text-white rounded-[15px] md:rounded-[25px] flex items-center justify-center shadow-xl shadow-emerald-500/20 active:scale-95 transition-all">
+                                        <Phone size={24} className="md:w-8 md:h-8" />
                                     </button>
-                                    <p className="text-[7px] text-slate-500 font-black uppercase tracking-widest mt-4">PRIVATE NETWORK ID</p>
+                                    <p className="text-[6px] md:text-[7px] text-slate-500 font-black uppercase tracking-widest mt-4">PRIVATE NETWORK ID</p>
                                 </div>
                             </div>
                         </div>
@@ -217,8 +217,14 @@ export default function QRScanPage() {
                         </div>
 
                         <div className="space-y-4 pt-10">
-                             <button onClick={() => window.location.href = `tel:108`} className="w-full h-24 bg-red-600 text-white rounded-[40px] font-black uppercase tracking-widest text-2xl flex justify-center items-center gap-6 active:scale-95 transition-all shadow-2xl shadow-red-600/30 border-b-8 border-red-800">
-                                <Siren size={32} className="animate-pulse" /> DIAL 108 AMBULANCE
+                             <button onClick={() => window.location.href = `tel:108`} className="w-full h-24 bg-red-600 text-white rounded-[40px] font-black uppercase tracking-widest relative active:scale-95 transition-all shadow-2xl shadow-red-600/30 border-b-8 border-red-800 group overflow-hidden">
+                                <div className="absolute left-6 md:left-10 top-1/2 -translate-y-1/2 z-10">
+                                    <Siren size={32} className="animate-pulse" />
+                                </div>
+                                <div className="w-full flex flex-col items-center justify-center relative z-0">
+                                    <span className="text-lg md:text-xl leading-none mb-1">DIAL 108</span>
+                                    <span className="text-xl md:text-2xl leading-none">AMBULANCE</span>
+                                </div>
                             </button>
                              <button onClick={() => {
                                 if (navigator.geolocation && coords) {
