@@ -250,16 +250,16 @@ export default function Dashboard() {
                         {profiles.map(profile => {
                             const isPeople = profile.category === 'people';
                             const isPets = profile.category === 'pets';
-                            const isItems = profile.category === 'items';
+                            const isValuables = profile.category === 'valuables';
                             const isVehicles = profile.category === 'vehicles';
 
-                            const Icon = isPeople ? User : isPets ? Dog : isItems ? Briefcase : Car;
-                            const color = isPeople ? 'text-red-500' : isPets ? 'text-emerald-500' : isItems ? 'text-blue-500' : 'text-yellow-500';
-                            const bgColor = isPeople ? 'bg-red-500' : isPets ? 'bg-emerald-500' : isItems ? 'bg-blue-500' : 'bg-yellow-500';
-                            const bgSoft = isPeople ? 'bg-red-500/10' : isPets ? 'bg-emerald-500/10' : isItems ? 'bg-blue-500/10' : 'bg-yellow-500/10';
+                            const Icon = isPeople ? User : isPets ? Dog : isValuables ? Briefcase : Car;
+                            const color = isPeople ? 'text-red-500' : isPets ? 'text-emerald-500' : isValuables ? 'text-blue-500' : 'text-yellow-500';
+                            const bgColor = isPeople ? 'bg-red-500' : isPets ? 'bg-emerald-500' : isValuables ? 'bg-blue-500' : 'bg-yellow-500';
+                            const bgSoft = isPeople ? 'bg-red-500/10' : isPets ? 'bg-emerald-500/10' : isValuables ? 'bg-blue-500/10' : 'bg-yellow-500/10';
                             
-                            const title = isPeople ? profile.data.name : isPets ? profile.data.petName : isItems ? profile.data.itemName : profile.data.vehicleNumber;
-                            const subtitle = isPeople ? profile.data.bloodGroup : isPets ? profile.data.petType : isItems ? 'Lost & Found' : profile.data.ownerName;
+                            const title = isPeople ? profile.data.name : isPets ? profile.data.petName : isValuables ? profile.data.itemName : profile.data.vehicleNumber;
+                            const subtitle = isPeople ? profile.data.bloodGroup : isPets ? profile.data.petType : isValuables ? 'Valuables' : profile.data.ownerName;
 
                             const qrUrl = `${window.location.origin}/qr/${profile.id}`;
 
@@ -342,6 +342,7 @@ export default function Dashboard() {
                                 <Input label="Health Issues" name="healthIssues" value={editData.healthIssues || ''} onChange={handleEditChange} />
                                 <Input label="Allergies" name="allergies" value={editData.allergies || ''} onChange={handleEditChange} />
                                 <Input label="Emergency Contact Name" name="emergencyContactName" value={editData.emergencyContactName || ''} onChange={handleEditChange} />
+                                <Input label="Relation" name="emergencyContactRelation" value={editData.emergencyContactRelation || ''} onChange={handleEditChange} />
                                 <Input label="Emergency Contact Phone" name="emergencyContactPhone" value={editData.emergencyContactPhone || ''} onChange={handleEditChange} />
                             </>
                         )}
@@ -354,9 +355,9 @@ export default function Dashboard() {
                                 <Input label="Reward" name="reward" value={editData.reward || ''} onChange={handleEditChange} />
                             </>
                         )}
-                        {editProfile.category === 'items' && (
+                        {editProfile.category === 'valuables' && (
                             <>
-                                <Input label="Item Name" name="itemName" value={editData.itemName || ''} onChange={handleEditChange} />
+                                <Input label="Valuable Name" name="itemName" value={editData.itemName || ''} onChange={handleEditChange} />
                                 <Input label="Owner Contact" name="ownerContact" value={editData.ownerContact || ''} onChange={handleEditChange} />
                                 <Input label="Message" name="message" value={editData.message || ''} onChange={handleEditChange} />
                                 <Input label="Reward" name="reward" value={editData.reward || ''} onChange={handleEditChange} />

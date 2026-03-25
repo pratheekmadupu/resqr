@@ -246,7 +246,7 @@ export default function QRScanPage() {
         </div>
     );
 
-    const renderItemsTemplate = () => (
+    const renderValuablesTemplate = () => (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="text-center mb-8">
                 <Badge className="bg-blue-500/20 text-blue-500 border-none px-6 py-2 mb-6 tracking-widest uppercase italic font-black flex items-center justify-center gap-2 w-max mx-auto">
@@ -256,7 +256,7 @@ export default function QRScanPage() {
             </div>
 
             <div className="bg-blue-500/10 border border-blue-500/20 p-8 rounded-[30px] text-center">
-                <h2 className="text-2xl font-black text-blue-400 uppercase italic tracking-tighter mb-2">"This item belongs to someone!"</h2>
+                <h2 className="text-2xl font-black text-blue-400 uppercase italic tracking-tighter mb-2">"This valuable belongs to someone!"</h2>
                 <p className="text-white/80 font-bold text-sm italic">"{data.message || 'Please contact the owner to return it.'}"</p>
                 {data.reward && (
                     <div className="mt-6 inline-block bg-blue-500 text-white font-black px-6 py-3 rounded-xl uppercase tracking-widest text-xs shadow-lg shadow-blue-500/20">
@@ -333,7 +333,7 @@ export default function QRScanPage() {
                 </div>
                 {category === 'people' && renderPeopleTemplate()}
                 {category === 'pets' && renderPetsTemplate()}
-                {category === 'items' && renderItemsTemplate()}
+                {category === 'valuables' && renderValuablesTemplate()}
                 {category === 'vehicles' && renderVehiclesTemplate()}
             </div>
         </div>

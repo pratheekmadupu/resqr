@@ -17,10 +17,10 @@ export default function ProfileCreation() {
 
     const [formData, setFormData] = useState({
         // People
-        name: '', bloodGroup: '', healthIssues: '', allergies: '', emergencyContactName: '', emergencyContactPhone: '', doctorContact: '',
+        name: '', bloodGroup: '', healthIssues: '', allergies: '', emergencyContactName: '', emergencyContactPhone: '', emergencyContactRelation: '', doctorContact: '',
         // Pets
         petName: '', petType: '', ownerContact: '', vaccinationInfo: '', reward: '',
-        // Items
+        // Valuables
         itemName: '', message: '',
         // Vehicles
         ownerName: '', vehicleNumber: '', contactNumber: '', emergencyContact: ''
@@ -29,7 +29,7 @@ export default function ProfileCreation() {
     const categories = [
         { id: 'people', title: 'People', icon: <User size={32} />, color: 'bg-red-500', desc: 'Emergency medical profile' },
         { id: 'pets', title: 'Pets', icon: <Dog size={32} />, color: 'bg-emerald-500', desc: 'Lost pet identification' },
-        { id: 'items', title: 'Items', icon: <Briefcase size={32} />, color: 'bg-blue-500', desc: 'Lost & found bags, laptops' },
+        { id: 'valuables', title: 'Valuables', icon: <Briefcase size={32} />, color: 'bg-blue-500', desc: 'Lost & found bags, laptops' },
         { id: 'vehicles', title: 'Vehicles', icon: <Car size={32} />, color: 'bg-yellow-500', desc: 'Owner contact, parking alerts' }
     ];
 
@@ -43,7 +43,7 @@ export default function ProfileCreation() {
             // Validation
             if (category === 'people' && !formData.name) return toast.error('Name is required');
             if (category === 'pets' && !formData.petName) return toast.error('Pet Name is required');
-            if (category === 'items' && !formData.itemName) return toast.error('Item Name is required');
+            if (category === 'valuables' && !formData.itemName) return toast.error('Item Name is required');
             if (category === 'vehicles' && !formData.vehicleNumber) return toast.error('Vehicle Number is required');
             setStep(3);
         } else if (step === 3) {
@@ -113,9 +113,12 @@ export default function ProfileCreation() {
             <Input name="allergies" label="Allergies (Critical)" placeholder="Penicillin, Peanuts, etc." value={formData.allergies} onChange={handleChange} />
             <div className="grid grid-cols-2 gap-4">
                 <Input name="emergencyContactName" label="Emergency Contact Name" value={formData.emergencyContactName} onChange={handleChange} />
-                <Input name="emergencyContactPhone" label="Emergency Phone No." value={formData.emergencyContactPhone} onChange={handleChange} />
+                <Input name="emergencyContactRelation" label="Relation (e.g. Father)" value={formData.emergencyContactRelation} onChange={handleChange} />
             </div>
-            <Input name="doctorContact" label="Doctor Contact No. (Optional)" value={formData.doctorContact} onChange={handleChange} />
+            <div className="grid grid-cols-2 gap-4">
+                <Input name="emergencyContactPhone" label="Emergency Phone No." value={formData.emergencyContactPhone} onChange={handleChange} />
+                <Input name="doctorContact" label="Doctor Contact No. (Optional)" value={formData.doctorContact} onChange={handleChange} />
+            </div>
         </div>
     );
 
@@ -130,9 +133,9 @@ export default function ProfileCreation() {
         </div>
     );
 
-    const renderItemsForm = () => (
+    const renderValuablesForm = () => (
         <div className="space-y-6">
-            <h3 className="text-xl font-black uppercase tracking-widest text-white italic mb-4">Item Recovery Label</h3>
+            <h3 className="text-xl font-black uppercase tracking-widest text-white italic mb-4">Valuables Recovery Label</h3>
             <Input name="itemName" label="Item Name & Description" placeholder="e.g. Black Dell XPS 15 Laptop" value={formData.itemName} onChange={handleChange} />
             <Input name="ownerContact" label="Your Phone Number" placeholder="+91 00000 00000" value={formData.ownerContact} onChange={handleChange} />
             <Input name="message" label="Display Message" placeholder="e.g. If found, please return to me. Important data inside." value={formData.message} onChange={handleChange} />
@@ -206,7 +209,7 @@ export default function ProfileCreation() {
                                 
                                 {category === 'people' && renderPeopleForm()}
                                 {category === 'pets' && renderPetsForm()}
-                                {category === 'items' && renderItemsForm()}
+                                {category === 'valuables' && renderValuablesForm()}
                                 {category === 'vehicles' && renderVehiclesForm()}
 
                                 <div className="mt-12">
