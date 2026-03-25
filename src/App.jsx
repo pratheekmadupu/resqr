@@ -17,7 +17,7 @@ import ViralQR from './pages/ViralQR';
 
 function App() {
     const location = useLocation();
-    const isScanPage = location.pathname.startsWith('/e/') || location.pathname.startsWith('/qr/');
+    const isScanPage = location.pathname.startsWith('/e/') || location.pathname.startsWith('/qr/') || location.pathname.startsWith('/u/');
 
     return (
         <div className="min-h-screen flex flex-col bg-slate-950 text-white">
@@ -34,6 +34,7 @@ function App() {
                     <Route path="/success" element={<SuccessPage />} />
                     <Route path="/e/:id" element={<EmergencyPage />} />
                     <Route path="/qr/:profileId" element={<QRScanPage />} />
+                    <Route path="/u/:username" element={<QRScanPage />} />
                     <Route path="/admin" element={<AdminPanel />} />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/contact" element={<ContactUs />} />
