@@ -154,12 +154,13 @@ export default function Dashboard() {
             ctx.fillStyle = '#000000';
             ctx.font = 'bold 24px Arial';
             ctx.textAlign = 'center';
-            ctx.fillText('RESQR ID', downloadCanvas.width / 2, padding / 2 + 10);
+            ctx.fillText('RESQR IDENTITY', downloadCanvas.width / 2, padding / 2 + 10);
             
-            ctx.font = 'bold 16px Arial';
-            ctx.fillText(name.toUpperCase(), downloadCanvas.width / 2, downloadCanvas.height - 30);
+            ctx.font = 'bold 20px Arial';
+            ctx.fillText(name.toUpperCase(), downloadCanvas.width / 2, downloadCanvas.height - 40);
             ctx.font = 'normal 14px Arial';
-            ctx.fillText('SCAN IN EMERGENCY', downloadCanvas.width / 2, downloadCanvas.height - 10);
+            ctx.fillStyle = '#666666';
+            ctx.fillText('SCAN TO ACCESS MEDICAL PROFILE', downloadCanvas.width / 2, downloadCanvas.height - 15);
 
             const url = downloadCanvas.toDataURL('image/png');
             const link = document.createElement('a');
@@ -228,13 +229,14 @@ export default function Dashboard() {
                         <Badge className="bg-primary/20 text-primary border-none mb-4 px-6 py-1 font-black italic tracking-widest uppercase text-[10px]">
                             GUARDIAN HUB
                         </Badge>
-                        <h1 className="text-5xl md:text-7xl font-black text-white italic uppercase tracking-tighter leading-none font-poppins">
-                            Command <span className="text-primary">Center</span>
+                    <div>
+                        <h1 className="text-5xl font-black text-white italic uppercase tracking-tighter leading-none font-poppins">
+                            Dashboard
                         </h1>
-                        <p className="text-slate-500 font-bold uppercase tracking-[0.2em] text-[10px] italic mt-4 flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                            NETWORK SECURE & ACTIVE
+                        <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-4 flex items-center gap-2 italic">
+                            Secure QR Identity Network
                         </p>
+                    </div>
                     </div>
                     <div>
                         <Button 
@@ -248,11 +250,11 @@ export default function Dashboard() {
 
                 {profiles.length === 0 ? (
                     <div className="space-y-12 animate-in fade-in duration-700">
-                        <div className="text-center mb-16">
-                            <h2 className="text-4xl md:text-5xl font-black text-white italic uppercase tracking-tighter leading-none font-poppins mb-6">
-                                INITIALIZE <span className="text-primary">SECURE</span> NODE
+                        <div className="text-center mb-12">
+                            <h2 className="text-4xl font-black text-white italic uppercase tracking-tighter leading-none font-poppins mb-4">
+                                START NEW QR
                             </h2>
-                            <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] italic">Choose a category to generate your first Guardian tag.</p>
+                            <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Select a category below to secure your identity.</p>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             {[
@@ -327,8 +329,16 @@ export default function Dashboard() {
                                             id={`qr-${profile.id}`}
                                             value={qrUrl}
                                             size={300}
-                                            level="L"
+                                            level="H"
                                             includeMargin={true}
+                                            imageSettings={{
+                                                src: `${import.meta.env.BASE_URL}resqr_icon.png`,
+                                                x: undefined,
+                                                y: undefined,
+                                                height: 60,
+                                                width: 60,
+                                                excavate: true,
+                                            }}
                                         />
                                     </div>
 
@@ -369,6 +379,34 @@ export default function Dashboard() {
                                 </Card>
                             );
                         })}
+                    </div>
+                )}
+
+                {/* RECENT ACTIVITY FEED - RESTORED AS BEFORE */}
+                {profiles.length > 0 && (
+                    <div className="pt-12 border-t border-white/5">
+                        <h2 className="text-2xl font-black text-white italic uppercase tracking-tighter mb-8 flex items-center gap-3">
+                            <Clock size={24} className="text-primary" /> Recent System Activity
+                        </h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {profiles.flatMap(p => 
+                                p.scans ? Object.entries(p.scans).map(([sid, scan]) => ({ ...scan, profileName: p.data.name || p.data.petName || p.data.itemName || p.data.vehicleNumber })) : []
+                            )
+                            .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+                            .slice(0, 6)
+                            .map((scan, i) => (
+                                <div key={i} className="bg-slate-900 border border-white/5 p-6 rounded-3xl flex items-center gap-4 animate-in fade-in slide-in-from-bottom-2 duration-500" style={{ animationDelay: `${i * 100}ms` }}>
+                                    <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                                        <QrCode size={20} />
+                                    </div>
+                                    <div className="min-w-0">
+                                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">{scan.profileName}</p>
+                                        <p className="text-white font-bold truncate uppercase italic text-sm">{scan.location}</p>
+                                        <p className="text-[9px] text-primary font-black uppercase tracking-widest mt-1">{scan.date} • {scan.time}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 )}
             </div>
