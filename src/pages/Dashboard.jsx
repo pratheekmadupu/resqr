@@ -113,13 +113,17 @@ export default function Dashboard() {
 
             ctx.drawImage(canvas, (CANVAS_W - 800) / 2, logoH + 200, 800, 800);
 
-            ctx.fillStyle = '#000000';
-            ctx.font = '900 68px Arial';
+            // Draw Bottom Text
+            ctx.fillStyle = '#111111';
+            ctx.font = 'italic 900 90px sans-serif';
             ctx.textAlign = 'center';
+            ctx.letterSpacing = "-4px";
             ctx.fillText('SCAN IN EMERGENCY', CANVAS_W / 2, CANVAS_H - 120);
 
-            ctx.font = '700 32px Arial';
-            ctx.fillStyle = '#64748b';
+            // Footer Site Name
+            ctx.font = 'bold 36px sans-serif';
+            ctx.fillStyle = '#94a3b8';
+            ctx.letterSpacing = "4px";
             ctx.fillText('POWERED BY RESQR.CO.IN', CANVAS_W / 2, CANVAS_H - 50);
 
             const link = document.createElement('a');
