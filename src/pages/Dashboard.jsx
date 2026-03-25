@@ -24,6 +24,7 @@ export default function Dashboard() {
     const [selectedProfileId, setSelectedProfileId] = useState(null);
     const [username, setUsername] = useState('');
 
+    const logoRef = useRef(null);
     const activeProfile = profiles.find(p => p.id === selectedProfileId) || profiles[0];
 
     useEffect(() => {
@@ -69,22 +70,15 @@ export default function Dashboard() {
             const uid = auth.currentUser.uid;
             const pid = activeProfile.id;
 
-            // Handle Username Claim
             if (username && username !== activeProfile.username) {
                 const cleanUser = username.toLowerCase().replace(/[^a-z0-9]/g, '');
                 const regRef = ref(db, `usernames/${cleanUser}`);
                 const existing = await get(regRef);
-                
                 if (existing.exists() && existing.val() !== `${uid}/${pid}`) {
-                    toast.error("Username already claimed by another user.", { id: t });
+                    toast.error("Username already claimed.", { id: t });
                     return;
                 }
-                
-                // Remove old username if exists
-                if (activeProfile.username) {
-                    await remove(ref(db, `usernames/${activeProfile.username.toLowerCase()}`));
-                }
-
+                if (activeProfile.username) await remove(ref(db, `usernames/${activeProfile.username.toLowerCase()}`));
                 await set(regRef, `${uid}/${pid}`);
                 await update(ref(db, `users/${uid}/profiles/${pid}`), { username: cleanUser });
             }
@@ -95,28 +89,51 @@ export default function Dashboard() {
         } catch (error) { toast.error("Sync Failed"); }
     };
 
-    const handleDownload = () => {
+    const handleDownload = async () => {
         try {
+            const t = toast.loading("Synthesizing Print-Ready Tag...");
             const canvas = document.getElementById(`qr-${activeProfile.id}`);
             if (!canvas) return;
+
             const downloadCanvas = document.createElement('canvas');
             const ctx = downloadCanvas.getContext('2d');
-            const padding = 40;
-            downloadCanvas.width = canvas.width + (padding * 2);
-            downloadCanvas.height = canvas.height + (padding * 2) + 80;
+            const CANVAS_W = 1200;
+            const CANVAS_H = 1500;
+            downloadCanvas.width = CANVAS_W;
+            downloadCanvas.height = CANVAS_H;
+
+            // Background White with rounded border look
             ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, downloadCanvas.width, downloadCanvas.height);
-            ctx.drawImage(canvas, padding, padding + 20);
-            ctx.fillStyle = '#ff0000';
-            ctx.font = '900 60px Arial'; ctx.textAlign = 'center';
-            ctx.fillText('RESQR', downloadCanvas.width / 2, padding + 30);
-            ctx.font = '900 24px Arial'; ctx.fillStyle = '#111111';
-            ctx.fillText('SCAN IN EMERGENCY', downloadCanvas.width / 2, downloadCanvas.height - 30);
+            ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+
+            // Draw Logo at top
+            const logo = new Image();
+            logo.src = '/logo.png';
+            await new Promise((resolve) => { logo.onload = resolve; });
+            const logoW = 500;
+            const logoH = (logo.height / logo.width) * logoW;
+            ctx.drawImage(logo, (CANVAS_W - logoW) / 2, 80, logoW, logoH);
+
+            // Draw QR Code
+            ctx.drawImage(canvas, (CANVAS_W - 800) / 2, logoH + 200, 800, 800);
+
+            // Draw Bottom Text
+            ctx.fillStyle = '#000000';
+            ctx.font = '900 68px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('SCAN IN EMERGENCY', CANVAS_W / 2, CANVAS_H - 120);
+
+            // Footer Site Name
+            ctx.font = '700 32px Arial';
+            ctx.fillStyle = '#64748b';
+            ctx.fillText('POWERED BY RESQR.CO.IN', CANVAS_W / 2, CANVAS_H - 50);
+
             const link = document.createElement('a');
-            link.href = downloadCanvas.toDataURL('image/png');
-            link.download = `RESQR_TAG.png`;
+            link.href = downloadCanvas.toDataURL('image/png', 1.0);
+            link.download = `RESQR_PRIME_TAG_${activeProfile.id}.png`;
             link.click();
-        } catch (err) { toast.error('Download failed'); }
+            toast.success("Precision Tag Downloaded", { id: t });
+        } catch (err) { toast.error('Synthesis failed'); }
     };
 
     if (loading) return <div className="min-h-screen bg-[#040812] flex items-center justify-center text-white italic">SYNCHRONIZING HUB...</div>;
@@ -144,9 +161,9 @@ export default function Dashboard() {
                 </header>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="bg-[#11192A] p-8 rounded-3xl border border-white/5 flex items-center gap-6"><div className="w-14 h-14 bg-indigo-500 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-indigo-500/20"><QrCode size={24} /></div><div><p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Total Scans</p><p className="text-4xl font-black italic uppercase tracking-tight font-poppins text-white">{activeProfile?.scans ? Object.keys(activeProfile.scans).length : 0}</p></div></div>
-                    <div className="bg-[#11192A] p-8 rounded-3xl border border-white/5 flex items-center gap-6"><div className="w-14 h-14 bg-emerald-500 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-emerald-500/20"><User size={24} /></div><div><p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Health Status</p><p className="text-4xl font-black italic uppercase tracking-tighter font-poppins text-emerald-400">Verified</p></div></div>
-                    <div className="bg-[#11192A] p-8 rounded-3xl border border-white/5 flex items-center gap-6"><div className="w-14 h-14 bg-[#E63946] rounded-2xl flex items-center justify-center text-white shadow-xl shadow-red-500/20"><ShieldCheck size={24} /></div><div><p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Safety Index</p><p className="text-4xl font-black italic uppercase tracking-tighter font-poppins text-white">High</p></div></div>
+                    <div className="bg-[#11192A] p-8 rounded-3xl border border-white/5 flex items-center gap-6 text-indigo-400"><div className="w-14 h-14 bg-indigo-500/10 rounded-2xl flex items-center justify-center border border-indigo-500/20"><QrCode size={24} /></div><div><p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Total Scans</p><p className="text-4xl font-black italic uppercase tracking-tight font-poppins text-white">{activeProfile?.scans ? Object.keys(activeProfile.scans).length : 0}</p></div></div>
+                    <div className="bg-[#11192A] p-8 rounded-3xl border border-white/5 flex items-center gap-6 text-emerald-400"><div className="w-14 h-14 bg-emerald-500/10 rounded-2xl flex items-center justify-center border border-emerald-500/20"><User size={24} /></div><div><p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Health Status</p><p className="text-4xl font-black italic uppercase tracking-tighter font-poppins text-emerald-400">Verified</p></div></div>
+                    <div className="bg-[#11192A] p-8 rounded-3xl border border-white/5 flex items-center gap-6 text-red-400"><div className="w-14 h-14 bg-[#E63946]/10 rounded-2xl flex items-center justify-center border border-red-500/20"><ShieldCheck size={24} /></div><div><p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Safety Index</p><p className="text-4xl font-black italic uppercase tracking-tighter font-poppins text-white">High</p></div></div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -173,6 +190,7 @@ export default function Dashboard() {
                                     <div className="md:col-span-2"><Input label="VULNERABILITIES / ALLERGIES" name="allergies" value={editData.allergies || ''} onChange={(e) => setEditData({...editData, allergies: e.target.value})} /></div>
                                     <Input label="GUARDIAN NAME" name="emergencyContactName" value={editData.emergencyContactName || ''} onChange={(e) => setEditData({...editData, emergencyContactName: e.target.value.toUpperCase()})} />
                                     <Input label="GUARDIAN RELATION" name="emergencyContactRelation" value={editData.emergencyContactRelation || ''} onChange={(e) => setEditData({...editData, emergencyContactRelation: e.target.value.toUpperCase()})} />
+                                    <Input label="GUARDIAN PHONE" name="emergencyContactPhone" value={editData.emergencyContactPhone || ''} onChange={(e) => setEditData({...editData, emergencyContactPhone: e.target.value})} />
                                     <div className="md:col-span-2 flex justify-center pt-6"><Button onClick={handleSave} className="w-full h-16 bg-primary text-white font-black italic uppercase tracking-[0.2em] rounded-2xl shadow-2xl shadow-primary/20">COMMIT RECORDS</Button></div>
                                 </div>
                             ) : (
@@ -203,11 +221,21 @@ export default function Dashboard() {
 
                     <div className="space-y-6">
                         <div className="bg-[#11192A] rounded-[50px] border border-white/5 overflow-hidden flex flex-col shadow-2xl">
-                            <div className="bg-[#E63946] text-white text-center py-5 text-[10px] font-black uppercase tracking-[0.4em] italic font-poppins">Live Identity Tag</div>
-                            <div className="p-10 flex flex-col items-center">
-                                <div className="bg-white p-6 rounded-[35px] shadow-2xl relative inline-block mx-auto mb-10 group cursor-pointer hover:scale-105 transition-transform"><QRCodeCanvas id={`qr-${activeProfile?.id}`} value={qrValue} size={180} level="H" includeMargin={true} imageSettings={{ src: "/resqr_icon.png", height: 40, width: 40, excavate: true }} /></div>
-                                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] text-center max-w-[200px] leading-relaxed mb-6 font-poppins">Personalized URL Active: <br/><span className="text-primary tracking-normal lowercase">resqr.co.in/u/{username || '...'}</span></p>
-                                <Link to={username ? `/u/${username}` : `/qr/${activeProfile?.id}`} target="_blank" className="w-full"><Button className="w-full h-16 bg-[#050B18] text-white font-black italic uppercase tracking-widest rounded-2xl border border-white/5 hover:bg-[#0a1225] flex items-center justify-center gap-3">Preview Page <ExternalLink size={18} /></Button></Link>
+                             {/* THE PROFESSIONAL DOWNLOAD PREVIEW CARD */}
+                            <div className="bg-white p-12 flex flex-col items-center">
+                                <img src="/logo.png" alt="RESQR" className="h-10 w-auto mb-10" />
+                                <div className="bg-white p-4 rounded-[25px] shadow-2xl relative mb-10">
+                                    <QRCodeCanvas id={`qr-${activeProfile?.id}`} value={qrValue} size={180} level="H" includeMargin={false} imageSettings={{ src: "/resqr_icon.png", height: 40, width: 40, excavate: true }} />
+                                </div>
+                                <p className="text-xl font-black text-black uppercase tracking-tighter mb-4 italic">SCAN IN EMERGENCY</p>
+                                <p className="text-[8px] text-slate-400 font-bold uppercase tracking-widest">POWERED BY RESQR.CO.IN</p>
+                            </div>
+                            <div className="bg-[#050B18] p-8 flex flex-col items-center text-center">
+                                <p className="text-[9px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-6 font-poppins leading-relaxed">This represents the final printed tag. Check for clarity before printing.</p>
+                                <div className="flex flex-col gap-3 w-full">
+                                    <Button onClick={handleDownload} className="w-full h-16 bg-red-600 hover:bg-red-700 text-white font-black italic uppercase tracking-widest rounded-2xl flex items-center justify-center gap-3">GET PRINT READY TAG <Download size={18} /></Button>
+                                    <Link to={username ? `/u/${username}` : `/qr/${activeProfile?.id}`} target="_blank" className="w-full"><Button variant="outline" className="w-full h-14 bg-transparent text-white border-white/10 font-black italic uppercase tracking-widest rounded-2xl flex items-center justify-center gap-3">View Public Records <ExternalLink size={16} /></Button></Link>
+                                </div>
                             </div>
                         </div>
                     </div>
