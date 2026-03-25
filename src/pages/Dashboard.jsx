@@ -160,14 +160,14 @@ export default function Dashboard() {
             ctx.drawImage(canvas, padding, padding);
             
             // Draw Text
-            ctx.fillStyle = '#E63946'; // RESQR RED
-            ctx.font = 'black 48px Arial';
+            ctx.fillStyle = '#ff0000'; // PURE RED
+            ctx.font = '900 60px Arial';
             ctx.textAlign = 'center';
-            ctx.fillText('RESQR', downloadCanvas.width / 2, padding / 2 + 20);
+            ctx.fillText('RESQR', downloadCanvas.width / 2, padding / 2 + 30);
             
-            ctx.font = 'bold 18px Arial';
-            ctx.fillStyle = '#1A1A1A';
-            ctx.fillText('SCAN IN EMERGENCY', downloadCanvas.width / 2, downloadCanvas.height - 25);
+            ctx.font = '900 24px Arial';
+            ctx.fillStyle = '#000000';
+            ctx.fillText('SCAN IN EMERGENCY', downloadCanvas.width / 2, downloadCanvas.height - 30);
 
             const url = downloadCanvas.toDataURL('image/png');
             const link = document.createElement('a');
@@ -241,11 +241,11 @@ export default function Dashboard() {
                             GUARDIAN HUB
                         </Badge>
                     <div>
-                        <h1 className="text-5xl font-black text-white italic uppercase tracking-tighter leading-none font-poppins">
-                            Dashboard
+                        <h1 className="text-6xl font-black text-white italic uppercase tracking-tighter leading-none font-poppins">
+                            DASHBOARD
                         </h1>
-                        <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-4 flex items-center gap-2 italic">
-                            Secure QR Identity Network
+                        <p className="text-slate-500 font-bold uppercase tracking-[0.4em] text-[9px] mt-4 flex items-center gap-2">
+                            PRIVATE SECURE SUBSYSTEM
                         </p>
                     </div>
                     </div>
