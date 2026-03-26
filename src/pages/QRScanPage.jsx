@@ -571,8 +571,8 @@ export default function QRScanPage() {
                                     <div className="flex justify-between items-start">
                                         <div className="min-w-0 flex-1">
                                             <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 italic">Family Liaison</p>
-                                            <h4 className="text-3xl font-black italic text-white uppercase font-poppins leading-none break-words">{data.emergencyContactName}</h4>
-                                            <Badge className="bg-white/5 text-slate-300 border border-white/10 px-4 py-1.5 font-black uppercase italic text-[9px] mt-4 tracking-widest">{data.emergencyContactRelation || 'PARENT'}</Badge>
+                                            <h4 className="text-3xl font-black italic text-white uppercase font-poppins leading-none break-words">{data?.emergencyContactName || 'GUARDIAN'}</h4>
+                                            <Badge className="bg-white/5 text-slate-300 border border-white/10 px-4 py-1.5 font-black uppercase italic text-[9px] mt-4 tracking-widest">{data?.emergencyContactRelation || 'PARENT'}</Badge>
                                         </div>
                                     </div>
 

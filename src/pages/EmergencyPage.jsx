@@ -223,29 +223,31 @@ export default function EmergencyPage() {
 
                 if (snapshot.exists()) {
                     const data = snapshot.val();
-                    // Handle nested 'data' field or flat object
-                    const decodedUser = data.data || data;
+                    const decodedUser = (data.data && typeof data.data === 'object') ? data.data : data;
                     
-                    setUser({
-                        name: (decodedUser.name || "UNIDENTIFIED").toUpperCase(),
-                        bloodGroup: decodedUser.bloodGroup || "B-POS",
-                        payment_status: decodedUser.payment_status || 'paid',
-                        allergies: decodedUser.allergies || "None reported",
-                        conditions: decodedUser.medicalConditions || decodedUser.healthIssues || "No chronic conditions reported",
-                        doctorContact: decodedUser.doctorContact || "",
-                        emergencyContact: {
-                            name: decodedUser.emergencyContactName || decodedUser.emergencyContact?.name || "Guardian Node",
-                            relation: decodedUser.emergencyContactRelation || decodedUser.emergencyContact?.relation || "Emergency Liaison",
-                            phone: decodedUser.emergencyContactPhone || decodedUser.emergencyContact?.phone || ""
-                        }
-                    });
-                    recordScan();
+                    if (decodedUser) {
+                        setUser({
+                            name: (decodedUser.name || "UNIDENTIFIED").toString().toUpperCase(),
+                            bloodGroup: decodedUser.bloodGroup || "B-POS",
+                            payment_status: decodedUser.payment_status || 'paid',
+                            allergies: decodedUser.allergies || "None reported",
+                            conditions: decodedUser.medicalConditions || decodedUser.healthIssues || "No chronic conditions reported",
+                            doctorContact: decodedUser.doctorContact || "",
+                            emergencyContact: {
+                                name: decodedUser.emergencyContactName || decodedUser.emergencyContact?.name || "Guardian Node",
+                                relation: decodedUser.emergencyContactRelation || decodedUser.emergencyContact?.relation || "Emergency Liaison",
+                                phone: decodedUser.emergencyContactPhone || decodedUser.emergencyContact?.phone || ""
+                            }
+                        });
+                        recordScan();
+                    } else {
+                        toast.error("Invalid Protocol Node");
+                    }
                 } else {
                     toast.error("Security Key Not Found");
                 }
             } catch (error) {
                 console.error("Critical Failure:", error);
-                toast.error("Signal Lost. Please reload scan.");
             } finally {
                 setLoading(false);
             }
@@ -464,7 +466,7 @@ export default function EmergencyPage() {
                     <div className="p-10 pt-14 text-center">
                         <span className="text-[11px] font-black text-slate-500 uppercase tracking-[0.4em] block mb-4 italic">Individual Name</span>
                         <h2 className="text-5xl sm:text-7xl font-black text-white uppercase italic tracking-tighter break-words font-poppins leading-none">
-                            {user.name}
+                            {user?.name || "UNIDENTIFIED"}
                         </h2>
                     </div>
                 </section>
@@ -478,7 +480,7 @@ export default function EmergencyPage() {
                             </div>
                             <div>
                                 <span className="text-[11px] font-black text-white/70 uppercase tracking-[0.4em] block mb-2 italic">Blood Group</span>
-                                <h3 className="text-7xl font-black text-white leading-none font-poppins tracking-tighter italic">{user.bloodGroup}</h3>
+                                <h3 className="text-7xl font-black text-white leading-none font-poppins tracking-tighter italic">{user?.bloodGroup || "B-POS"}</h3>
                             </div>
                         </div>
                         <Activity size={200} className="absolute right-[-40px] bottom-[-40px] text-white opacity-5 pointer-events-none" />
@@ -603,9 +605,9 @@ export default function EmergencyPage() {
                             <div className="flex justify-between items-center">
                                 <div>
                                     <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-2 italic">Guardian One</span>
-                                    <h4 className="text-3xl font-black text-white uppercase italic tracking-tight">{user.emergencyContact.name}</h4>
+                                    <h4 className="text-3xl font-black text-white uppercase italic tracking-tight">{user?.emergencyContact?.name || "Guardian Node"}</h4>
                                 </div>
-                                <Badge className="bg-white/5 text-slate-300 border border-white/10 font-black uppercase py-2 px-6 italic tracking-widest">{user.emergencyContact.relation}</Badge>
+                                <Badge className="bg-white/5 text-slate-300 border border-white/10 font-black uppercase py-2 px-6 italic tracking-widest">{user?.emergencyContact?.relation || "Emergency Liaison"}</Badge>
                             </div>
 
                             <div className="pt-4 flex flex-col gap-4">
