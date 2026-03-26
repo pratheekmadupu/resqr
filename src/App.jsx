@@ -44,7 +44,6 @@ function App() {
                     <Route path="/success" element={<SuccessPage />} />
                     <Route path="/e/:id" element={<EmergencyPage />} />
                     <Route path="/qr/:profileId" element={<QRScanPage />} />
-                    <Route path="/u/:username" element={<QRScanPage />} />
                     <Route path="/admin" element={<AdminPanel />} />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/contact" element={<ContactUs />} />

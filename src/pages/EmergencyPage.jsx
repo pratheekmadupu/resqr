@@ -203,51 +203,38 @@ export default function EmergencyPage() {
 
     useEffect(() => {
         const fetchProfile = async () => {
+            if (!id) return setLoading(false);
             try {
-                let pid = id;
-                let uid = null;
+                let snap = await get(ref(db, `profiles/${id}`));
                 
-                if (id?.includes('_')) {
-                    uid = id.split('_')[0];
+                if (!snap.exists() && id.includes('_')) {
+                    const uid = id.split('_')[0];
+                    snap = await get(ref(db, `users/${uid}/profiles/${id}`));
                 }
 
-                let snapshot = null;
-                if (uid) {
-                    snapshot = await get(ref(db, `users/${uid}/profiles/${id}`));
-                }
-                
-                // Fallback to top-level if not found or no uid
-                if (!snapshot || !snapshot.exists()) {
-                    snapshot = await get(ref(db, `profiles/${id}`));
-                }
-
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
-                    const decodedUser = (data.data && typeof data.data === 'object') ? data.data : data;
+                if (snap.exists()) {
+                    const raw = snap.val();
+                    const decoded = raw.data || raw;
                     
-                    if (decodedUser) {
-                        setUser({
-                            name: String(decodedUser?.name || "UNIDENTIFIED").toUpperCase(),
-                            bloodGroup: decodedUser?.bloodGroup || "B-POS",
-                            payment_status: decodedUser?.payment_status || 'paid',
-                            allergies: decodedUser?.allergies || "None reported",
-                            conditions: decodedUser?.medicalConditions || decodedUser?.healthIssues || "No chronic conditions reported",
-                            doctorContact: decodedUser?.doctorContact || "",
-                            emergencyContact: {
-                                name: decodedUser?.emergencyContactName || decodedUser?.emergencyContact?.name || "Guardian Node",
-                                relation: decodedUser?.emergencyContactRelation || decodedUser?.emergencyContact?.relation || "Emergency Liaison",
-                                phone: decodedUser?.emergencyContactPhone || decodedUser?.emergencyContact?.phone || ""
-                            }
-                        });
-                        recordScan();
-                    } else {
-                        toast.error("Invalid Protocol Node");
-                    }
+                    setUser({
+                        name: (decoded.name || "UNIDENTIFIED").toString().toUpperCase(),
+                        bloodGroup: decoded.bloodGroup || "B-POS",
+                        payment_status: decoded.payment_status || 'paid',
+                        allergies: decoded.allergies || "None reported",
+                        conditions: decoded.medicalConditions || decoded.healthIssues || "No chronic conditions reported",
+                        doctorContact: decoded.doctorContact || "",
+                        emergencyContact: {
+                            name: decoded.emergencyContactName || decoded.emergencyContact?.name || "Guardian Node",
+                            relation: decoded.emergencyContactRelation || decoded.emergencyContact?.relation || "Emergency Liaison",
+                            phone: decoded.emergencyContactPhone || decoded.emergencyContact?.phone || ""
+                        }
+                    });
+                    recordScan();
                 } else {
-                    toast.error("Security Key Not Found");
+                    toast.error("Profile Node Offline");
                 }
             } catch (error) {
-                console.error("Critical Failure:", error);
+                console.error("Profile Load Error:", error);
             } finally {
                 setLoading(false);
             }

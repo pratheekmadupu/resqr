@@ -43,67 +43,40 @@ export default function QRScanPage() {
 
     useEffect(() => {
         const fetchProfile = async () => {
-            try {
-                let pid = profileId;
-                let uid = null;
-
-                if (username) {
-                    const registrySnap = await get(ref(db, `usernames/${username.toLowerCase()}`));
-                    if (registrySnap.exists()) {
-                        const path = registrySnap.val();
-                        if (typeof path === 'string') {
-                            if (path.includes('/')) {
-                                uid = path.split('/')[0];
-                                pid = path.split('/')[1];
-                            } else {
-                                // Assume it's a PID and find associated UID in legacy map
-                                pid = path;
-                                const legacy = await get(ref(db, `profiles/${pid}`));
-                                if (legacy.exists()) uid = legacy.val().uid || null;
-                            }
-                        }
-                    } else {
-                        // Direct lookup as legacy ID
-                         pid = username;
-                         const legacy = await get(ref(db, `profiles/${pid}`));
-                         if (legacy.exists()) { 
-                            const val = legacy.val();
-                            setProfile({ category: 'people', data: val, id: pid, uid: val.uid || null }); 
-                            setLoading(false); 
-                            return; 
-                         }
+             const id = profileId || username;
+             if (!id) return setLoading(false);
+             
+             try {
+                // Try direct root lookup first (fastest)
+                let snap = await get(ref(db, `profiles/${id}`));
+                
+                // If not found, try username registry
+                if (!snap.exists()) {
+                    const regSnap = await get(ref(db, `usernames/${id.toLowerCase()}`));
+                    if (regSnap.exists()) {
+                        const path = regSnap.val();
+                        snap = await get(ref(db, `users/${path}`));
                     }
                 }
-
-                if (!uid && pid) {
-                    if (pid?.includes('_')) uid = pid.split('_')[0];
+                
+                // If still not found, try UID_PID format
+                if (!snap.exists() && id.includes('_')) {
+                    const [uid, pid] = id.split('_');
+                    snap = await get(ref(db, `users/${uid}/profiles/${id}`));
                 }
 
-                if (uid && pid) {
-                    const snap = await get(ref(db, `users/${uid}/profiles/${pid}`));
-                    if (snap.exists()) {
-                        const val = snap.val();
-                        const normalized = val.data ? { ...val, id: pid, uid } : { category: 'people', data: val, id: pid, uid };
-                        setProfile(normalized);
-                        recordScan(uid, pid);
-                    } else {
-                        // Search in root profiles as last resort
-                        const rootSnap = await get(ref(db, `profiles/${pid}`));
-                        if (rootSnap.exists()) {
-                             const val = rootSnap.val();
-                             setProfile({ category: 'people', data: val, id: pid, uid: val.uid || null });
-                        }
-                    }
-                } else if (pid) {
-                    const legacy = await get(ref(db, `profiles/${pid}`));
-                    if (legacy.exists()) {
-                        const val = legacy.val();
-                        setProfile({ category: 'people', data: val, id: pid, uid: val.uid || null });
-                    }
+                if (snap.exists()) {
+                    const raw = snap.val();
+                    const data = raw.data || raw;
+                    const uid = raw.uid || (id.includes('_') ? id.split('_')[0] : null);
+                    setProfile({ category: 'people', data, id, uid });
+                    if (uid) recordScan(uid, id);
                 }
-            } catch (error) {
-                console.error("Critical Profile Load Failure:", error);
-            } finally { setLoading(false); }
+             } catch (err) {
+                console.error("Fetch Error:", err);
+             } finally {
+                setLoading(false);
+             }
         };
         fetchProfile();
     }, [profileId, username]);
