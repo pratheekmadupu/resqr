@@ -37,15 +37,23 @@ export default function PaymentPage() {
                             formData.name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-');
 
                         const profileRef = ref(db, 'profiles/' + nameSlug);
-                        await update(profileRef, {
+                        const profileData = {
                             ...formData,
                             email: user.email,
                             uid: user.uid,
                             payment_status: 'pending',
                             last_updated: new Date().toISOString()
-                        });
+                        };
+
+                        // 1. Sync to global node
+                        await update(ref(db, `profiles/${nameSlug}`), profileData);
+
+                        // 2. Sync to user-specific node
+                        await update(ref(db, `users/${user.uid}/profiles/${nameSlug}`), profileData);
+
                         console.log("Successfully synced pending profile for", user.email);
                         localStorage.removeItem('resqr_pending_profile');
+                        localStorage.setItem('resqr_active_slug', nameSlug);
                     } catch (err) {
                         console.error("Failed to sync pending profile:", err);
                     }
@@ -151,13 +159,33 @@ export default function PaymentPage() {
                             }
 
                             if (activeSlug) {
-                                await update(ref(db, `profiles/${activeSlug}`), {
+                                const finalPaymentData = {
                                     payment_status: 'paid',
                                     payment_id: response.razorpay_payment_id,
                                     order_id: response.razorpay_order_id || "direct_pay",
                                     payment_date: new Date().toISOString(),
                                     last_updated: new Date().toISOString()
-                                });
+                                };
+
+                                // 1. Update Global Profile Node
+                                try {
+                                    await update(ref(db, `profiles/${activeSlug}`), finalPaymentData);
+                                } catch (e) { console.warn("Global update failed:", e); }
+
+                                // 2. Update User-Specific Profile Node
+                                // First try with the slug directly (modern format usually is the UID)
+                                try {
+                                    const uid = activeSlug.includes('_') ? activeSlug.split('_')[0] : (currentUser?.uid);
+                                    if (uid) {
+                                        await update(ref(db, `users/${uid}/profiles/${activeSlug}`), finalPaymentData);
+                                    }
+                                } catch (e) {
+                                    console.warn("User-specific update failed:", e);
+                                    // Fallback: search for profile in user node if uid extraction failed
+                                    if (currentUser) {
+                                         await update(ref(db, `users/${currentUser.uid}/profiles/${activeSlug}`), finalPaymentData);
+                                    }
+                                }
                             }
                         } catch (updateErr) {
                             console.error("Local update error:", updateErr);

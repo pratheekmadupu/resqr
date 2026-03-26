@@ -16,19 +16,35 @@ export default function SuccessPage() {
 
     useEffect(() => {
         const slug = localStorage.getItem('resqr_active_slug');
-        if (slug) {
-            get(ref(db, `profiles/${slug}`)).then(snapshot => {
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
+        const fetchProfile = async () => {
+            try {
+                // 1. First try global node
+                let snap = await get(ref(db, `profiles/${slug}`));
+                if (!snap.exists()) {
+                    // 2. Try user-specific node if global fails
+                    const uid = slug.includes('_') ? slug.split('_')[0] : null;
+                    if (uid) {
+                        snap = await get(ref(db, `users/${uid}/profiles/${slug}`));
+                    }
+                }
+
+                if (snap.exists()) {
+                    const data = snap.val();
                     if (data.payment_status === 'pending') {
                         toast.error("Activation required");
                         window.location.href = '/payment';
                         return;
                     }
                     setProfile(data);
+                } else {
+                    console.error("Profile not found in any vault node");
                 }
-            });
-        } else {
+            } catch (err) {
+                console.error("Success context load failed:", err);
+            }
+        };
+
+        if (slug) fetchProfile(); else {
             window.location.href = '/';
         }
     }, []);

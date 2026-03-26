@@ -51,7 +51,7 @@ export default function ProfileCreation() {
                 const user = auth.currentUser;
                 if (!user) {
                     toast.success('Profile drafted. Please login to secure your item.');
-                    localStorage.setItem('resqr_pending_draft', JSON.stringify({ category, data: formData }));
+                    localStorage.setItem('resqr_pending_profile', JSON.stringify({ category, data: formData }));
                     navigate('/login?redirect_to=/dashboard');
                     return;
                 }
