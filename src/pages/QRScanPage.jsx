@@ -1,8 +1,11 @@
+import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { Phone, MapPin, AlertCircle, Heart, Activity, Loader2, Info, Lock, Shield, Share2, Activity as HeartPulse, Navigation, Siren, Users, ChevronRight, MessageSquare, ShieldAlert, CheckCircle2, XCircle, Key } from 'lucide-react';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db, auth } from '../lib/firebase';
+import { ref, get, push, serverTimestamp } from 'firebase/database';
 import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 import toast from 'react-hot-toast';
 
@@ -63,7 +66,10 @@ export default function QRScanPage() {
                 if (uid && pid) {
                     const snap = await get(ref(db, `users/${uid}/profiles/${pid}`));
                     if (snap.exists()) {
-                        setProfile(snap.val());
+                        const val = snap.val();
+                        // Normalize the structure to { category, data }
+                        const normalized = val.data ? val : { category: 'people', data: val };
+                        setProfile(normalized);
                         recordScan(uid, pid);
                     } else {
                         const legacy = await get(ref(db, `profiles/${pid}`));
