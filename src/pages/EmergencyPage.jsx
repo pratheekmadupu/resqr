@@ -17,10 +17,10 @@ export default function EmergencyPage() {
     const [hospitals, setHospitals] = useState([]);
     const [findingHospital, setFindingHospital] = useState(false);
     const [showCallScreen, setShowCallScreen] = useState(false);
-    const [showOtpModal, setShowOtpModal] = useState(false);
     const [otpVerified, setOtpVerified] = useState(false);
     const [otpCode, setOtpCode] = useState('');
     const [isVerifying, setIsVerifying] = useState(false);
+    const [accessCode, setAccessCode] = useState(null);
     const [callRequested, setCallRequested] = useState(false);
     const [isTransmitting, setIsTransmitting] = useState(false);
     const [visitCount, setVisitCount] = useState(0);
@@ -329,17 +329,24 @@ export default function EmergencyPage() {
                 toast.error("Bot Check Expired: Please refresh the page and try again.");
             } else if (error.code === 'auth/quota-exceeded') {
                 toast.error("SMS Quota Full: Try again later or switch to a higher node.");
-            } else if (error.code === 'auth/unauthorized-domain' || error.message.includes('auth/unauthorized-domain')) {
-                toast.error("Security Block: This domain is not authorized in Firebase Console.", { 
-                    duration: 10000, 
-                    icon: '🔒',
-                    // Allow UI preview if blocked
-                    action: { label: 'Demo Bypass', onClick: () => { setOtpVerified(true); toast.success("SIMULATION MODE ACTIVE: DATA UNLOCKED FOR PREVIEW"); } }
-                });
             } else {
-                toast.error("Handshake failed. Ensure Phone Auth is active and domain is whitelisted.", {
-                    action: { label: 'Demo Bypass', onClick: () => { setOtpVerified(true); toast.success("SIMULATION MODE ACTIVE: DATA UNLOCKED FOR PREVIEW"); } }
-                });
+                // FAIL-SAFE: DATABASE-NATIVE OTP GENERATION
+                console.warn("SMS Handshake Delayed. Shifting to Satellite Node Verification.");
+                const generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+                const uid = id.includes('_') ? id.split('_')[0] : null;
+
+                if (uid) {
+                    await push(ref(db, `users/${uid}/profiles/${id}/scans`), {
+                        timestamp: serverTimestamp(),
+                        status: 'SMS SIGNAL LOST - GENERATED FALLBACK CODE',
+                        active_access_code: generatedCode
+                    });
+                    setAccessCode(generatedCode);
+                    setShowOtpModal(true);
+                    toast.success("Family Notified. Use verification code from guardian dashboard.");
+                } else {
+                    toast.error("Handshake failed. Ensure Phone Auth is active and domain is whitelisted.");
+                }
             }
             
             if (window.recaptchaVerifier) {
@@ -356,16 +363,26 @@ export default function EmergencyPage() {
         
         setIsVerifying(true);
         try {
-            await confirmationResult.confirm(otpCode);
-            setOtpVerified(true);
-            setShowOtpModal(false);
-            toast.success("Access Granted: Medical History Refined");
+            if (accessCode && otpCode === accessCode) {
+                // Verify via database fallback
+                setOtpVerified(true);
+                setShowOtpModal(false);
+                toast.success("Access Granted: Medical History Refined");
+            } else if (confirmationResult) {
+                // Verify via Firebase
+                await confirmationResult.confirm(otpCode);
+                setOtpVerified(true);
+                setShowOtpModal(false);
+                toast.success("Access Granted: Medical History Refined");
+            } else {
+                throw new Error("Invalid Handshake");
+            }
             
             // Log security override
             await push(ref(db, `profiles/${id}/scans`), {
                 timestamp: serverTimestamp(),
                 status: 'SENSITIVE DATA UNLOCKED',
-                type: 'Verified OTP'
+                type: 'Verified Secure Node'
             });
         } catch (error) {
             console.error("Verification error:", error);

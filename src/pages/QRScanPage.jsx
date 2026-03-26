@@ -20,10 +20,10 @@ export default function QRScanPage() {
     
     // Privacy & Security States
     const [showCallScreen, setShowCallScreen] = useState(false);
-    const [showOtpModal, setShowOtpModal] = useState(false);
     const [otpVerified, setOtpVerified] = useState(false);
     const [otpCode, setOtpCode] = useState('');
     const [isVerifying, setIsVerifying] = useState(false);
+    const [accessCode, setAccessCode] = useState(null);
     const [callRequested, setCallRequested] = useState(false);
     const [isTransmitting, setIsTransmitting] = useState(false);
     const [visitCount, setVisitCount] = useState(0);
@@ -300,17 +300,25 @@ export default function QRScanPage() {
             // Enhanced Diagnostic Feedback
             if (error.code === 'auth/invalid-phone-number') {
                 toast.error("Format Invalid: Ensure the registry has a valid 10-digit number.");
-            } else if (error.code === 'auth/unauthorized-domain' || error.message.includes('auth/unauthorized-domain')) {
-                toast.error("Security Block: This domain is not authorized in Firebase Console.", { 
-                    duration: 10000, 
-                    icon: '🔒',
-                    // Allow UI preview if blocked
-                    action: { label: 'Demo Bypass', onClick: () => { setOtpVerified(true); toast.success("SIMULATION MODE ACTIVE: DATA UNLOCKED FOR PREVIEW"); } }
-                });
             } else {
-                toast.error("Handshake failed. Ensure Phone Auth is active and domain is whitelisted.", {
-                    action: { label: 'Demo Bypass', onClick: () => { setOtpVerified(true); toast.success("SIMULATION MODE ACTIVE: DATA UNLOCKED FOR PREVIEW"); } }
-                });
+                // FAIL-SAFE: DATABASE-NATIVE OTP GENERATION
+                console.warn("SMS Handshake Delayed. Shifting to Satellite Node Verification.");
+                const generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+                const pid = profileId || (profile?.id);
+                const uid = (profile?.uid) || (pid?.includes('_') ? pid.split('_')[0] : null);
+
+                if (uid && pid) {
+                    await push(ref(db, `users/${uid}/profiles/${pid}/scans`), {
+                        timestamp: serverTimestamp(),
+                        status: 'SMS SIGNAL LOST - GENERATED FALLBACK CODE',
+                        active_access_code: generatedCode
+                    });
+                    setAccessCode(generatedCode);
+                    setShowOtpModal(true);
+                    toast.success("Family Notified. Use verification code from guardian dashboard.");
+                } else {
+                    toast.error("Handshake failed. Ensure Phone Auth is active and domain is whitelisted.");
+                }
             }
             
             if (window.recaptchaVerifier) {
@@ -327,10 +335,20 @@ export default function QRScanPage() {
         
         setIsVerifying(true);
         try {
-            await confirmationResult.confirm(otpCode);
-            setOtpVerified(true);
-            setShowOtpModal(false);
-            toast.success("Security Cleared: Full Access Granted");
+            if (accessCode && otpCode === accessCode) {
+                // Verify via local/db fallback
+                setOtpVerified(true);
+                setShowOtpModal(false);
+                toast.success("Security Cleared: Full Access Granted");
+            } else if (confirmationResult) {
+                // Verify via Firebase
+                await confirmationResult.confirm(otpCode);
+                setOtpVerified(true);
+                setShowOtpModal(false);
+                toast.success("Security Cleared: Full Access Granted");
+            } else {
+                throw new Error("Invalid Handshake");
+            }
             
             const pid = profileId || (profile?.id);
             const uid = profile?.uid || (profileId?.includes('_') ? profileId.split('_')[0] : null);
@@ -339,7 +357,7 @@ export default function QRScanPage() {
                 await push(ref(db, `users/${uid}/profiles/${pid}/scans`), {
                     timestamp: serverTimestamp(),
                     status: 'IDENTITY VAULT OPENED',
-                    type: 'Validated OTP'
+                    type: 'Validated Secure Node'
                 });
             }
         } catch (error) {
