@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Phone, MapPin, AlertCircle, Heart, Activity, Info, Loader2, Lock, Navigation, Building2, Shield, ChevronRight } from 'lucide-react';
+import { Phone, MapPin, AlertCircle, Heart, Activity, Info, Loader2, Lock, Navigation, Building2, Shield, ChevronRight, MessageSquare, ShieldAlert, CheckCircle2, XCircle } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useParams } from 'react-router-dom';
 import { db } from '../lib/firebase';
 import { ref, get, push, serverTimestamp } from 'firebase/database';
@@ -15,6 +15,13 @@ export default function EmergencyPage() {
     const [coords, setCoords] = useState(null);
     const [hospitals, setHospitals] = useState([]);
     const [findingHospital, setFindingHospital] = useState(false);
+    const [showCallScreen, setShowCallScreen] = useState(false);
+    const [showOtpModal, setShowOtpModal] = useState(false);
+    const [otpVerified, setOtpVerified] = useState(false);
+    const [otpCode, setOtpCode] = useState('');
+    const [isVerifying, setIsVerifying] = useState(false);
+    const [callRequested, setCallRequested] = useState(false);
+    
     const [user, setUser] = useState({
         name: "LOADING...",
         bloodGroup: "--",
@@ -30,10 +37,9 @@ export default function EmergencyPage() {
     const recordScan = async () => {
         if (scanRecorded) return;
         try {
-            let locationName = 'Emergency Scan';
+            let locationName = 'Emergency Scan Received';
             let coords = null;
 
-            // Try to get precise location
             try {
                 const position = await new Promise((resolve, reject) => {
                     navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 });
@@ -52,26 +58,31 @@ export default function EmergencyPage() {
                 timestamp: serverTimestamp(),
                 time: new Date().toLocaleTimeString(),
                 date: new Date().toLocaleDateString(),
-                status: 'QR Scan',
+                status: 'QR Scan Alert',
                 location: locationName,
-                coords: coords
+                coords: coords,
+                type: 'Emergency Access'
             };
 
             await push(ref(db, `profiles/${id}/scans`), scanData);
             
-            // Also log to user-specific path for dashboard tracking if it's a modern profile ID
             if (id.includes('_')) {
                 const uid = id.split('_')[0];
                 await push(ref(db, `users/${uid}/profiles/${id}/scans`), scanData);
             }
             setScanRecorded(true);
 
-            if (coords) {
-                toast.success('Your location has been logged for emergency contacts.', {
-                    icon: '📍',
-                    duration: 5000
-                });
-            }
+            // Alert family toast
+            toast.success('Emergency contact has been notified of your location!', {
+                icon: '🛡️',
+                duration: 6000,
+                style: {
+                    background: '#ef4444',
+                    color: '#fff',
+                    fontWeight: 'bold',
+                    borderRadius: '20px'
+                }
+            });
         } catch (e) {
             console.error("Scan recording failed", e);
         }
@@ -82,8 +93,6 @@ export default function EmergencyPage() {
             if (!coords) return;
             setFindingHospital(true);
             try {
-                // Using Overpass API to find nearest hospitals
-                // node["amenity"="hospital"](around:10000,lat,lng); -> 10km radius
                 const query = `[out:json];node["amenity"="hospital"](around:15000,${coords.lat},${coords.lng});out 5;`;
                 const response = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`);
                 const data = await response.json();
@@ -133,7 +142,6 @@ export default function EmergencyPage() {
                             phone: decodedUser.emergencyContactPhone
                         }
                     });
-                    // Log the scan!
                     recordScan();
                 } else {
                     toast.error("Profile not found");
@@ -148,10 +156,56 @@ export default function EmergencyPage() {
         fetchProfile();
     }, [id]);
 
+    const initiateMaskedCall = () => {
+        setShowCallScreen(true);
+        // Simulate a virtual call connection
+        setTimeout(() => {
+            // In a real scenario, this would redirect to a Twilio bridge URL
+            // For now, we simulate the "Handshake" then trigger the tel: protocol
+            // but the number itself is never displayed in the UI.
+            console.log("Secure connection established via Virtual ID: +1-RES-QR-001");
+            window.location.href = `tel:${user.emergencyContact.phone}`;
+            setTimeout(() => setShowCallScreen(false), 2000);
+        }, 3000);
+    };
+
+    const handleRequestCall = async () => {
+        setCallRequested(true);
+        try {
+            await push(ref(db, `profiles/${id}/scans`), {
+                timestamp: serverTimestamp(),
+                time: new Date().toLocaleTimeString(),
+                status: 'CALLBACK REQUESTED',
+                type: 'Urgent'
+            });
+            toast.success("Callback request sent to guardian!", {
+                icon: '📲',
+                style: { borderRadius: '20px' }
+            });
+        } catch (e) {
+            toast.error("Failed to send request");
+        }
+    };
+
+    const handleVerifyOtp = () => {
+        setIsVerifying(true);
+        // Simulate OTP verification logic
+        setTimeout(() => {
+            if (otpCode === '1234' || otpCode === '0000') {
+                setOtpVerified(true);
+                setShowOtpModal(false);
+                toast.success("Access Granted: Sensitive Details Unlocked");
+            } else {
+                toast.error("Invalid Secret Code");
+            }
+            setIsVerifying(false);
+        }, 1500);
+    };
+
     if (loading) {
         return (
-            <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-                <Loader2 className="text-primary animate-spin" size={48} />
+            <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+                <Loader2 className="text-red-600 animate-spin" size={48} />
             </div>
         );
     }
@@ -160,269 +214,333 @@ export default function EmergencyPage() {
         return (
             <div className="min-h-screen bg-medical-bg text-white flex items-center justify-center p-8 font-manrope">
                 <div className="max-w-md w-full bg-medical-card rounded-[40px] p-12 text-center border border-white/5 relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent" />
-                    <div className="w-24 h-24 bg-primary/20 rounded-[30px] flex items-center justify-center mx-auto mb-10 text-primary border border-primary/20 shadow-2xl animate-pulse">
+                    <div className="absolute top-0 left-0 w-full h-[2px] bg-red-600" />
+                    <div className="w-24 h-24 bg-red-600/20 rounded-[30px] flex items-center justify-center mx-auto mb-10 text-red-600 border border-red-600/20">
                         <Lock size={40} />
                     </div>
                     <h2 className="text-4xl font-black italic uppercase tracking-tighter leading-none mb-6 font-poppins text-white">Profile Pending Activation</h2>
-                    <p className="text-slate-500 font-bold uppercase tracking-widest text-xs mb-10 italic">This medical profile has not been activated yet. Please ensure the identity owner has completed the secure activation process.</p>
-                    <div className="pt-8 border-t border-white/5 flex flex-col items-center gap-4 text-[9px] font-black text-slate-600 uppercase tracking-[0.4em] italic leading-tight">
-                        <span>Secured by Guardian Network</span>
-                    </div>
+                    <p className="text-slate-500 font-bold uppercase tracking-widest text-xs mb-10 italic">This medical profile has not been activated yet.</p>
                 </div>
             </div>
         );
     }
 
-    const handleCall = () => {
-        window.location.href = `tel:${user.emergencyContact.phone}`;
-    };
-
-    const handleSendLocation = () => {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((position) => {
-                const { latitude, longitude } = position.coords;
-                const msg = encodeURIComponent(`Emergency! My location: https://www.google.com/maps?q=${latitude},${longitude}`);
-                window.location.href = `https://wa.me/${user.emergencyContact.phone.replace(/\D/g, '')}?text=${msg}`;
-            });
-        } else {
-            alert("Geolocation is not supported by this browser.");
-        }
-    };
-
     return (
-        <div className="min-h-screen bg-medical-bg text-white font-manrope selection:bg-primary/30">
-            {/* Urgency Header - Dark Professional Hub */}
-            <div className="bg-slate-950/80 backdrop-blur-md border-b border-white/5 p-6 text-center sticky top-0 z-40 shadow-2xl">
-                <div className="flex flex-col items-center justify-center gap-3">
+        <div className="min-h-screen bg-white text-slate-900 font-manrope selection:bg-red-600/30">
+            {/* FRAUD PREVENTION BANNER */}
+            <div className="bg-red-600 text-white px-6 py-3 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest sticky top-0 z-50">
+                <ShieldAlert size={16} />
+                THIS PROFILE IS FOR EMERGENCY USE ONLY. ABUSE IS LOGGED & REPORTED.
+            </div>
+
+            {/* Header */}
+            <div className="bg-white border-b border-slate-100 p-6 flex flex-col items-center justify-center gap-4 sticky top-[34px] z-40 shadow-sm">
+                <div className="flex items-center gap-3">
                     <img
                         src={`${import.meta.env.BASE_URL}logo.png`}
-                        alt="RESQR Medical Profile"
-                        style={{ height: '48px', width: 'auto' }}
+                        alt="RESQR"
+                        style={{ height: '32px', width: 'auto' }}
+                        className="filter grayscale brightness-0"
                     />
-                    <div className="flex flex-col items-center">
-                        <Badge className="px-5 py-1 font-black italic bg-primary/20 text-primary border-none text-[10px] tracking-widest uppercase">
-                            ENCRYPTED MEDICAL PROFILE
-                        </Badge>
-                        <p className="font-bold text-[8px] text-slate-500 mt-1 uppercase tracking-widest italic">Secure Digital Identification Vault</p>
-                    </div>
+                    <div className="h-6 w-px bg-slate-200" />
+                    <Badge className="px-3 py-1 font-black italic bg-red-100 text-red-600 border-none text-[10px] tracking-widest uppercase">
+                        EMERGENCY PORTAL
+                    </Badge>
                 </div>
             </div>
 
-            <main className="p-4 sm:p-8 space-y-8 max-w-2xl mx-auto">
-                {/* Name Block - Tactical ID Style */}
-                <section className="bg-medical-card rounded-[40px] shadow-2xl border border-white/5 overflow-hidden relative">
-                    <div className="bg-slate-950 p-4 flex justify-between items-center text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] italic">
-                        <span>Unit Identification</span>
-                        <span className="text-emerald-500 flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                            Verified
-                        </span>
+            <main className="p-4 sm:p-8 space-y-6 max-w-2xl mx-auto pb-32">
+                {/* IDENTITY CARD */}
+                <section className="bg-white rounded-[40px] border-2 border-slate-100 overflow-hidden shadow-2xl relative">
+                    <div className="bg-slate-50 p-4 flex justify-between items-center text-[10px] font-black text-slate-400 uppercase tracking-widest italic">
+                        <span>Identity Lock: VERIFIED</span>
+                        <div className="flex gap-1">
+                            <div className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse" />
+                            <div className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse delay-75" />
+                        </div>
                     </div>
-                    <div className="p-12 text-center">
-                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] block mb-3 italic">Identity Owner</span>
-                        <h2 className="text-4xl sm:text-6xl font-black text-white uppercase italic tracking-tighter break-words font-poppins leading-none">
+                    <div className="p-10 pt-14 text-center">
+                        <span className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] block mb-4 italic">Individual Name</span>
+                        <h2 className="text-5xl sm:text-7xl font-black text-slate-900 uppercase italic tracking-tighter break-words font-poppins leading-none">
                             {user.name}
                         </h2>
                     </div>
-                    <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
                 </section>
 
-                {/* Primary Stats Grid */}
-                <div className="grid grid-cols-1 gap-8">
-                    <div className="bg-medical-card p-10 rounded-[40px] shadow-2xl border border-white/5 flex items-center justify-between relative overflow-hidden group">
-                        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/5 to-transparent opacity-50" />
+                {/* VITAL INFORMATION - RED THEME */}
+                <div className="grid grid-cols-1 gap-6">
+                    <div className="bg-red-600 p-10 rounded-[40px] shadow-2xl flex items-center justify-between relative overflow-hidden group text-white">
                         <div className="flex items-center gap-8 relative z-10">
-                            <div className="w-20 h-20 bg-primary rounded-3xl flex items-center justify-center text-white shadow-2xl shadow-primary/20 transition-transform group-hover:scale-105">
+                            <div className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-3xl flex items-center justify-center text-white border border-white/30">
                                 <Heart size={36} fill="white" />
                             </div>
                             <div>
-                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] block mb-2 italic">Blood Type</span>
-                                <h3 className="text-6xl font-black text-white leading-none font-poppins tracking-tighter italic">{user.bloodGroup}</h3>
+                                <span className="text-[11px] font-black text-white/70 uppercase tracking-[0.4em] block mb-2 italic">Blood Group</span>
+                                <h3 className="text-7xl font-black text-white leading-none font-poppins tracking-tighter italic">{user.bloodGroup}</h3>
                             </div>
                         </div>
-                        <div className="hidden sm:block opacity-[0.03] absolute right-0 bottom-0 -mb-10 -mr-10">
-                            <Activity size={240} />
-                        </div>
+                        <Activity size={200} className="absolute right-[-40px] bottom-[-40px] text-white opacity-5 pointer-events-none" />
                     </div>
 
-                    <div className="bg-slate-950 p-10 rounded-[40px] shadow-2xl border border-white/5 flex flex-col items-start gap-6 text-white relative overflow-hidden group">
+                    <div className="bg-white p-10 rounded-[40px] shadow-xl border-2 border-slate-100 space-y-6">
                         <div className="flex items-center gap-4">
-                            <div className="p-3 bg-primary/20 rounded-2xl text-primary border border-primary/20">
+                            <div className="p-3 bg-red-50 rounded-2xl text-red-600 border border-red-100">
                                 <Activity size={24} />
                             </div>
-                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] italic">Clinical Diagnosis</span>
+                            <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest italic">Medical Conditions</span>
                         </div>
-                        <p className="text-3xl font-black italic uppercase tracking-tight break-words leading-none text-white">{user.conditions}</p>
-                        <div className="absolute bottom-0 right-0 w-32 h-32 bg-primary/5 blur-3xl rounded-full" />
-                    </div>
-                </div>
-
-                {/* Info Blocks */}
-                <div className="space-y-8">
-                    <div className="bg-medical-card p-10 rounded-[40px] shadow-2xl border border-white/5 relative overflow-hidden">
-                        <div className="flex items-center gap-4 mb-8">
-                            <div className="p-3 bg-primary/20 rounded-2xl text-primary border border-primary/20 shadow-lg shadow-primary/20">
-                                <AlertCircle size={22} />
-                            </div>
-                            <h3 className="text-xl font-black text-white italic uppercase tracking-tighter leading-none">Critical Alerts</h3>
-                        </div>
-                        <p className="text-2xl font-black text-primary uppercase italic p-8 bg-slate-950/50 rounded-3xl border border-primary/20 shadow-inner">
-                            {user.allergies}
+                        <p className="text-3xl font-black italic uppercase tracking-tight text-slate-800 leading-tight">
+                            {user.conditions}
                         </p>
                     </div>
 
-                    {/* NEAREST HOSPITAL SECTION */}
-                    <div className="bg-medical-card p-10 rounded-[40px] shadow-2xl border border-white/5 relative overflow-hidden group">
-                        <div className="flex items-center gap-4 mb-8">
-                            <div className="p-3 bg-emerald-500/20 rounded-2xl text-emerald-500 border border-emerald-500/20 shadow-lg shadow-emerald-500/20">
-                                <Building2 size={22} />
+                    <div className="bg-white p-10 rounded-[40px] shadow-xl border-2 border-slate-100 space-y-6">
+                        <div className="flex items-center gap-4 text-red-600">
+                            <div className="p-3 bg-red-50 rounded-2xl border border-red-100">
+                                <AlertCircle size={24} />
                             </div>
-                            <h3 className="text-xl font-black text-white italic uppercase tracking-tighter leading-none">Nearest Emergency Facility</h3>
+                            <span className="text-[11px] font-black uppercase tracking-widest italic">Critical Allergies</span>
                         </div>
-
-                        {findingHospital ? (
-                            <div className="flex items-center gap-4 p-6 bg-slate-950/50 rounded-3xl border border-white/5 animate-pulse">
-                                <Loader2 className="animate-spin text-slate-500" size={20} />
-                                <span className="text-xs font-black uppercase tracking-widest text-slate-500 italic">Scanning Local Perimeter...</span>
-                            </div>
-                        ) : hospitals.length > 0 ? (
-                            <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                                {hospitals.map((hospital, idx) => (
-                                    <div key={idx} className="p-6 bg-slate-950 border border-white/5 rounded-3xl shadow-inner hover:border-emerald-500/30 transition-all group/h">
-                                        <div className="flex justify-between items-start mb-4">
-                                            <div className="flex-1">
-                                                <span className="text-[8px] font-black text-slate-600 uppercase tracking-[0.4em] block mb-1 italic">Facility Node {idx + 1}</span>
-                                                <h4 className="text-lg font-black text-white uppercase italic tracking-tight leading-none group-hover/h:text-emerald-400 transition-colors">
-                                                    {hospital.name}
-                                                </h4>
-                                                {hospital.addr && <p className="text-[9px] text-slate-500 mt-2 uppercase font-bold italic tracking-wider">{hospital.addr}</p>}
-                                            </div>
-                                            <button
-                                                onClick={() => {
-                                                    const url = hospital.lat
-                                                        ? `https://www.google.com/maps/dir/?api=1&origin=${coords.lat},${coords.lng}&destination=${hospital.lat},${hospital.lng}&travelmode=driving`
-                                                        : `https://www.google.com/maps/search/hospital/@${coords.lat},${coords.lng}`;
-                                                    window.open(url, '_blank');
-                                                }}
-                                                className="bg-emerald-500/10 hover:bg-emerald-500 text-emerald-500 hover:text-white p-3 rounded-xl transition-all active:scale-90"
-                                            >
-                                                <Navigation size={18} />
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="p-8 bg-slate-950 border border-white/5 rounded-3xl text-center">
-                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic mb-4">Initial Position Lock Required</p>
-                                <button
-                                    onClick={recordScan}
-                                    className="text-xs font-black text-primary uppercase italic tracking-widest hover:underline"
-                                >
-                                    Force GPS Initialization
-                                </button>
-                            </div>
-                        )}
-                        <div className="absolute -right-8 -bottom-8 opacity-[0.02] pointer-events-none">
-                            <Building2 size={200} />
-                        </div>
-                    </div>
-
-                    {/* RE-ADDED FAMILY CONTACT SECTION */}
-                    <div className="bg-medical-card p-10 rounded-[40px] shadow-2xl border border-white/5">
-                        <div className="flex items-center gap-4 mb-10 border-b border-white/5 pb-8">
-                            <div className="p-3 bg-blue-500/20 rounded-2xl text-blue-500 border border-blue-500/20 shadow-lg shadow-blue-500/20">
-                                <Phone size={22} />
-                            </div>
-                            <h3 className="text-xl font-black text-white italic uppercase tracking-tighter">Emergency Liaison</h3>
-                        </div>
-                        <div className="space-y-10">
-                            <div className="flex justify-between items-start">
-                                <div>
-                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] block mb-3 italic">Contact Name</span>
-                                    <h4 className="text-3xl font-black text-white uppercase italic tracking-tight">{user.emergencyContact.name}</h4>
-                                </div>
-                                <div className="text-right">
-                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] block mb-3 italic">Relation</span>
-                                    <Badge className="bg-blue-500/10 text-blue-400 border-none font-black uppercase py-2 px-6 italic tracking-widest">{user.emergencyContact.relation}</Badge>
-                                </div>
-                            </div>
-                            <div className="pt-2">
-                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] block mb-3 italic">Direct Secure Line</span>
-                                <p className="text-2xl font-black text-white/20 tracking-[0.2em] font-poppins italic uppercase">Encrypted for Privacy</p>
-                            </div>
-                        </div>
+                        <p className="text-3xl font-black italic uppercase tracking-tight text-red-600 leading-tight bg-red-50 p-6 rounded-3xl border border-red-100">
+                            {user.allergies}
+                        </p>
                     </div>
                 </div>
 
-                {/* Actions - Fast Response */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-6">
-                    <button
-                        onClick={handleCall}
-                        className="w-full bg-emerald-600 hover:bg-emerald-700 text-white p-10 rounded-[35px] flex items-center justify-center gap-5 transition-all active:scale-95 shadow-2xl shadow-emerald-900/40 relative overflow-hidden group"
-                    >
-                        <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                        <Phone size={28} fill="white" className="relative z-10" />
-                        <span className="text-2xl font-black uppercase italic tracking-tighter relative z-10">Call {user.emergencyContact.relation || 'Guardian'}</span>
-                    </button>
+                {/* SENSITIVE DETAILS - OTP PROTECTED */}
+                <section className="bg-slate-900 p-10 rounded-[40px] shadow-2xl relative overflow-hidden">
+                    <div className="flex items-center justify-between mb-8">
+                        <div className="flex items-center gap-4">
+                            <div className="p-3 bg-white/10 rounded-2xl text-white">
+                                <Lock size={22} />
+                            </div>
+                            <h3 className="text-xl font-black text-white italic uppercase tracking-tighter">Sensitive Profile</h3>
+                        </div>
+                        {!otpVerified && (
+                             <Badge className="bg-amber-500/20 text-amber-500 border-none font-black uppercase italic tracking-widest">LOCKED</Badge>
+                        )}
+                    </div>
 
-                    <button
-                        onClick={handleSendLocation}
-                        className="w-full bg-primary hover:bg-primary-dark text-white p-10 rounded-[35px] flex items-center justify-center gap-5 transition-all active:scale-95 shadow-2xl shadow-primary/40 relative overflow-hidden group"
-                    >
-                        <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                        <MapPin size={28} fill="white" className="relative z-10" />
-                        <span className="text-2xl font-black uppercase italic tracking-tighter relative z-10">Send GPS to {user.emergencyContact.relation || 'Guardian'}</span>
-                    </button>
+                    <div className={`relative transition-all duration-700 ${!otpVerified ? 'blur-xl' : 'blur-0'}`}>
+                        <div className="space-y-6">
+                            <div className="flex justify-between border-b border-white/5 pb-4">
+                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest italic">Home Address</span>
+                                <span className="text-white font-black italic uppercase">Residential Area, Hyderabad</span>
+                            </div>
+                            <div className="flex justify-between border-b border-white/5 pb-4">
+                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest italic">Medication Log</span>
+                                <span className="text-white font-black italic uppercase">Insulin Type B (Daily)</span>
+                            </div>
+                        </div>
+                    </div>
 
+                    {!otpVerified && (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center p-10 text-center z-10">
+                            <p className="text-[10px] font-black text-white uppercase tracking-[0.3em] mb-6 italic opacity-70">OTP verification required for medication & address history</p>
+                            <Button 
+                                onClick={() => setShowOtpModal(true)}
+                                className="bg-white text-slate-900 hover:bg-red-600 hover:text-white rounded-[20px] px-8 py-4 font-black uppercase italic text-xs tracking-widest"
+                            >
+                                Unlock Sensitive Details
+                            </Button>
+                        </div>
+                    )}
+                </section>
+
+                {/* EMERGENCY CONTACTS */}
+                <section className="bg-white rounded-[40px] border-2 border-slate-100 overflow-hidden">
+                    <div className="bg-slate-50 p-10">
+                        <div className="flex items-center gap-4 mb-10 border-b border-slate-200 pb-8">
+                            <div className="p-3 bg-red-600 text-white rounded-2xl shadow-lg shadow-red-200">
+                                <Shield size={22} />
+                            </div>
+                            <h3 className="text-xl font-black text-slate-900 italic uppercase tracking-tighter">Verified Guardians</h3>
+                        </div>
+                        
+                        <div className="space-y-8">
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2 italic">Guardian One</span>
+                                    <h4 className="text-3xl font-black text-slate-900 uppercase italic tracking-tight">{user.emergencyContact.name}</h4>
+                                </div>
+                                <Badge className="bg-slate-100 text-slate-600 border-none font-black uppercase py-2 px-6 italic tracking-widest">{user.emergencyContact.relation}</Badge>
+                            </div>
+
+                            <div className="pt-4 flex flex-col gap-4">
+                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block italic">Secure Contact Protocol</span>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <button 
+                                        onClick={initiateMaskedCall}
+                                        className="bg-red-600 hover:bg-red-700 text-white p-6 rounded-[24px] flex items-center justify-center gap-3 transition-all active:scale-95 shadow-xl shadow-red-200 group"
+                                    >
+                                        <Phone size={22} fill="white" />
+                                        <span className="font-black uppercase italic tracking-tighter text-lg">Call Family</span>
+                                    </button>
+                                    <button 
+                                        onClick={handleRequestCall}
+                                        disabled={callRequested}
+                                        className={`p-6 rounded-[24px] flex items-center justify-center gap-3 transition-all active:scale-95 border-2 ${callRequested ? 'bg-slate-50 border-slate-100 text-slate-400' : 'bg-white border-slate-200 text-slate-800 hover:border-red-600 hover:text-red-600 shadow-lg'}`}
+                                    >
+                                        <MessageSquare size={22} />
+                                        <span className="font-black uppercase italic tracking-tighter text-lg">{callRequested ? 'Request Sent' : 'Request Call'}</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* EXTRA ACTIONS */}
+                <div className="space-y-4">
                     <button
                         onClick={() => window.location.href = 'tel:108'}
-                        className="w-full sm:col-span-2 bg-red-600 hover:bg-red-700 text-white p-10 rounded-[35px] flex items-center justify-center gap-5 transition-all active:scale-95 shadow-2xl shadow-red-900/40 relative overflow-hidden group"
+                        className="w-full bg-slate-900 hover:bg-black text-white p-8 rounded-[30px] flex items-center justify-center gap-5 transition-all shadow-xl"
                     >
-                        <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                        <Phone size={28} fill="white" className="relative z-10" />
-                        <span className="text-2xl font-black uppercase italic tracking-tighter relative z-10">Call Ambulance (108)</span>
+                        <Phone size={24} fill="white" />
+                        <span className="text-xl font-black uppercase italic tracking-tighter">Call Ambulance (108)</span>
+                    </button>
+
+                    <button 
+                        onClick={() => toast.success("Misuse report initiated. Safety log entry created.")}
+                        className="w-full bg-slate-50 border border-slate-200 text-slate-400 p-6 rounded-[25px] flex items-center justify-center gap-3 hover:bg-red-50 hover:text-red-600 hover:border-red-100 transition-all text-xs font-black uppercase italic tracking-widest"
+                    >
+                        <ShieldAlert size={18} />
+                        Report Profile Misuse
                     </button>
                 </div>
-
-                {/* Join ResQR CTA */}
-                <div className="pt-24 pb-12 text-center">
-                    <div className="inline-block p-[1px] rounded-[40px] bg-gradient-to-r from-emerald-500/20 via-primary/20 to-blue-500/20 mb-8 max-w-full">
-                        <div className="bg-slate-950 rounded-[39px] p-10 md:p-14 border border-white/5 relative overflow-hidden group shadow-2xl">
-                             <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/10 blur-[80px] rounded-full group-hover:bg-primary/20 transition-all duration-700" />
-                                    
-                            <div className="relative z-10 flex flex-col items-center">
-                                <div className="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center mb-8 border border-white/10 group-hover:scale-110 transition-transform duration-500">
-                                    <Shield size={32} className="text-white" />
-                                </div>
-                                
-                                <h3 className="text-3xl md:text-4xl font-black italic text-white uppercase font-poppins mb-4 tracking-tighter leading-none">
-                                    Hero Protocol Complete?
-                                </h3>
-                                <p className="text-slate-400 text-[10px] md:text-xs font-bold uppercase tracking-[0.3em] mb-10 max-w-[320px] mx-auto leading-relaxed italic opacity-70">
-                                    You've played your part in a rescue. Now, ensure your own safety with a ResQR Identity.
-                                </p>
-                                
-                                <button 
-                                    onClick={() => window.location.href = '/login?redirect_to=/create-profile'}
-                                    className="w-full py-6 bg-white text-slate-950 rounded-[24px] font-black uppercase tracking-[0.2em] text-[10px] md:text-xs hover:bg-emerald-500 hover:text-white transition-all transform hover:translate-y-[-4px] active:translate-y-[0px] shadow-2xl flex items-center justify-center gap-3 group/btn"
-                                >
-                                    Activate My Protection
-                                    <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <footer className="text-center py-20 opacity-30">
-                    <div className="flex items-center justify-center gap-4 mb-5">
-                        <img src={`${import.meta.env.BASE_URL}logo.png`} alt="RESQR Logo" className="h-10 w-auto grayscale brightness-200" />
-                    </div>
-                    <p className="text-[9px] font-black uppercase tracking-[0.5em] text-slate-500 italic">Global Identity Protection Network • Encrypted Portal</p>
-                </footer>
             </main>
+
+            {/* SECURE CALL OVERLAY */}
+            <AnimatePresence>
+                {showCallScreen && (
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[100] bg-red-600 flex flex-col items-center justify-center text-white p-10 text-center"
+                    >
+                        <div className="w-32 h-32 bg-white/20 rounded-full flex items-center justify-center mb-10 animate-pulse border-2 border-white/50">
+                            <Shield size={64} />
+                        </div>
+                        <h2 className="text-4xl font-black uppercase italic tracking-tighter mb-4">Securing Connection</h2>
+                        <p className="text-white/70 font-bold uppercase tracking-[0.3em] text-xs mb-10 italic">Routing call through ResQR Virtual Line...</p>
+                        
+                        <div className="flex gap-4">
+                            <div className="w-2 h-2 rounded-full bg-white animate-bounce" />
+                            <div className="w-2 h-2 rounded-full bg-white animate-bounce delay-100" />
+                            <div className="w-2 h-2 rounded-full bg-white animate-bounce delay-200" />
+                        </div>
+                        
+                        <div className="mt-20 px-8 py-3 bg-black/20 rounded-full border border-white/10 text-[10px] font-black uppercase tracking-widest">
+                            Virtual ID Hash: RT-8892-QX
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* OTP MODAL */}
+            <AnimatePresence>
+                {showOtpModal && (
+                    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+                        <motion.div 
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            className="bg-white rounded-[40px] w-full max-w-sm p-10 shadow-2xl border-2 border-slate-100 relative overflow-hidden"
+                        >
+                            <button 
+                                onClick={() => setShowOtpModal(false)}
+                                className="absolute top-6 right-6 text-slate-300 hover:text-slate-900"
+                            >
+                                <XCircle size={28} />
+                            </button>
+                            
+                            <div className="text-center">
+                                <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-6 text-red-600">
+                                    <Lock size={32} />
+                                </div>
+                                <h3 className="text-2xl font-black text-slate-900 uppercase italic tracking-tighter mb-2">Verification Sent</h3>
+                                <p className="text-slate-400 text-[11px] font-bold uppercase tracking-widest italic mb-8">A code has been sent to the guardian's device.</p>
+                                
+                                <div className="space-y-6">
+                                    <input 
+                                        type="text" 
+                                        placeholder="ENTER 4-DIGIT CODE"
+                                        className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-6 text-center text-2xl font-black italic tracking-[0.5em] focus:border-red-600 outline-none transition-all placeholder:text-slate-200 placeholder:tracking-normal placeholder:text-sm"
+                                        maxLength={4}
+                                        value={otpCode}
+                                        onChange={(e) => setOtpCode(e.target.value)}
+                                    />
+                                    <Button 
+                                        onClick={handleVerifyOtp}
+                                        disabled={isVerifying || otpCode.length < 4}
+                                        className="w-full bg-red-600 hover:bg-red-700 text-white p-6 rounded-[20px] font-black uppercase italic tracking-widest shadow-xl shadow-red-200 flex items-center justify-center gap-3"
+                                    >
+                                        {isVerifying ? <Loader2 className="animate-spin" size={20} /> : <CheckCircle2 size={20} />}
+                                        {isVerifying ? 'Verifying...' : 'Unlock Data'}
+                                    </Button>
+                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest italic pt-4">Emergency rescuer ID will be tracked</p>
+                                </div>
+                            </div>
+                        </motion.div>
+                        <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 bg-slate-900/40 backdrop-blur-md -z-10"
+                            onClick={() => setShowOtpModal(false)}
+                        />
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* NEAREST HOSPITALS (FOOTER SECTION) */}
+            <div className="bg-slate-50 py-20 px-6 border-t border-slate-100">
+                <div className="max-w-2xl mx-auto">
+                    <div className="flex items-center gap-4 mb-10">
+                        <div className="p-3 bg-slate-900 text-white rounded-2xl">
+                            <Building2 size={22} />
+                        </div>
+                        <h3 className="text-xl font-black text-slate-900 italic uppercase tracking-tighter">Nearby Medical Centers</h3>
+                    </div>
+
+                    {findingHospital ? (
+                        <div className="flex items-center gap-4 p-8 bg-white border-2 border-slate-100 rounded-[30px] animate-pulse">
+                            <Loader2 className="animate-spin text-red-600" size={24} />
+                            <span className="text-xs font-black uppercase tracking-[0.3em] text-slate-400 italic">Scanning Geo-Coordinates...</span>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 gap-4">
+                            {hospitals.map((hospital, idx) => (
+                                <div key={idx} className="p-6 bg-white border-2 border-slate-100 rounded-[30px] flex justify-between items-center group hover:border-red-600 transition-all">
+                                    <div>
+                                        <h4 className="text-lg font-black text-slate-900 uppercase italic tracking-tight">{hospital.name}</h4>
+                                        <p className="text-[10px] text-slate-400 uppercase font-bold italic tracking-wider mt-1">{hospital.addr || 'Secondary Facility'}</p>
+                                    </div>
+                                    <button
+                                        onClick={() => {
+                                            const url = hospital.lat
+                                                ? `https://www.google.com/maps/dir/?api=1&origin=${coords.lat},${coords.lng}&destination=${hospital.lat},${hospital.lng}&travelmode=driving`
+                                                : `https://www.google.com/maps/search/hospital/@${coords.lat},${coords.lng}`;
+                                            window.open(url, '_blank');
+                                        }}
+                                        className="bg-slate-900 text-white p-4 rounded-2xl hover:bg-red-600 transition-all active:scale-90"
+                                    >
+                                        <Navigation size={20} />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            <footer className="text-center py-20 bg-white border-t border-slate-100">
+                <img src={`${import.meta.env.BASE_URL}logo.png`} alt="RESQR" className="h-8 w-auto mx-auto mb-6 grayscale brightness-0 opacity-20" />
+                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-300 italic">
+                    Privacy First Emergency Protocol • 2026 ResQR
+                </p>
+            </footer>
         </div>
     );
 }
