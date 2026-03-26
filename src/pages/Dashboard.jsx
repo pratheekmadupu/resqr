@@ -56,9 +56,15 @@ export default function Dashboard() {
                 setProfiles(profilesData);
                 setLoading(false);
                 
-                // Redirect NEW users (those with 0 profiles) to creation page
+                // Redirect users to appropriate page
                 if (!snapshot.exists()) {
                     navigate('/create-profile');
+                } else {
+                    const profileArray = Object.values(snapshot.val());
+                    const hasPaidProfile = profileArray.some(p => p.payment_status === 'paid');
+                    if (!hasPaidProfile) {
+                        navigate('/payment');
+                    }
                 }
             });
         };

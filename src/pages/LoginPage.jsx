@@ -63,7 +63,13 @@ export default function LoginPage() {
                     if (!profilesSnapshot.exists()) {
                         navigate('/create-profile');
                     } else {
-                        navigate(redirectTo);
+                        const profileList = Object.values(profilesSnapshot.val());
+                        const hasPaidProfile = profileList.some(p => p.payment_status === 'paid');
+                        if (!hasPaidProfile) {
+                            navigate('/payment');
+                        } else {
+                            navigate(redirectTo);
+                        }
                     }
                 } catch (error) {
                     console.error("Profile check error:", error);
@@ -100,13 +106,19 @@ export default function LoginPage() {
                 await syncUserToDb(userCredential.user);
                 toast.success('Welcome back!', { id: toastId });
                 
-                // Redirect if no profiles
+                // Redirect if no profiles or no paid profiles
                 const profilesRef = ref(db, `users/${userCredential.user.uid}/profiles`);
                 const profilesSnapshot = await get(profilesRef);
                 if (!profilesSnapshot.exists()) {
                     navigate('/create-profile');
                 } else {
-                    navigate(redirectTo);
+                    const profileList = Object.values(profilesSnapshot.val());
+                    const hasPaidProfile = profileList.some(p => p.payment_status === 'paid');
+                    if (!hasPaidProfile) {
+                        navigate('/payment');
+                    } else {
+                        navigate(redirectTo);
+                    }
                 }
             } else {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -137,7 +149,13 @@ export default function LoginPage() {
             if (!profilesSnapshot.exists()) {
                 navigate('/create-profile');
             } else {
-                navigate(redirectTo);
+                const profileList = Object.values(profilesSnapshot.val());
+                const hasPaidProfile = profileList.some(p => p.payment_status === 'paid');
+                if (!hasPaidProfile) {
+                    navigate('/payment');
+                } else {
+                    navigate(redirectTo);
+                }
             }
         } catch (error) {
             console.error("Google auth error:", error);

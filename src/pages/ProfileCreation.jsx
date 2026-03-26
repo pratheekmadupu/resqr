@@ -73,8 +73,8 @@ export default function ProfileCreation() {
                 // Set as active slug for legacy support or dashboard default
                 localStorage.setItem('resqr_active_slug', profileId);
                 
-                toast.success('Profile created successfully!');
-                navigate('/dashboard');
+                toast.success('Step 1 Complete: Profile Created');
+                navigate('/payment');
 
             } catch (error) {
                 console.error("Error creating profile:", error);
