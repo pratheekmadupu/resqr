@@ -150,16 +150,16 @@ export default function EmergencyPage() {
                 if (snapshot.exists()) {
                     const decodedUser = snapshot.val();
                     setUser({
-                        name: decodedUser.name.toUpperCase(),
-                        bloodGroup: decodedUser.bloodGroup,
-                        payment_status: decodedUser.payment_status,
+                        name: (decodedUser.name || "UNIDENTIFIED").toUpperCase(),
+                        bloodGroup: decodedUser.bloodGroup || "O+",
+                        payment_status: decodedUser.payment_status || 'paid',
                         allergies: decodedUser.allergies || "None reported",
-                        conditions: decodedUser.medicalConditions || "No chronic conditions reported",
+                        conditions: decodedUser.medicalConditions || decodedUser.healthIssues || "No chronic conditions reported",
                         doctorContact: decodedUser.doctorContact || "",
                         emergencyContact: {
-                            name: decodedUser.emergencyContactName,
-                            relation: decodedUser.emergencyContactRelation,
-                            phone: decodedUser.emergencyContactPhone
+                            name: decodedUser.emergencyContactName || "Primary Liaison",
+                            relation: decodedUser.emergencyContactRelation || "Emergency Node",
+                            phone: decodedUser.emergencyContactPhone || ""
                         }
                     });
                     recordScan();
