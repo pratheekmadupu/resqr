@@ -264,15 +264,17 @@ export default function EmergencyPage() {
             toast.success(`Security code dispatched to ${user.emergencyContact.name}`);
         } catch (error) {
             console.error("Firebase Auth Error:", error.code, error.message);
-            
+            // Enhanced Diagnostic Feedback
             if (error.code === 'auth/invalid-phone-number') {
-                toast.error("The stored phone number is invalid for SMS.");
+                toast.error("Format Invalid: Ensure the registry has a valid 10-digit number.");
             } else if (error.code === 'auth/captcha-check-failed') {
-                toast.error("Security challenge failed. Please refresh.");
+                toast.error("Bot Check Expired: Please refresh the page and try again.");
             } else if (error.code === 'auth/quota-exceeded') {
-                toast.error("SMS quota exceeded for today.");
+                toast.error("SMS Quota Full: Try again later or switch to a higher node.");
+            } else if (error.code === 'auth/unauthorized-domain' || error.message.includes('auth/unauthorized-domain')) {
+                toast.error("Security Block: This domain is not authorized in Firebase Console.");
             } else {
-                toast.error("Handshake failed. Ensure Phone Auth is enabled in Firebase.");
+                toast.error("Handshake failed. Ensure Phone Auth is active and domain is whitelisted.");
             }
             
             if (window.recaptchaVerifier) {
@@ -453,16 +455,22 @@ export default function EmergencyPage() {
                     </div>
 
                     {!otpVerified && (
-                        <div className="absolute inset-0 flex flex-col items-center justify-center p-10 text-center z-10">
-                            <p className="text-[10px] font-black text-white uppercase tracking-[0.3em] mb-6 italic opacity-70">OTP verification required for medication & address history</p>
-                            <Button 
-                                onClick={handleSendOtp}
-                                disabled={sendingOtp}
-                                className="bg-white text-slate-950 hover:bg-red-600 hover:text-white rounded-[20px] px-8 py-4 font-black uppercase italic text-xs tracking-widest flex items-center gap-2"
-                            >
-                                {sendingOtp ? <Loader2 className="animate-spin" size={16} /> : <Key size={16} />}
-                                {sendingOtp ? 'Sending...' : 'Unlock Sensitive Details'}
-                            </Button>
+                        <div className="absolute inset-x-0 top-[15%] z-10 p-6 flex flex-col items-center justify-center text-center">
+                            <div className="bg-[#11192A]/60 backdrop-blur-md rounded-[32px] p-8 border border-white/10 shadow-3xl max-w-sm">
+                                <p className="text-[10px] font-black text-white/50 uppercase tracking-[0.2em] mb-6 italic">OTP verification required for medication & address history</p>
+                                <Button 
+                                    onClick={handleSendOtp}
+                                    disabled={sendingOtp}
+                                    className="bg-white text-slate-950 hover:bg-red-600 hover:text-white rounded-[20px] px-10 py-5 font-black uppercase italic text-[10px] tracking-widest flex items-center gap-2 mb-4 w-full justify-center"
+                                >
+                                    {sendingOtp ? <Loader2 className="animate-spin" size={16} /> : <Key size={16} />}
+                                    {sendingOtp ? 'Sending...' : 'Unlock Sensitive Details'}
+                                </Button>
+                                <div className="flex flex-col gap-2 pt-4 border-t border-white/5 opacity-40">
+                                    <div className="h-4 w-40 bg-white/10 rounded-full mx-auto" />
+                                    <div className="h-4 w-32 bg-white/10 rounded-full mx-auto" />
+                                </div>
+                            </div>
                         </div>
                     )}
                 </section>
