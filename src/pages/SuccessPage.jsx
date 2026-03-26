@@ -13,6 +13,7 @@ import toast from 'react-hot-toast';
 export default function SuccessPage() {
     const qrRef = useRef();
     const [profile, setProfile] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const slug = localStorage.getItem('resqr_active_slug');
@@ -41,10 +42,14 @@ export default function SuccessPage() {
                 }
             } catch (err) {
                 console.error("Success context load failed:", err);
+            } finally {
+                setLoading(false);
             }
         };
 
-        if (slug) fetchProfile(); else {
+        if (slug) fetchProfile();
+        else {
+            setLoading(false);
             window.location.href = '/';
         }
     }, []);
@@ -110,15 +115,28 @@ export default function SuccessPage() {
 
     const getQRValue = () => {
         const slug = localStorage.getItem('resqr_active_slug');
-        if (!slug) return `${window.location.origin}/e/demo`;
-        return `${window.location.origin}/e/${slug}`;
+        if (!slug) return `${window.location.origin}/qr/demo`;
+        return `${window.location.origin}/qr/${slug}`;
     };
 
     const getUserName = () => {
+        if (profile?.data?.name) return profile.data.name;
+        if (profile?.name) return profile.name;
         const slug = localStorage.getItem('resqr_active_slug');
         if (!slug) return "Valued User";
-        return slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        return slug.split('_').pop() || "User Node";
     };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-medical-bg flex items-center justify-center">
+                <div className="flex flex-col items-center gap-6">
+                    <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+                    <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 animate-pulse italic">Authenticating Identity Node...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-medical-bg py-24 px-4 text-white font-manrope selection:bg-primary/30">
