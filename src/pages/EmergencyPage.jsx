@@ -146,28 +146,48 @@ export default function EmergencyPage() {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const snapshot = await get(ref(db, `profiles/${id}`));
+                let pid = id;
+                let uid = null;
+                
+                if (id?.includes('_')) {
+                    uid = id.split('_')[0];
+                }
+
+                let snapshot = null;
+                if (uid) {
+                    snapshot = await get(ref(db, `users/${uid}/profiles/${id}`));
+                }
+                
+                // Fallback to top-level if not found or no uid
+                if (!snapshot || !snapshot.exists()) {
+                    snapshot = await get(ref(db, `profiles/${id}`));
+                }
+
                 if (snapshot.exists()) {
-                    const decodedUser = snapshot.val();
+                    const data = snapshot.val();
+                    // Handle nested 'data' field or flat object
+                    const decodedUser = data.data || data;
+                    
                     setUser({
                         name: (decodedUser.name || "UNIDENTIFIED").toUpperCase(),
-                        bloodGroup: decodedUser.bloodGroup || "O+",
+                        bloodGroup: decodedUser.bloodGroup || "B-POS",
                         payment_status: decodedUser.payment_status || 'paid',
                         allergies: decodedUser.allergies || "None reported",
                         conditions: decodedUser.medicalConditions || decodedUser.healthIssues || "No chronic conditions reported",
                         doctorContact: decodedUser.doctorContact || "",
                         emergencyContact: {
-                            name: decodedUser.emergencyContactName || "Primary Liaison",
-                            relation: decodedUser.emergencyContactRelation || "Emergency Node",
-                            phone: decodedUser.emergencyContactPhone || ""
+                            name: decodedUser.emergencyContactName || decodedUser.emergencyContact?.name || "Guardian Node",
+                            relation: decodedUser.emergencyContactRelation || decodedUser.emergencyContact?.relation || "Emergency Liaison",
+                            phone: decodedUser.emergencyContactPhone || decodedUser.emergencyContact?.phone || ""
                         }
                     });
                     recordScan();
                 } else {
-                    toast.error("Profile not found");
+                    toast.error("Security Key Not Found");
                 }
             } catch (error) {
-                console.error("Failed to load emergency data", error);
+                console.error("Critical Failure:", error);
+                toast.error("Signal Lost. Please reload scan.");
             } finally {
                 setLoading(false);
             }
