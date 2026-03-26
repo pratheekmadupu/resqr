@@ -160,7 +160,7 @@ export default function Dashboard() {
                 </header>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="bg-[#11192A] p-8 rounded-3xl border border-white/5 flex items-center gap-6"><div className="w-14 h-14 bg-indigo-500/10 rounded-2xl flex items-center justify-center border border-indigo-500/20"><QrCode size={24} /></div><div><p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Total Scans</p><p className="text-4xl font-black italic uppercase tracking-tight font-poppins text-white">{activeProfile?.scans ? Object.keys(activeProfile.scans).length : 0}</p></div></div>
+                    <div className="bg-[#11192A] p-8 rounded-3xl border border-white/5 flex items-center gap-6 cursor-pointer hover:border-indigo-500/30 transition-all group/stat" onClick={() => document.getElementById('recent-scans')?.scrollIntoView({ behavior: 'smooth' })}><div className="w-14 h-14 bg-indigo-500/10 rounded-2xl flex items-center justify-center border border-indigo-500/20 group-hover/stat:bg-indigo-500/20 transition-all"><QrCode size={24} /></div><div><p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Total Scans</p><p className="text-4xl font-black italic uppercase tracking-tight font-poppins text-white">{activeProfile?.scans ? Object.keys(activeProfile.scans).length : 0}</p></div></div>
                     <div className="bg-[#11192A] p-8 rounded-3xl border border-white/5 flex items-center gap-6"><div className="w-14 h-14 bg-emerald-500/10 rounded-2xl flex items-center justify-center border border-emerald-500/20"><User size={24} /></div><div><p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Health Status</p><p className="text-4xl font-black italic uppercase tracking-tighter font-poppins text-emerald-400">Verified</p></div></div>
                     <div className="bg-[#11192A] p-8 rounded-3xl border border-white/5 flex items-center gap-6"><div className="w-14 h-14 bg-[#E63946]/10 rounded-2xl flex items-center justify-center border border-red-500/20"><ShieldCheck size={24} /></div><div><p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Safety Index</p><p className="text-4xl font-black italic uppercase tracking-tighter font-poppins text-white">High</p></div></div>
                 </div>
@@ -239,7 +239,87 @@ export default function Dashboard() {
                     </div>
                 </div>
 
+                {/* RECENT SCAN ACTIVITY */}
+                <div id="recent-scans" className="pt-20 border-t border-white/5 space-y-10">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <h2 className="text-4xl font-black uppercase italic tracking-tighter font-poppins mb-2">Recent Scanned Locations</h2>
+                            <p className="text-slate-500 font-bold text-xs uppercase tracking-[0.3em]">Track where and when your security nodes were accessed.</p>
+                        </div>
+                        <div className="hidden md:block">
+                             <Badge className="bg-primary/10 text-primary border-none px-4 py-2 font-black italic text-[10px] uppercase tracking-widest">LIVE MONITORING ACTIVE</Badge>
+                        </div>
+                    </div>
+
+                    {activeProfile?.scans ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {Object.entries(activeProfile.scans)
+                                .sort((a, b) => {
+                                    const timeA = a[1].timestamp || 0;
+                                    const timeB = b[1].timestamp || 0;
+                                    return timeB - timeA;
+                                })
+                                .slice(0, 6)
+                                .map(([id, scan]) => (
+                                <motion.div 
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    key={id} 
+                                    className="bg-[#11192A] p-8 rounded-[40px] border border-white/5 relative overflow-hidden group hover:border-primary/30 transition-all duration-500 shadow-2xl"
+                                >
+                                    <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    
+                                    <div className="flex items-start justify-between mb-8 relative z-10">
+                                        <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center text-primary border border-primary/20 shadow-lg shadow-primary/5 group-hover:scale-110 transition-transform">
+                                            <MapPin size={24} />
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5 font-poppins italic">{scan.date}</p>
+                                            <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest leading-none font-poppins italic">{scan.time}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="space-y-6 relative z-10">
+                                        <div>
+                                            <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.3em] mb-2 italic">Access Point</p>
+                                            <p className="text-xl font-black text-white uppercase italic tracking-tight font-poppins group-hover:text-primary transition-colors">
+                                                {scan.location || 'Encrypted Node Location'}
+                                            </p>
+                                        </div>
+                                        
+                                        {scan.coords ? (
+                                            <button 
+                                                onClick={() => window.open(`https://www.google.com/maps?q=${scan.coords.lat},${scan.coords.lng}`, '_blank')}
+                                                className="w-full py-5 bg-[#050B18] hover:bg-primary text-slate-400 hover:text-white border border-white/5 hover:border-primary rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 italic shadow-inner"
+                                            >
+                                                <ExternalLink size={16} /> Locate On Grid
+                                            </button>
+                                        ) : (
+                                            <div className="w-full py-5 bg-[#050B18]/50 border border-white/5 rounded-2xl text-[10px] font-black uppercase tracking-[0.1em] text-slate-700 flex items-center justify-center gap-2 italic">
+                                                <Lock size={14} /> Coordinates Masked
+                                            </div>
+                                        )}
+                                    </div>
+                                    
+                                    <div className="absolute -right-4 -bottom-4 opacity-[0.02] group-hover:opacity-[0.05] transition-opacity pointer-events-none">
+                                        <Activity size={120} />
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="h-64 border-2 border-dashed border-white/5 rounded-[50px] flex flex-col items-center justify-center text-slate-700 italic bg-[#11192A]/30 group">
+                            <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                                <Clock size={32} className="opacity-20 text-white" />
+                            </div>
+                            <p className="text-[10px] font-black uppercase tracking-[0.3em]">No recent scan activity detected on this identity node.</p>
+                            <p className="text-[8px] font-bold uppercase tracking-[0.2em] mt-2 opacity-30">Scan your QR tag to initialize tracking.</p>
+                        </div>
+                    )}
+                </div>
+
                 {/* ADDITIONAL IDENTITY NODE - AS REQUESTED */}
+
                 <div className="pt-20 border-t border-white/5 space-y-10">
                     <div className="text-center">
                         <h2 className="text-4xl font-black uppercase italic tracking-tighter font-poppins mb-2">Powering Multiple Identities?</h2>

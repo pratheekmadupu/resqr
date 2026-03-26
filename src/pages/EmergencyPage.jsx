@@ -58,6 +58,12 @@ export default function EmergencyPage() {
             };
 
             await push(ref(db, `profiles/${id}/scans`), scanData);
+            
+            // Also log to user-specific path for dashboard tracking if it's a modern profile ID
+            if (id.includes('_')) {
+                const uid = id.split('_')[0];
+                await push(ref(db, `users/${uid}/profiles/${id}/scans`), scanData);
+            }
             setScanRecorded(true);
 
             if (coords) {
