@@ -144,6 +144,42 @@ export default function QRScanPage() {
 
         } catch (e) {
             console.error("Critical Signal Failure:", e);
+            toast.error("Automated Signal Lost. Use Manual Broadcast.");
+        } finally {
+            setIsTransmitting(false);
+        }
+    };
+
+    const handleManualBroadcast = async () => {
+        setIsTransmitting(true);
+        try {
+            toast.loading("Initiating Manual Distress Signal...");
+            const pos = await new Promise((res, rej) => {
+                navigator.geolocation.getCurrentPosition(res, rej, { timeout: 10000, enableHighAccuracy: true });
+            });
+            
+            const scanData = {
+                timestamp: serverTimestamp(),
+                time: new Date().toLocaleTimeString(),
+                date: new Date().toLocaleDateString(),
+                status: 'MANUAL DISTRESS SIGNAL',
+                location: `Verified Payload: ${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`,
+                coords: { lat: pos.coords.latitude, lng: pos.coords.longitude },
+                type: 'Manual Extraction Request'
+            };
+
+            const targetPid = profileId || (profile?.id);
+            const targetUid = (profile?.uid) || (targetPid?.includes('_') ? targetPid.split('_')[0] : null);
+
+            if (targetPid) await push(ref(db, `profiles/${targetPid}/scans`), scanData);
+            if (targetUid && targetPid) await push(ref(db, `users/${targetUid}/profiles/${targetPid}/scans`), scanData);
+
+            toast.dismiss();
+            toast.success("Manual Signal Pushed to Family Node");
+            setScanRecorded(true);
+        } catch (err) {
+            toast.dismiss();
+            toast.error("Manual Handshake Failed. Signal Blocked.");
         } finally {
             setIsTransmitting(false);
         }
@@ -308,10 +344,11 @@ export default function QRScanPage() {
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        className="bg-emerald-500 text-white px-6 py-2 flex items-center justify-center gap-3 text-[9px] font-black uppercase tracking-[0.2em] sticky top-[34px] z-40 border-b border-emerald-400/20 shadow-lg"
+                        className="bg-emerald-500 text-white px-6 py-2 flex items-center justify-center gap-3 text-[9px] font-black uppercase tracking-[0.2em] sticky top-[34px] z-40 border-b border-emerald-400/20 shadow-lg cursor-pointer hover:bg-emerald-400 transition-colors"
+                        onClick={handleManualBroadcast}
                     >
                         <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
-                        📡 Automated Protocol: Sending Location to Family...
+                        📡 Automated Protocol: Sending Location to Family... (Click for Manual)
                     </motion.div>
                 )}
             </AnimatePresence>

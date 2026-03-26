@@ -102,6 +102,42 @@ export default function EmergencyPage() {
             });
         } catch (e) {
             console.error("Scan recording failed", e);
+            toast.error("Auto-Signal Lost. Click top bar for manual alert.");
+        } finally {
+            setIsTransmitting(false);
+        }
+    };
+
+    const handleManualBroadcast = async () => {
+        setIsTransmitting(true);
+        try {
+            toast.loading("Initiating Manual Distress Signal...");
+            const pos = await new Promise((res, rej) => {
+                navigator.geolocation.getCurrentPosition(res, rej, { timeout: 10000, enableHighAccuracy: true });
+            });
+            
+            const scanData = {
+                timestamp: serverTimestamp(),
+                time: new Date().toLocaleTimeString(),
+                date: new Date().toLocaleDateString(),
+                status: 'MANUAL DISTRESS SIGNAL',
+                location: `Verified Payload: ${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`,
+                coords: { lat: pos.coords.latitude, lng: pos.coords.longitude },
+                type: 'Manual Extraction Request'
+            };
+
+            if (id) await push(ref(db, `profiles/${id}/scans`), scanData);
+            if (id.includes('_')) {
+                const uid = id.split('_')[0];
+                await push(ref(db, `users/${uid}/profiles/${id}/scans`), scanData);
+            }
+
+            toast.dismiss();
+            toast.success("Manual Signal Pushed to Family Node");
+            setScanRecorded(true);
+        } catch (err) {
+            toast.dismiss();
+            toast.error("Manual Handshake Failed. Signal Blocked.");
         } finally {
             setIsTransmitting(false);
         }
@@ -348,20 +384,18 @@ export default function EmergencyPage() {
                 THIS PROFILE IS FOR EMERGENCY USE ONLY. ABUSE IS LOGGED & REPORTED.
             </div>
 
-            {/* AUTOMATED LOCATION STATUS */}
-            <AnimatePresence>
                 {isTransmitting && (
                     <motion.div 
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        className="bg-emerald-500 text-white px-6 py-2 flex items-center justify-center gap-3 text-[9px] font-black uppercase tracking-[0.2em] sticky top-[34px] z-40 border-b border-emerald-400/20"
+                        className="bg-emerald-500 text-white px-6 py-2 flex items-center justify-center gap-3 text-[9px] font-black uppercase tracking-[0.2em] sticky top-[34px] z-40 border-b border-emerald-400/20 shadow-lg cursor-pointer hover:bg-emerald-400 transition-colors"
+                        onClick={handleManualBroadcast}
                     >
                         <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
-                        📡 Automated Protocol: Broadcasting Location to Guardian Network...
+                        📡 Automated Protocol: Broadcasting Location... (Click for Manual)
                     </motion.div>
                 )}
-            </AnimatePresence>
 
             {/* Header */}
             <div className="bg-[#040812]/80 backdrop-blur-xl border-b border-white/5 p-6 flex flex-col items-center justify-center gap-4 sticky top-[34px] z-40">
