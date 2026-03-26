@@ -87,55 +87,66 @@ export default function QRScanPage() {
     const recordScan = async (userId, pid) => {
         if (scanRecorded) return;
         setIsTransmitting(true);
+        
         try {
-            let userCoords = null;
-            let locationName = "Scanning Extraction Point...";
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        userCoords = { lat: position.coords.latitude, lng: position.coords.longitude };
-                        setCoords(userCoords);
-                        locationName = `Verified: ${userCoords.lat.toFixed(4)}, ${userCoords.lng.toFixed(4)}`;
-                        updateScanNode(userId, pid, locationName, userCoords);
-                    },
-                    (err) => {
-                        updateScanNode(userId, pid, "Unknown Area (Permission Denied)", null);
-                    },
-                    { timeout: 15000, maximumAge: 0, enableHighAccuracy: true }
-                );
-            } else {
-                updateScanNode(userId, pid, "Geolocation Not Supported", null);
-            }
-            setScanRecorded(true);
+            let lat = null;
+            let lng = null;
+            let locationName = "Emergency Scan Received";
 
+            // Promisify Geolocation for reliable await behavior
+            try {
+                const position = await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, { 
+                        timeout: 10000, 
+                        maximumAge: 0, 
+                        enableHighAccuracy: true 
+                    });
+                });
+                lat = position.coords.latitude;
+                lng = position.coords.longitude;
+                setCoords({ lat, lng });
+                locationName = `Verified: ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+            } catch (err) {
+                console.warn("Geolocation signal lost. Logging general alert.");
+                locationName = "Unknown Area (Geo-Node Offline)";
+            }
+
+            const scanData = {
+                timestamp: serverTimestamp(),
+                time: new Date().toLocaleTimeString(),
+                date: new Date().toLocaleDateString(),
+                status: 'QR SCAN ALERT',
+                location: locationName,
+                coords: (lat && lng) ? { lat, lng } : null,
+                type: 'Direct Extraction Request'
+            };
+
+            // DUAL-PATH LOGGING
+            const targetPid = pid || profileId || (profile?.id);
+            const targetUid = userId || (profile?.uid) || (targetPid?.includes('_') ? targetPid.split('_')[0] : null);
+
+            // 1. Push to Legacy Global Registry (Root Level)
+            if (targetPid) {
+                await push(ref(db, `profiles/${targetPid}/scans`), scanData);
+            }
+
+            // 2. Push to Modern Private Node (User Level)
+            if (targetUid && targetPid) {
+                await push(ref(db, `users/${targetUid}/profiles/${targetPid}/scans`), scanData);
+            }
+
+            setScanRecorded(true);
             toast.success('Emergency alert sent to family with your location!', {
                 icon: '🛡️',
                 duration: 6000,
-                style: {
-                    background: '#ef4444',
-                    color: '#fff',
-                    borderRadius: '20px',
-                    fontWeight: 'bold'
-                }
+                style: { background: '#ef4444', color: '#fff', borderRadius: '20px', fontWeight: 'bold' }
             });
+
         } catch (e) {
-            console.error("Scan recording failed", e);
+            console.error("Critical Signal Failure:", e);
         } finally {
             setIsTransmitting(false);
         }
-    };
-
-    const updateScanNode = async (userId, pid, loc, crd) => {
-        const scanData = {
-            timestamp: serverTimestamp(),
-            time: new Date().toLocaleTimeString(),
-            date: new Date().toLocaleDateString(),
-            status: 'CRITICAL ACCESS',
-            location: loc,
-            coords: crd,
-            type: 'Direct QR Entry'
-        };
-        await push(ref(db, `users/${userId}/profiles/${pid}/scans`), scanData);
     };
 
     useEffect(() => {
