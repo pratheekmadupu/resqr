@@ -21,6 +21,7 @@ export default function EmergencyPage() {
     const [otpCode, setOtpCode] = useState('');
     const [isVerifying, setIsVerifying] = useState(false);
     const [callRequested, setCallRequested] = useState(false);
+    const [isTransmitting, setIsTransmitting] = useState(false);
     const [visitCount, setVisitCount] = useState(0);
     
     useEffect(() => {
@@ -48,6 +49,7 @@ export default function EmergencyPage() {
 
     const recordScan = async () => {
         if (scanRecorded) return;
+        setIsTransmitting(true);
         try {
             let locationName = 'Emergency Scan Received';
             let coords = null;
@@ -97,6 +99,8 @@ export default function EmergencyPage() {
             });
         } catch (e) {
             console.error("Scan recording failed", e);
+        } finally {
+            setIsTransmitting(false);
         }
     };
 
@@ -245,6 +249,21 @@ export default function EmergencyPage() {
                 <ShieldAlert size={16} />
                 THIS PROFILE IS FOR EMERGENCY USE ONLY. ABUSE IS LOGGED & REPORTED.
             </div>
+
+            {/* AUTOMATED LOCATION STATUS */}
+            <AnimatePresence>
+                {isTransmitting && (
+                    <motion.div 
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="bg-emerald-500 text-white px-6 py-2 flex items-center justify-center gap-3 text-[9px] font-black uppercase tracking-[0.2em] sticky top-[34px] z-40 border-b border-emerald-400/20"
+                    >
+                        <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                        📡 Automated Protocol: Broadcasting Location to Guardian Network...
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Header */}
             <div className="bg-[#040812]/80 backdrop-blur-xl border-b border-white/5 p-6 flex flex-col items-center justify-center gap-4 sticky top-[34px] z-40">

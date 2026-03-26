@@ -24,6 +24,7 @@ export default function QRScanPage() {
     const [otpCode, setOtpCode] = useState('');
     const [isVerifying, setIsVerifying] = useState(false);
     const [callRequested, setCallRequested] = useState(false);
+    const [isTransmitting, setIsTransmitting] = useState(false);
     const [visitCount, setVisitCount] = useState(0);
 
     useEffect(() => {
@@ -79,6 +80,7 @@ export default function QRScanPage() {
 
     const recordScan = async (userId, pid) => {
         if (scanRecorded) return;
+        setIsTransmitting(true);
         try {
             let userCoords = null;
             let locationName = "Scanning Extraction Point...";
@@ -110,7 +112,11 @@ export default function QRScanPage() {
                     fontWeight: 'bold'
                 }
             });
-        } catch (e) {}
+        } catch (e) {
+            console.error("Scan recording failed", e);
+        } finally {
+            setIsTransmitting(false);
+        }
     };
 
     const updateScanNode = async (userId, pid, loc, crd) => {
@@ -200,8 +206,23 @@ export default function QRScanPage() {
             {/* FRAUD PREVENTION BANNER */}
             <div className="bg-red-600 text-white px-6 py-3 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest sticky top-0 z-50 shadow-xl italic">
                 <ShieldAlert size={16} />
-                SECURE EMERGENCY PORTAL • UNAUTHORIZED DATA HARVESTING IS ILLEGAL
+                EMERGENCY SCAN SIGNAL DETECTED. LOCATION LOGGING ACTIVE.
             </div>
+
+            {/* AUTOMATED LOCATION STATUS */}
+            <AnimatePresence>
+                {isTransmitting && (
+                    <motion.div 
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="bg-emerald-500 text-white px-6 py-2 flex items-center justify-center gap-3 text-[9px] font-black uppercase tracking-[0.2em] sticky top-[34px] z-40 border-b border-emerald-400/20 shadow-lg"
+                    >
+                        <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                        📡 Automated Protocol: Sending Location to Family...
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             <div className="max-w-xl mx-auto space-y-8 pb-40 px-5 pt-8">
                 
