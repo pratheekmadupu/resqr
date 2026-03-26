@@ -135,6 +135,32 @@ export default function QRScanPage() {
                 await push(ref(db, `users/${targetUid}/profiles/${targetPid}/scans`), scanData);
             }
 
+            // WhatsApp Redirect Logic (Auto-Construct Payload)
+            if (lat && lng) {
+                const rawPh = profile.data.emergencyContactPhone || profile.data.ownerContact || profile.data.contactNumber;
+                const sanPh = rawPh?.replace(/[^0-9+]/g, '');
+                
+                if (sanPh) {
+                    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+                    const waMessage = encodeURIComponent(`🚨 *RESQR EMERGENCY ALERT* 🚨\n\nI have just scanned the medical ID of *${(data.name || "A Patient").toUpperCase()}*.\n\n📍 *CURRENT LOCATION:* ${mapsUrl}\n\n⚠️ *RESPONSE TYPE:* Critical Extraction Request.`);
+                    const waPhone = sanPh.startsWith('+') ? sanPh.substring(1) : sanPh;
+                    const waUrl = `https://wa.me/${waPhone}?text=${waMessage}`;
+                    
+                    // Show WhatsApp prompt
+                    toast((t) => (
+                        <div className="flex flex-col gap-4">
+                            <b className="text-sm font-black uppercase italic">Family Signal Ready</b>
+                            <button 
+                                onClick={() => { window.open(waUrl, '_blank'); toast.dismiss(t.id); }}
+                                className="bg-emerald-600 text-white px-6 py-4 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-xl flex items-center gap-2 justify-center"
+                            >
+                                <MessageSquare size={14} /> Rapid WhatsApp Signal
+                            </button>
+                        </div>
+                    ), { duration: 25000, position: 'bottom-center' });
+                }
+            }
+
             setScanRecorded(true);
             toast.success('Emergency alert sent to family with your location!', {
                 icon: '🛡️',

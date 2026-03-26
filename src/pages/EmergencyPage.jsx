@@ -87,7 +87,29 @@ export default function EmergencyPage() {
                 const uid = id.split('_')[0];
                 await push(ref(db, `users/${uid}/profiles/${id}/scans`), scanData);
             }
-            setScanRecorded(true);
+            // WhatsApp Bridge Initialization
+            if (coords) {
+                const rawPh = user.emergencyContact?.phone || user.doctorContact;
+                const sanPh = rawPh?.replace(/[^0-9+]/g, '');
+                if (sanPh) {
+                    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${coords.lat},${coords.lng}`;
+                    const waMessage = encodeURIComponent(`🚨 *RESQR EMERGENCY ALERT* 🚨\n\nI have just scanned the medical profile ID of *${(user.name || "A Patient").toUpperCase()}*.\n\n📍 *CURRENT LOCATION:* ${mapsUrl}\n\n⚕️ *PROTOCOL:* High Priority Rescue Dispatch Requested.`);
+                    const waPhone = sanPh.startsWith('+') ? sanPh.substring(1) : sanPh;
+                    const waUrl = `https://wa.me/${waPhone}?text=${waMessage}`;
+
+                    toast((t) => (
+                        <div className="flex flex-col gap-4">
+                            <b className="text-sm font-black uppercase italic">Signal Family Node</b>
+                            <button 
+                                onClick={() => { window.open(waUrl, '_blank'); toast.dismiss(t.id); }}
+                                className="bg-emerald-600 text-white px-6 py-4 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-xl flex items-center gap-2 justify-center"
+                            >
+                                <MessageSquare size={14} /> Dispatch via WhatsApp
+                            </button>
+                        </div>
+                    ), { duration: 25000, position: 'bottom-center' });
+                }
+            }
 
             // Alert family toast
             toast.success('Emergency contact has been notified of your location!', {
