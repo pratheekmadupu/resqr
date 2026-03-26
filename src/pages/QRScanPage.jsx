@@ -24,6 +24,18 @@ export default function QRScanPage() {
     const [otpCode, setOtpCode] = useState('');
     const [isVerifying, setIsVerifying] = useState(false);
     const [callRequested, setCallRequested] = useState(false);
+    const [visitCount, setVisitCount] = useState(0);
+
+    useEffect(() => {
+        const id = profileId || username;
+        if (id) {
+            const key = `resqr_scan_visit_${id}`;
+            const current = parseInt(localStorage.getItem(key) || '0');
+            const next = current + 1;
+            localStorage.setItem(key, next.toString());
+            setVisitCount(next);
+        }
+    }, [profileId, username]);
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -142,7 +154,6 @@ export default function QRScanPage() {
     const handleRequestCall = async () => {
         setCallRequested(true);
         try {
-            // Log callback request
             const pid = profileId || (profile?.id);
             const uid = profile?.uid || (profileId?.includes('_') ? profileId.split('_')[0] : null);
 
@@ -179,13 +190,13 @@ export default function QRScanPage() {
         }, 1500);
     };
 
-    if (loading) return <div className="min-h-screen bg-white flex items-center justify-center"><Loader2 className="text-red-600 animate-spin" size={48} /></div>;
-    if (!profile) return <div className="min-h-screen bg-white flex flex-col items-center justify-center text-slate-900 p-10 text-center"><Shield size={64} className="text-red-600 mb-6 opacity-30" /><h1 className="text-2xl font-black uppercase italic tracking-tighter">NODE UNAVAILABLE</h1><p className="text-slate-400 text-[10px] uppercase tracking-widest mt-2 max-w-xs">The record you are looking for may have been moved or deactivated.</p></div>;
+    if (loading) return <div className="min-h-screen bg-[#040812] flex items-center justify-center"><Loader2 className="text-red-600 animate-spin" size={48} /></div>;
+    if (!profile) return <div className="min-h-screen bg-[#040812] flex flex-col items-center justify-center text-white p-10 text-center"><Shield size={64} className="text-red-600 mb-6 opacity-30" /><h1 className="text-2xl font-black uppercase italic tracking-tighter">NODE UNAVAILABLE</h1><p className="text-slate-500 text-[10px] uppercase tracking-widest mt-2 max-w-xs">The record you are looking for may have been moved or deactivated.</p></div>;
 
     const { category, data } = profile;
 
     return (
-        <div className="min-h-screen bg-white text-slate-900 font-manrope selection:bg-red-600/30">
+        <div className="min-h-screen bg-[#040812] text-white font-manrope selection:bg-red-600/30">
             {/* FRAUD PREVENTION BANNER */}
             <div className="bg-red-600 text-white px-6 py-3 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest sticky top-0 z-50 shadow-xl italic">
                 <ShieldAlert size={16} />
@@ -195,8 +206,8 @@ export default function QRScanPage() {
             <div className="max-w-xl mx-auto space-y-8 pb-40 px-5 pt-8">
                 
                 <div className="flex flex-col items-center mb-8 text-center animate-in fade-in duration-700">
-                     <img src="/logo.png" alt="RESQR" className="h-8 w-auto mb-6 grayscale brightness-0" />
-                     <Badge className="bg-red-50 text-red-600 border border-red-100 px-6 py-2 tracking-[0.3em] uppercase italic font-black text-[10px]">
+                     <img src="/logo.png" alt="RESQR" className="h-8 w-auto mb-6" />
+                     <Badge className="bg-red-600 text-white border-none px-6 py-2 tracking-[0.3em] uppercase italic font-black text-[10px] shadow-lg shadow-red-600/20">
                         Verified Medical ID
                      </Badge>
                 </div>
@@ -204,8 +215,8 @@ export default function QRScanPage() {
                 {category === 'people' && (
                     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-700">
                         {/* NAME BLOCK */}
-                        <div className="bg-white rounded-[40px] border-2 border-slate-100 overflow-hidden shadow-2xl relative">
-                            <div className="bg-slate-50 p-4 flex justify-between items-center text-[10px] font-black text-slate-400 uppercase tracking-widest italic font-poppins">
+                        <div className="bg-[#11192A] rounded-[40px] border border-white/5 overflow-hidden shadow-2xl relative">
+                            <div className="bg-black/20 p-4 flex justify-between items-center text-[10px] font-black text-slate-500 uppercase tracking-widest italic font-poppins">
                                 <span>Security Level: TITANIUM</span>
                                 <div className="flex gap-1">
                                     <div className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse" />
@@ -213,8 +224,8 @@ export default function QRScanPage() {
                                 </div>
                             </div>
                             <div className="p-10 pt-12 text-center">
-                                <span className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] block mb-4 italic">Individual Identity</span>
-                                <h1 className="text-5xl sm:text-7xl font-black uppercase text-slate-900 tracking-tighter italic font-poppins break-words leading-none w-full">
+                                <span className="text-[11px] font-black text-slate-500 uppercase tracking-[0.4em] block mb-4 italic">Individual Identity</span>
+                                <h1 className="text-5xl sm:text-7xl font-black uppercase text-white tracking-tighter italic font-poppins break-words leading-none w-full">
                                     {data.name}
                                 </h1>
                             </div>
@@ -235,17 +246,17 @@ export default function QRScanPage() {
                                 <Activity size={200} className="absolute right-[-40px] bottom-[-40px] text-white opacity-5 pointer-events-none" />
                             </div>
 
-                            <div className="bg-white rounded-[40px] border-2 border-slate-100 p-10 flex flex-col gap-6 shadow-xl">
+                            <div className="bg-[#11192A] rounded-[40px] border border-white/5 p-10 flex flex-col gap-6 shadow-xl">
                                 <div className="flex items-center gap-4">
-                                    <div className="p-3 bg-slate-900 text-white rounded-2xl shadow-lg">
+                                    <div className="p-3 bg-white text-slate-950 rounded-2xl shadow-lg">
                                         <Activity size={24} />
                                     </div>
-                                    <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest italic">Clinical State</p>
+                                    <p className="text-[11px] font-black text-slate-500 uppercase tracking-widest italic">Clinical State</p>
                                 </div>
-                                <h2 className="text-3xl font-black italic text-slate-800 uppercase font-poppins leading-tight">{data.healthIssues || 'NO CHRONIC CONDITIONS'}</h2>
+                                <h2 className="text-3xl font-black italic text-white uppercase font-poppins leading-tight">{data.healthIssues || 'NO CHRONIC CONDITIONS'}</h2>
                             </div>
 
-                            <div className="bg-red-50 rounded-[40px] border-2 border-red-100 p-10 flex flex-col gap-6 shadow-xl">
+                            <div className="bg-red-600/5 rounded-[40px] border border-red-600/10 p-10 flex flex-col gap-6 shadow-xl">
                                 <div className="flex items-center gap-4 text-red-600">
                                     <AlertCircle size={24} />
                                     <p className="text-[11px] font-black uppercase tracking-widest italic">Critical Alerts</p>
@@ -255,7 +266,7 @@ export default function QRScanPage() {
                         </div>
 
                         {/* SENSITIVE DETAILS - OTP PROTECTED */}
-                        <section className="bg-slate-950 p-10 rounded-[40px] shadow-2xl relative overflow-hidden">
+                        <section className="bg-slate-900 p-10 rounded-[40px] shadow-2xl relative overflow-hidden border border-white/5">
                             <div className="flex items-center justify-between mb-8">
                                 <div className="flex items-center gap-4">
                                     <div className="p-3 bg-white/10 rounded-2xl text-white">
@@ -264,7 +275,7 @@ export default function QRScanPage() {
                                     <h3 className="text-xl font-black text-white italic uppercase tracking-tighter">Sensitive Records</h3>
                                 </div>
                                 {!otpVerified && (
-                                     <Badge className="bg-amber-500/20 text-amber-500 border-none font-black uppercase italic tracking-widest">ENCRYPTED</Badge>
+                                     <Badge className="bg-amber-500/10 text-amber-500 border border-amber-500/20 font-black uppercase italic tracking-widest">ENCRYPTED</Badge>
                                 )}
                             </div>
 
@@ -286,7 +297,7 @@ export default function QRScanPage() {
                                     <p className="text-[10px] font-black text-white uppercase tracking-[0.3em] mb-6 italic opacity-50 max-w-[200px]">Guardian confirmation required to decrypt full history</p>
                                     <Button 
                                         onClick={() => setShowOtpModal(true)}
-                                        className="bg-white text-slate-900 hover:bg-red-600 hover:text-white rounded-[20px] px-8 py-4 font-black uppercase italic text-xs tracking-widest"
+                                        className="bg-white text-slate-950 hover:bg-red-600 hover:text-white rounded-[20px] px-8 py-4 font-black uppercase italic text-xs tracking-widest"
                                     >
                                         Initiate Authentication
                                     </Button>
@@ -295,28 +306,28 @@ export default function QRScanPage() {
                         </section>
 
                         {/* GUARDIAN SECTION */}
-                        <div className="bg-white rounded-[40px] border-2 border-slate-100 overflow-hidden shadow-xl">
+                        <div className="bg-[#11192A] rounded-[40px] border border-white/5 overflow-hidden shadow-xl">
                             <div className="p-10 flex flex-col gap-10">
-                                <div className="flex items-center gap-4 border-b border-slate-100 pb-8">
-                                    <div className="p-3 bg-red-600 text-white rounded-2xl">
+                                <div className="flex items-center gap-4 border-b border-white/10 pb-8">
+                                    <div className="p-3 bg-red-600 text-white rounded-2xl shadow-lg shadow-red-600/20">
                                         <Users size={22} />
                                     </div>
-                                    <p className="text-xl font-black text-slate-900 uppercase tracking-tighter italic">Emergency Network</p>
+                                    <p className="text-xl font-black text-white uppercase tracking-tighter italic">Emergency Network</p>
                                 </div>
                                 
                                 <div className="space-y-10">
                                     <div className="flex justify-between items-start">
                                         <div className="min-w-0 flex-1">
-                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 italic">Family Liaison</p>
-                                            <h4 className="text-3xl font-black italic text-slate-900 uppercase font-poppins leading-none break-words">{data.emergencyContactName}</h4>
-                                            <Badge className="bg-slate-100 text-slate-600 border-none px-4 py-1.5 font-black uppercase italic text-[9px] mt-4 tracking-widest">{data.emergencyContactRelation || 'PARENT'}</Badge>
+                                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 italic">Family Liaison</p>
+                                            <h4 className="text-3xl font-black italic text-white uppercase font-poppins leading-none break-words">{data.emergencyContactName}</h4>
+                                            <Badge className="bg-white/5 text-slate-300 border border-white/10 px-4 py-1.5 font-black uppercase italic text-[9px] mt-4 tracking-widest">{data.emergencyContactRelation || 'PARENT'}</Badge>
                                         </div>
                                     </div>
 
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <button 
                                             onClick={initiateMaskedCall}
-                                            className="h-20 bg-red-600 text-white rounded-[30px] flex items-center justify-center gap-3 shadow-xl shadow-red-200 active:scale-95 transition-all group overflow-hidden relative"
+                                            className="h-20 bg-red-600 text-white rounded-[30px] flex items-center justify-center gap-3 shadow-xl shadow-red-600/20 active:scale-95 transition-all group overflow-hidden relative"
                                         >
                                             <Phone size={24} fill="white" />
                                             <span className="font-black uppercase italic tracking-widest">Connect Call</span>
@@ -324,7 +335,7 @@ export default function QRScanPage() {
                                         <button 
                                             onClick={handleRequestCall}
                                             disabled={callRequested}
-                                            className={`h-20 rounded-[30px] flex items-center justify-center gap-3 border-2 transition-all active:scale-95 ${callRequested ? 'bg-slate-50 border-slate-100 text-slate-400' : 'bg-white border-slate-200 text-slate-800 hover:border-red-600 hover:text-red-600 shadow-lg'}`}
+                                            className={`h-20 rounded-[30px] flex items-center justify-center gap-3 border-2 transition-all active:scale-95 ${callRequested ? 'bg-white/5 border-white/10 text-slate-500' : 'bg-[#040812] border-white/10 text-white hover:border-red-600 hover:text-red-600 shadow-lg'}`}
                                         >
                                             <MessageSquare size={24} />
                                             <span className="font-black uppercase italic tracking-widest">{callRequested ? 'Alert Dispatched' : 'Request Call'}</span>
@@ -332,23 +343,53 @@ export default function QRScanPage() {
                                     </div>
                                 </div>
                             </div>
-                            <div className="bg-slate-50 p-4 text-center">
-                                <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.5em] italic">Private Virtual Node • No Number Exposure</p>
+                            <div className="bg-black/20 p-4 text-center">
+                                <p className="text-[8px] font-black text-slate-500 uppercase tracking-[0.5em] italic">Private Virtual Node • No Number Exposure</p>
                             </div>
                         </div>
 
+                        {/* OPTIONAL BACKUP NUMBER - REVEALED ON SECOND VISIT */}
+                        {visitCount >= 2 && data.doctorContact && (
+                            <div className="bg-emerald-600/5 rounded-[40px] border border-emerald-500/20 overflow-hidden shadow-2xl animate-in fade-in slide-in-from-bottom-8 duration-1000">
+                                <div className="p-10 text-left">
+                                    <div className="flex items-center gap-4 mb-8">
+                                        <div className="p-3 bg-emerald-500 text-white rounded-2xl shadow-lg shadow-emerald-500/20">
+                                            <Phone size={22} />
+                                        </div>
+                                        <h3 className="text-xl font-black text-white italic uppercase tracking-tighter">Backup Contact Node</h3>
+                                    </div>
+                                    
+                                    <div className="flex justify-between items-center">
+                                        <div>
+                                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-2 italic">Direct Secondary Line</span>
+                                            <h4 className="text-4xl font-black text-emerald-500 uppercase italic tracking-tighter font-poppins">{data.doctorContact}</h4>
+                                        </div>
+                                        <button 
+                                            onClick={() => window.location.href = `tel:${data.doctorContact}`}
+                                            className="w-20 h-20 bg-emerald-500 hover:bg-emerald-600 text-white rounded-3xl flex items-center justify-center shadow-xl shadow-emerald-500/30 active:scale-90 transition-all shrink-0"
+                                        >
+                                            <Phone size={28} fill="white" />
+                                        </button>
+                                    </div>
+                                    <div className="mt-8 pt-6 border-t border-emerald-500/10">
+                                        <p className="text-[9px] font-black text-emerald-500/50 uppercase tracking-[0.3em] italic">Secondary Number revealed via sequential terminal access</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                         {/* EXTRAS */}
                         <div className="space-y-4 pt-10">
-                             <button onClick={() => window.location.href = `tel:108`} className="w-full h-24 bg-slate-900 text-white rounded-[40px] font-black uppercase tracking-widest relative active:scale-95 transition-all shadow-xl group flex items-center justify-center gap-6">
+                             <button onClick={() => window.location.href = `tel:108`} className="w-full h-24 bg-white text-slate-950 rounded-[40px] font-black uppercase tracking-widest relative active:scale-95 transition-all shadow-xl group flex items-center justify-center gap-6">
                                 <Siren size={32} className="text-red-600 animate-pulse" />
-                                <div className="text-left">
-                                    <p className="text-xl leading-none italic font-poppins">CALL 108</p>
+                                <div className="text-left text-black">
+                                    <p className="text-xl leading-none italic font-poppins font-black">CALL 108</p>
                                     <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em] mt-1">First Responders</p>
                                 </div>
                             </button>
                             <button 
                                 onClick={() => toast.success("Safety violation logged. Security team notified.")}
-                                className="w-full bg-slate-50 border border-slate-200 text-slate-400 p-6 rounded-[25px] flex items-center justify-center gap-3 hover:bg-red-50 hover:text-red-600 hover:border-red-100 transition-all text-[9px] font-black uppercase italic tracking-[0.2em]"
+                                className="w-full bg-[#11192A] border border-white/10 text-slate-500 p-6 rounded-[25px] flex items-center justify-center gap-3 hover:bg-red-600/10 hover:text-red-600 hover:border-red-600/20 transition-all text-[9px] font-black uppercase italic tracking-[0.2em]"
                             >
                                 <ShieldAlert size={18} />
                                 Report Security Misuse
@@ -357,23 +398,23 @@ export default function QRScanPage() {
 
                         {/* Join ResQR CTA */}
                         <div className="pt-24 pb-16 text-center">
-                            <div className="inline-block p-[0.5px] rounded-[45px] bg-gradient-to-br from-red-600/20 to-slate-200 mb-8 w-full">
-                                <div className="bg-white rounded-[44px] p-12 md:p-16 border border-slate-100 relative overflow-hidden group shadow-2xl">
+                            <div className="inline-block p-[1px] rounded-[45px] bg-gradient-to-br from-red-600/20 to-white/10 mb-8 w-full">
+                                <div className="bg-[#11192A] rounded-[44px] p-12 md:p-16 border border-white/5 relative overflow-hidden group shadow-2xl">
                                     <div className="relative z-10 flex flex-col items-center">
-                                        <div className="w-20 h-20 bg-slate-50 rounded-[30px] flex items-center justify-center mb-10 border border-slate-100 group-hover:scale-110 transition-transform duration-500 shadow-inner">
+                                        <div className="w-20 h-20 bg-white/5 rounded-[30px] flex items-center justify-center mb-10 border border-white/5 group-hover:scale-110 transition-transform duration-500 shadow-inner">
                                             <Shield size={36} className="text-red-600" />
                                         </div>
                                         
-                                        <h3 className="text-3xl md:text-5xl font-black italic text-slate-900 uppercase font-poppins mb-6 tracking-tighter leading-none">
+                                        <h3 className="text-3xl md:text-5xl font-black italic text-white uppercase font-poppins mb-6 tracking-tighter leading-none">
                                             Role Complete?
                                         </h3>
-                                        <p className="text-slate-400 text-[11px] font-bold uppercase tracking-[0.3em] mb-12 max-w-[300px] mx-auto leading-relaxed italic">
+                                        <p className="text-slate-500 text-[11px] font-bold uppercase tracking-[0.3em] mb-12 max-w-[300px] mx-auto leading-relaxed italic">
                                             Responder protocols finished. Secure your own family's medical safety today.
                                         </p>
                                         
                                         <button 
                                             onClick={() => window.location.href = '/login?redirect_to=/create-profile'}
-                                            className="w-full py-7 bg-slate-900 text-white rounded-[25px] font-black uppercase tracking-[0.2em] text-xs hover:bg-red-600 transition-all shadow-2xl flex items-center justify-center gap-4 group/btn"
+                                            className="w-full py-7 bg-white text-slate-950 rounded-[25px] font-black uppercase tracking-[0.2em] text-xs hover:bg-red-600 hover:text-white transition-all shadow-2xl flex items-center justify-center gap-4 group/btn"
                                         >
                                             Activate My Protection
                                             <ChevronRight size={20} className="group-hover:translate-x-2 transition-transform" />
@@ -422,27 +463,27 @@ export default function QRScanPage() {
                             initial={{ scale: 0.9, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.9, opacity: 0 }}
-                            className="bg-white rounded-[45px] w-full max-w-sm p-12 shadow-2xl border-2 border-slate-100 relative overflow-hidden"
+                            className="bg-[#11192A] rounded-[45px] w-full max-w-sm p-12 shadow-2xl border border-white/10 relative overflow-hidden"
                         >
                             <button 
                                 onClick={() => setShowOtpModal(false)}
-                                className="absolute top-8 right-8 text-slate-300 hover:text-slate-900"
+                                className="absolute top-8 right-8 text-slate-500 hover:text-white"
                             >
                                 <XCircle size={32} />
                             </button>
                             
                             <div className="text-center">
-                                <div className="w-20 h-20 bg-red-50 rounded-3xl flex items-center justify-center mx-auto mb-8 text-red-600">
+                                <div className="w-20 h-20 bg-red-600/10 rounded-3xl flex items-center justify-center mx-auto mb-8 text-red-600">
                                     <Lock size={36} />
                                 </div>
-                                <h3 className="text-3xl font-black text-slate-900 uppercase italic tracking-tighter mb-4">Auth Required</h3>
-                                <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest italic mb-10 leading-relaxed">Safety Protocol 09: Enter the code sent to the registered guardian device.</p>
+                                <h3 className="text-3xl font-black text-white uppercase italic tracking-tighter mb-4">Auth Required</h3>
+                                <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest italic mb-10 leading-relaxed">Safety Protocol 09: Enter the code sent to the registered guardian device.</p>
                                 
                                 <div className="space-y-6">
                                     <input 
                                         type="text" 
                                         placeholder="0000"
-                                        className="w-full bg-slate-50 border-2 border-slate-100 rounded-3xl p-7 text-center text-4xl font-black italic tracking-[0.5em] focus:border-red-600 outline-none transition-all placeholder:text-slate-200"
+                                        className="w-full bg-black/40 border-2 border-white/5 rounded-3xl p-7 text-center text-4xl font-black italic tracking-[0.5em] focus:border-red-600 outline-none transition-all placeholder:text-slate-700 text-white"
                                         maxLength={4}
                                         value={otpCode}
                                         onChange={(e) => setOtpCode(e.target.value)}
@@ -450,12 +491,12 @@ export default function QRScanPage() {
                                     <Button 
                                         onClick={handleVerifyOtp}
                                         disabled={isVerifying || otpCode.length < 4}
-                                        className="w-full bg-slate-900 hover:bg-red-600 text-white p-7 rounded-[25px] font-black uppercase italic tracking-widest shadow-xl flex items-center justify-center gap-4 transition-all"
+                                        className="w-full bg-white hover:bg-red-600 text-slate-950 hover:text-white p-7 rounded-[25px] font-black uppercase italic tracking-widest shadow-xl flex items-center justify-center gap-4 transition-all"
                                     >
                                         {isVerifying ? <Loader2 className="animate-spin" size={24} /> : <CheckCircle2 size={24} />}
                                         {isVerifying ? 'Verifying Node' : 'Unlock records'}
                                     </Button>
-                                    <p className="text-[9px] font-bold text-slate-300 uppercase tracking-widest italic pt-6">Your access terminal ID is being logged.</p>
+                                    <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest italic pt-6">Your access terminal ID is being logged.</p>
                                 </div>
                             </div>
                         </motion.div>
@@ -463,7 +504,7 @@ export default function QRScanPage() {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="fixed inset-0 bg-slate-900/60 backdrop-blur-xl -z-10"
+                            className="fixed inset-0 bg-black/60 backdrop-blur-xl -z-10"
                             onClick={() => setShowOtpModal(false)}
                         />
                     </div>
@@ -471,31 +512,31 @@ export default function QRScanPage() {
             </AnimatePresence>
 
             {/* NEAREST HOSPITALS (FOOTER SECTION) */}
-            <div className="bg-slate-50 py-24 px-8 border-t-2 border-slate-100">
+            <div className="bg-[#040812] py-24 px-8 border-t border-white/5">
                 <div className="max-w-xl mx-auto">
                     <div className="flex items-center gap-4 mb-12">
-                        <div className="p-4 bg-slate-900 text-white rounded-3xl shadow-xl">
+                        <div className="p-4 bg-red-600 text-white rounded-3xl shadow-lg shadow-red-600/20">
                             <Navigation size={24} />
                         </div>
-                        <h3 className="text-2xl font-black text-slate-900 italic uppercase tracking-tighter">Emergency Extraction Nodes</h3>
+                        <h3 className="text-2xl font-black text-white italic uppercase tracking-tighter">Emergency Extraction Nodes</h3>
                     </div>
 
                     {findingHospital ? (
-                        <div className="flex flex-col items-center gap-6 p-12 bg-white border-2 border-slate-100 rounded-[40px] animate-pulse">
+                        <div className="flex flex-col items-center gap-6 p-12 bg-[#11192A] border border-white/5 rounded-[40px] animate-pulse">
                             <Loader2 className="animate-spin text-red-600" size={40} />
-                            <span className="text-[11px] font-black uppercase tracking-[0.4rem] text-slate-400 italic">Syncing Coordinates...</span>
+                            <span className="text-[11px] font-black uppercase tracking-[0.4rem] text-slate-500 italic">Syncing Coordinates...</span>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 gap-6">
                             {hospitals.map((hospital, idx) => (
-                                <div key={idx} className="p-8 bg-white border-2 border-slate-100 rounded-[40px] flex justify-between items-center group hover:border-red-600 transition-all shadow-sm hover:shadow-2xl">
+                                <div key={idx} className="p-8 bg-[#11192A] border border-white/5 rounded-[40px] flex justify-between items-center group hover:border-red-600 transition-all shadow-xl">
                                     <div className="min-w-0 pr-6">
-                                        <h4 className="text-xl font-black text-slate-900 uppercase italic tracking-tight truncate">{hospital.name}</h4>
-                                        <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest mt-2 italic">{hospital.addr || 'Secondary Node'}</p>
+                                        <h4 className="text-xl font-black text-white uppercase italic tracking-tight truncate">{hospital.name}</h4>
+                                        <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest mt-2 italic">{hospital.addr || 'Secondary Node'}</p>
                                     </div>
                                     <button
                                         onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${hospital.lat},${hospital.lng}`)}
-                                        className="p-5 bg-slate-900 text-white rounded-2xl hover:bg-red-600 transition-all active:scale-90 shadow-lg"
+                                        className="p-5 bg-red-600 text-white rounded-2xl hover:bg-white hover:text-red-600 transition-all active:scale-90 shadow-lg shadow-red-600/20"
                                     >
                                         <Navigation size={22} />
                                     </button>
@@ -506,9 +547,9 @@ export default function QRScanPage() {
                 </div>
             </div>
 
-            <footer className="text-center py-24 bg-white border-t border-slate-100 opacity-20">
-                <img src="/logo.png" alt="RESQR" className="h-8 w-auto mx-auto mb-8 grayscale brightness-0" />
-                <p className="text-[10px] font-black uppercase tracking-[0.5em] text-slate-900 italic">
+            <footer className="text-center py-24 bg-[#040812] border-t border-white/5 opacity-40">
+                <img src="/logo.png" alt="RESQR" className="h-8 w-auto mx-auto mb-8 grayscale" />
+                <p className="text-[10px] font-black uppercase tracking-[0.5em] text-slate-600 italic">
                     GLOBAL MEDICAL IDENTITY NETWORK • PROTECTING LIVES
                 </p>
             </footer>
