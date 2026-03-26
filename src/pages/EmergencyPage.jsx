@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Phone, MapPin, AlertCircle, Heart, Activity, Info, Loader2, Lock, Navigation, Building2, Shield, ChevronRight, MessageSquare, ShieldAlert, CheckCircle2, XCircle } from 'lucide-react';
+import { Phone, MapPin, AlertCircle, Heart, Activity, Info, Loader2, Lock, Navigation, Building2, Shield, ChevronRight, MessageSquare, ShieldAlert, CheckCircle2, XCircle, Key } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useParams } from 'react-router-dom';
-import { db } from '../lib/firebase';
+import { db, auth } from '../lib/firebase';
 import { ref, get, push, serverTimestamp } from 'firebase/database';
+import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 import toast from 'react-hot-toast';
 
 export default function EmergencyPage() {
@@ -23,6 +24,8 @@ export default function EmergencyPage() {
     const [callRequested, setCallRequested] = useState(false);
     const [isTransmitting, setIsTransmitting] = useState(false);
     const [visitCount, setVisitCount] = useState(0);
+    const [confirmationResult, setConfirmationResult] = useState(null);
+    const [sendingOtp, setSendingOtp] = useState(false);
     
     useEffect(() => {
         if (id) {
@@ -204,19 +207,67 @@ export default function EmergencyPage() {
         }
     };
 
-    const handleVerifyOtp = () => {
-        setIsVerifying(true);
-        // Simulate OTP verification logic
-        setTimeout(() => {
-            if (otpCode === '1234' || otpCode === '0000') {
-                setOtpVerified(true);
-                setShowOtpModal(false);
-                toast.success("Access Granted: Sensitive Details Unlocked");
-            } else {
-                toast.error("Invalid Secret Code");
+    const setupRecaptcha = () => {
+        if (!window.recaptchaVerifier) {
+            window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+                'size': 'invisible',
+                'callback': (response) => {
+                    console.log("Recaptcha verified");
+                }
+            });
+        }
+    };
+
+    const handleSendOtp = async () => {
+        if (!user.emergencyContact.phone) return toast.error("No contact number found for this profile");
+        
+        setSendingOtp(true);
+        setupRecaptcha();
+        
+        const phoneNumber = user.emergencyContact.phone.startsWith('+') 
+            ? user.emergencyContact.phone 
+            : `+91${user.emergencyContact.phone}`;
+
+        try {
+            const appVerifier = window.recaptchaVerifier;
+            const result = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
+            setConfirmationResult(result);
+            setShowOtpModal(true);
+            toast.success(`OTP Sent to ${user.emergencyContact.name}'s phone!`);
+        } catch (error) {
+            console.error("OTP send failed:", error);
+            toast.error("Security handshake failed. Please check network.");
+            if (window.recaptchaVerifier) {
+                window.recaptchaVerifier.clear();
+                window.recaptchaVerifier = null;
             }
+        } finally {
+            setSendingOtp(false);
+        }
+    };
+
+    const handleVerifyOtp = async () => {
+        if (!otpCode || otpCode.length < 6) return toast.error("Please enter the 6-digit code");
+        
+        setIsVerifying(true);
+        try {
+            await confirmationResult.confirm(otpCode);
+            setOtpVerified(true);
+            setShowOtpModal(false);
+            toast.success("Access Granted: Medical History Refined");
+            
+            // Log security override
+            await push(ref(db, `profiles/${id}/scans`), {
+                timestamp: serverTimestamp(),
+                status: 'SENSITIVE DATA UNLOCKED',
+                type: 'Verified OTP'
+            });
+        } catch (error) {
+            console.error("Verification error:", error);
+            toast.error("Invalid or Expired OTP Code");
+        } finally {
             setIsVerifying(false);
-        }, 1500);
+        }
     };
 
     if (loading) {
@@ -352,6 +403,8 @@ export default function EmergencyPage() {
                         )}
                     </div>
 
+                    <div id="recaptcha-container"></div>
+
                     <div className={`relative transition-all duration-700 ${!otpVerified ? 'blur-xl' : 'blur-0'}`}>
                         <div className="space-y-6">
                             <div className="flex justify-between border-b border-white/5 pb-4">
@@ -369,10 +422,12 @@ export default function EmergencyPage() {
                         <div className="absolute inset-0 flex flex-col items-center justify-center p-10 text-center z-10">
                             <p className="text-[10px] font-black text-white uppercase tracking-[0.3em] mb-6 italic opacity-70">OTP verification required for medication & address history</p>
                             <Button 
-                                onClick={() => setShowOtpModal(true)}
-                                className="bg-white text-slate-950 hover:bg-red-600 hover:text-white rounded-[20px] px-8 py-4 font-black uppercase italic text-xs tracking-widest"
+                                onClick={handleSendOtp}
+                                disabled={sendingOtp}
+                                className="bg-white text-slate-950 hover:bg-red-600 hover:text-white rounded-[20px] px-8 py-4 font-black uppercase italic text-xs tracking-widest flex items-center gap-2"
                             >
-                                Unlock Sensitive Details
+                                {sendingOtp ? <Loader2 className="animate-spin" size={16} /> : <Key size={16} />}
+                                {sendingOtp ? 'Sending...' : 'Unlock Sensitive Details'}
                             </Button>
                         </div>
                     )}
@@ -516,33 +571,39 @@ export default function EmergencyPage() {
                                 <XCircle size={28} />
                             </button>
                             
-                            <div className="text-center">
-                                <div className="w-16 h-16 bg-red-600/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-red-600">
-                                    <Lock size={32} />
+                            <div className="tex                                 <div className="w-16 h-16 bg-red-600/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-red-600">
+                                    <Key size={32} />
                                 </div>
-                                <h3 className="text-2xl font-black text-white uppercase italic tracking-tighter mb-2">Verification Sent</h3>
-                                <p className="text-slate-500 text-[11px] font-bold uppercase tracking-widest italic mb-8 font-poppins">A code has been sent to the guardian's device.</p>
+                                <h3 className="text-2xl font-black text-white uppercase italic tracking-tighter mb-2">Verification Inbound</h3>
+                                <p className="text-slate-500 text-[11px] font-bold uppercase tracking-widest italic mb-8 font-poppins text-center">
+                                    A secure 6-digit code has been sent to {user.emergencyContact.name}. 
+                                    <span className="block text-white mt-2">Ask them for the code to unlock private history.</span>
+                                </p>
                                 
                                 <div className="space-y-6">
                                     <input 
                                         type="text" 
-                                        placeholder="0000"
-                                        className="w-full bg-black/40 border-2 border-white/5 rounded-2xl p-6 text-center text-2xl font-black italic tracking-[0.5em] focus:border-red-600 outline-none transition-all placeholder:text-slate-700 placeholder:tracking-normal placeholder:text-sm text-white"
-                                        maxLength={4}
+                                        placeholder="000000"
+                                        className="w-full bg-black/40 border-2 border-white/5 rounded-2xl p-6 text-center text-3xl font-black italic tracking-[0.5em] focus:border-red-600 outline-none transition-all placeholder:text-slate-700 placeholder:tracking-normal placeholder:text-lg text-white"
+                                        maxLength={6}
                                         value={otpCode}
                                         onChange={(e) => setOtpCode(e.target.value)}
                                     />
                                     <Button 
                                         onClick={handleVerifyOtp}
-                                        disabled={isVerifying || otpCode.length < 4}
+                                        disabled={isVerifying || otpCode.length < 6}
                                         className="w-full bg-white hover:bg-red-600 text-slate-950 hover:text-white p-6 rounded-[20px] font-black uppercase italic tracking-widest shadow-xl flex items-center justify-center gap-3 transition-all"
                                     >
                                         {isVerifying ? <Loader2 className="animate-spin" size={20} /> : <CheckCircle2 size={20} />}
                                         {isVerifying ? 'Verifying...' : 'Unlock Data'}
                                     </Button>
-                                    <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest italic pt-4">Emergency rescuer ID will be tracked</p>
+                                    <div className="pt-6 border-t border-white/5 flex flex-col gap-2">
+                                        <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest italic">Emergency rescuer ID will be tracked</p>
+                                        <button onClick={handleSendOtp} className="text-[10px] text-red-600 font-black uppercase italic underline hover:text-white transition-colors">Resend Code</button>
+                                    </div>
                                 </div>
                             </div>
+    </div>
                         </motion.div>
                         <motion.div 
                             initial={{ opacity: 0 }}

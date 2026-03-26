@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { db } from '../lib/firebase';
-import { ref, get, push, serverTimestamp } from 'firebase/database';
-import { Phone, MapPin, AlertCircle, Heart, Activity, Loader2, Info, Lock, Shield, Share2, Activity as HeartPulse, Navigation, Siren, Users, ChevronRight, MessageSquare, ShieldAlert, CheckCircle2, XCircle } from 'lucide-react';
+import { Phone, MapPin, AlertCircle, Heart, Activity, Loader2, Info, Lock, Shield, Share2, Activity as HeartPulse, Navigation, Siren, Users, ChevronRight, MessageSquare, ShieldAlert, CheckCircle2, XCircle, Key } from 'lucide-react';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { motion, AnimatePresence } from 'framer-motion';
+import { db, auth } from '../lib/firebase';
+import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 import toast from 'react-hot-toast';
 
 export default function QRScanPage() {
@@ -26,6 +24,8 @@ export default function QRScanPage() {
     const [callRequested, setCallRequested] = useState(false);
     const [isTransmitting, setIsTransmitting] = useState(false);
     const [visitCount, setVisitCount] = useState(0);
+    const [confirmationResult, setConfirmationResult] = useState(null);
+    const [sendingOtp, setSendingOtp] = useState(false);
 
     useEffect(() => {
         const id = profileId || username;
@@ -182,18 +182,72 @@ export default function QRScanPage() {
         }
     };
 
-    const handleVerifyOtp = () => {
-        setIsVerifying(true);
-        setTimeout(() => {
-            if (otpCode === '1234' || otpCode === '0000') {
-                setOtpVerified(true);
-                setShowOtpModal(false);
-                toast.success("Identity Vault Unlocked: Full Records Available");
-            } else {
-                toast.error("Security Authentication Failed");
+    const setupRecaptcha = () => {
+        if (!window.recaptchaVerifier) {
+            window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+                'size': 'invisible',
+                'callback': (response) => {
+                    console.log("Recaptcha verified");
+                }
+            });
+        }
+    };
+
+    const handleSendOtp = async () => {
+        if (!profile.data.emergencyContactPhone && !profile.data.ownerContact && !profile.data.contactNumber) {
+            return toast.error("No contact number found for this profile");
+        }
+        
+        setSendingOtp(true);
+        setupRecaptcha();
+        
+        const rawPhone = profile.data.emergencyContactPhone || profile.data.ownerContact || profile.data.contactNumber;
+        const phoneNumber = rawPhone.startsWith('+') ? rawPhone : `+91${rawPhone}`;
+
+        try {
+            const appVerifier = window.recaptchaVerifier;
+            const result = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
+            setConfirmationResult(result);
+            setShowOtpModal(true);
+            toast.success(`Security code dispatched to family!`);
+        } catch (error) {
+            console.error("OTP send failed:", error);
+            toast.error("Security handshake failed. Please refresh Node.");
+            if (window.recaptchaVerifier) {
+                window.recaptchaVerifier.clear();
+                window.recaptchaVerifier = null;
             }
+        } finally {
+            setSendingOtp(false);
+        }
+    };
+
+    const handleVerifyOtp = async () => {
+        if (!otpCode || otpCode.length < 6) return toast.error("Please enter the 6-digit code");
+        
+        setIsVerifying(true);
+        try {
+            await confirmationResult.confirm(otpCode);
+            setOtpVerified(true);
+            setShowOtpModal(false);
+            toast.success("Security Cleared: Full Access Granted");
+            
+            const pid = profileId || (profile?.id);
+            const uid = profile?.uid || (profileId?.includes('_') ? profileId.split('_')[0] : null);
+
+            if (uid && pid) {
+                await push(ref(db, `users/${uid}/profiles/${pid}/scans`), {
+                    timestamp: serverTimestamp(),
+                    status: 'IDENTITY VAULT OPENED',
+                    type: 'Validated OTP'
+                });
+            }
+        } catch (error) {
+            console.error("Verification error:", error);
+            toast.error("Invalid or Expired Security Code");
+        } finally {
             setIsVerifying(false);
-        }, 1500);
+        }
     };
 
     if (loading) return <div className="min-h-screen bg-[#040812] flex items-center justify-center"><Loader2 className="text-red-600 animate-spin" size={48} /></div>;
@@ -296,11 +350,13 @@ export default function QRScanPage() {
                                     <h3 className="text-xl font-black text-white italic uppercase tracking-tighter">Sensitive Records</h3>
                                 </div>
                                 {!otpVerified && (
-                                     <Badge className="bg-amber-500/10 text-amber-500 border border-amber-500/20 font-black uppercase italic tracking-widest">ENCRYPTED</Badge>
+                                     <Badge className="bg-amber-500/10 text-amber-500 border border-amber-500/20 px-3 py-1 font-black italic text-[9px] uppercase tracking-widest">LOCKED RECORD</Badge>
                                 )}
                             </div>
 
-                            <div className={`relative transition-all duration-700 ${!otpVerified ? 'blur-2xl' : 'blur-0'}`}>
+                            <div id="recaptcha-container"></div>
+
+                            <div className={`space-y-4 px-1 ${!otpVerified ? 'blur-xl opacity-30' : 'opacity-100'}`}>
                                 <div className="space-y-6 text-white/50">
                                     <div className="flex justify-between border-b border-white/5 pb-4">
                                         <span className="text-[10px] font-bold uppercase tracking-widest italic">Primary Base</span>
@@ -315,12 +371,14 @@ export default function QRScanPage() {
 
                             {!otpVerified && (
                                 <div className="absolute inset-0 flex flex-col items-center justify-center p-10 text-center z-10">
-                                    <p className="text-[10px] font-black text-white uppercase tracking-[0.3em] mb-6 italic opacity-50 max-w-[200px]">Guardian confirmation required to decrypt full history</p>
+                                    <p className="text-[9px] font-black text-white/50 uppercase tracking-[0.2em] mb-6 italic">Secure verification required for residential & medication log</p>
                                     <Button 
-                                        onClick={() => setShowOtpModal(true)}
-                                        className="bg-white text-slate-950 hover:bg-red-600 hover:text-white rounded-[20px] px-8 py-4 font-black uppercase italic text-xs tracking-widest"
+                                        onClick={handleSendOtp}
+                                        disabled={sendingOtp}
+                                        className="h-14 rounded-2xl bg-white text-slate-950 hover:bg-red-600 hover:text-white px-10 font-black uppercase italic tracking-widest text-[10px] shadow-xl flex items-center gap-2"
                                     >
-                                        Initiate Authentication
+                                        {sendingOtp ? <Loader2 className="animate-spin" size={16} /> : <Key size={16} />}
+                                        {sendingOtp ? 'Verifying...' : 'Unlock Identity Vault'}
                                     </Button>
                                 </div>
                             )}
@@ -484,40 +542,43 @@ export default function QRScanPage() {
                             initial={{ scale: 0.9, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.9, opacity: 0 }}
-                            className="bg-[#11192A] rounded-[45px] w-full max-w-sm p-12 shadow-2xl border border-white/10 relative overflow-hidden"
+                            className="bg-[#11192A] rounded-[40px] w-full max-w-sm p-10 shadow-2xl border border-white/10 relative overflow-hidden"
                         >
                             <button 
                                 onClick={() => setShowOtpModal(false)}
-                                className="absolute top-8 right-8 text-slate-500 hover:text-white"
+                                className="absolute top-6 right-6 text-slate-500 hover:text-white"
                             >
-                                <XCircle size={32} />
+                                <XCircle size={28} />
                             </button>
                             
                             <div className="text-center">
-                                <div className="w-20 h-20 bg-red-600/10 rounded-3xl flex items-center justify-center mx-auto mb-8 text-red-600">
-                                    <Lock size={36} />
+                                <div className="w-16 h-16 bg-red-600/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-red-600">
+                                    <Key size={32} />
                                 </div>
-                                <h3 className="text-3xl font-black text-white uppercase italic tracking-tighter mb-4">Auth Required</h3>
-                                <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest italic mb-10 leading-relaxed">Safety Protocol 09: Enter the code sent to the registered guardian device.</p>
+                                <h3 className="text-2xl font-black text-white uppercase italic tracking-tighter mb-2">Security Challenge</h3>
+                                <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest italic mb-8 font-poppins px-4">A 6-digit code has been sent to the guardian. Ask them for the code to unlock this vault.</p>
                                 
                                 <div className="space-y-6">
                                     <input 
                                         type="text" 
-                                        placeholder="0000"
-                                        className="w-full bg-black/40 border-2 border-white/5 rounded-3xl p-7 text-center text-4xl font-black italic tracking-[0.5em] focus:border-red-600 outline-none transition-all placeholder:text-slate-700 text-white"
-                                        maxLength={4}
+                                        placeholder="000000"
+                                        className="w-full bg-black/40 border-2 border-white/5 rounded-2xl p-6 text-center text-3xl font-black italic tracking-[0.5em] focus:border-red-600 outline-none transition-all placeholder:text-slate-700 placeholder:tracking-normal placeholder:text-lg text-white"
+                                        maxLength={6}
                                         value={otpCode}
                                         onChange={(e) => setOtpCode(e.target.value)}
                                     />
                                     <Button 
                                         onClick={handleVerifyOtp}
-                                        disabled={isVerifying || otpCode.length < 4}
-                                        className="w-full bg-white hover:bg-red-600 text-slate-950 hover:text-white p-7 rounded-[25px] font-black uppercase italic tracking-widest shadow-xl flex items-center justify-center gap-4 transition-all"
+                                        disabled={isVerifying || otpCode.length < 6}
+                                        className="w-full h-16 bg-white hover:bg-red-600 text-slate-950 hover:text-white rounded-[20px] font-black uppercase italic tracking-widest shadow-xl flex items-center justify-center gap-3 transition-all"
                                     >
-                                        {isVerifying ? <Loader2 className="animate-spin" size={24} /> : <CheckCircle2 size={24} />}
-                                        {isVerifying ? 'Verifying Node' : 'Unlock records'}
+                                        {isVerifying ? <Loader2 className="animate-spin" size={20} /> : <CheckCircle2 size={20} />}
+                                        {isVerifying ? 'Verifying...' : 'Unlock Data'}
                                     </Button>
-                                    <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest italic pt-6">Your access terminal ID is being logged.</p>
+                                    <div className="pt-6 border-t border-white/5 flex flex-col gap-2">
+                                        <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest italic">Emergency rescuer node is monitored</p>
+                                        <button onClick={handleSendOtp} className="text-[10px] text-red-600 font-black uppercase italic underline hover:text-white transition-colors">Resend Secure Code</button>
+                                    </div>
                                 </div>
                             </div>
                         </motion.div>
