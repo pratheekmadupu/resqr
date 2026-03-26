@@ -17,7 +17,7 @@ import {
     isSignInWithEmailLink,
     signInWithEmailLink
 } from 'firebase/auth';
-import { ref, update } from 'firebase/database';
+import { ref, update, get } from 'firebase/database';
 
 export default function LoginPage() {
     const [isLogin, setIsLogin] = useState(true);
@@ -55,9 +55,20 @@ export default function LoginPage() {
             }
         }
 
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
             if (user && !isSignInWithEmailLink(auth, window.location.href)) {
-                navigate(redirectTo);
+                try {
+                    const profilesRef = ref(db, `users/${user.uid}/profiles`);
+                    const profilesSnapshot = await get(profilesRef);
+                    if (!profilesSnapshot.exists()) {
+                        navigate('/create-profile');
+                    } else {
+                        navigate(redirectTo);
+                    }
+                } catch (error) {
+                    console.error("Profile check error:", error);
+                    navigate(redirectTo);
+                }
             }
         });
         return () => unsubscribe();
@@ -88,13 +99,22 @@ export default function LoginPage() {
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 await syncUserToDb(userCredential.user);
                 toast.success('Welcome back!', { id: toastId });
+                
+                // Redirect if no profiles
+                const profilesRef = ref(db, `users/${userCredential.user.uid}/profiles`);
+                const profilesSnapshot = await get(profilesRef);
+                if (!profilesSnapshot.exists()) {
+                    navigate('/create-profile');
+                } else {
+                    navigate(redirectTo);
+                }
             } else {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 await updateProfile(userCredential.user, { displayName: name });
                 await syncUserToDb(userCredential.user, name);
                 toast.success('Account created successfully!', { id: toastId });
+                navigate('/create-profile'); // New users always go to create profile
             }
-            navigate(redirectTo);
         } catch (error) {
             console.error("Auth error:", error);
             toast.error(error.message || 'Authentication failed', { id: toastId });
@@ -110,7 +130,15 @@ export default function LoginPage() {
             const result = await signInWithPopup(auth, provider);
             await syncUserToDb(result.user);
             toast.success('Signed in with Google!');
-            navigate(redirectTo);
+            
+            // Check for profiles
+            const profilesRef = ref(db, `users/${result.user.uid}/profiles`);
+            const profilesSnapshot = await get(profilesRef);
+            if (!profilesSnapshot.exists()) {
+                navigate('/create-profile');
+            } else {
+                navigate(redirectTo);
+            }
         } catch (error) {
             console.error("Google auth error:", error);
             toast.error(`Google Sign-in failed: ${error.code || error.message}`);

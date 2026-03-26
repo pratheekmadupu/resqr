@@ -49,10 +49,17 @@ export default function Dashboard() {
             const uid = auth.currentUser.uid;
             const profilesRef = ref(db, `users/${uid}/profiles`);
             unsubscribe = onValue(profilesRef, (snapshot) => {
-                if (snapshot.exists()) {
-                    setProfiles(Object.entries(snapshot.val()).map(([id, p]) => ({ id, ...p })).reverse());
-                } else setProfiles([]);
+                const profilesData = snapshot.exists() 
+                    ? Object.entries(snapshot.val()).map(([id, p]) => ({ id, ...p })).reverse()
+                    : [];
+                
+                setProfiles(profilesData);
                 setLoading(false);
+                
+                // Redirect NEW users (those with 0 profiles) to creation page
+                if (!snapshot.exists()) {
+                    navigate('/create-profile');
+                }
             });
         };
         if (auth.currentUser) init();
@@ -61,7 +68,7 @@ export default function Dashboard() {
             return () => clearTimeout(timer);
         }
         return () => { if (unsubscribe) unsubscribe(); };
-    }, []);
+    }, [navigate]);
 
     const handleSave = async () => {
         try {
