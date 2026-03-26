@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Phone, MapPin, AlertCircle, Heart, Activity, Info, Loader2, Lock, Navigation, Building2 } from 'lucide-react';
+import { Phone, MapPin, AlertCircle, Heart, Activity, Info, Loader2, Lock, Navigation, Building2, Shield, ChevronRight } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { motion } from 'framer-motion';
@@ -378,6 +378,36 @@ export default function EmergencyPage() {
                         <Phone size={28} fill="white" className="relative z-10" />
                         <span className="text-2xl font-black uppercase italic tracking-tighter relative z-10">Call Ambulance (108)</span>
                     </button>
+                </div>
+
+                {/* Join ResQR CTA */}
+                <div className="pt-24 pb-12 text-center">
+                    <div className="inline-block p-[1px] rounded-[40px] bg-gradient-to-r from-emerald-500/20 via-primary/20 to-blue-500/20 mb-8 max-w-full">
+                        <div className="bg-slate-950 rounded-[39px] p-10 md:p-14 border border-white/5 relative overflow-hidden group shadow-2xl">
+                             <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/10 blur-[80px] rounded-full group-hover:bg-primary/20 transition-all duration-700" />
+                                    
+                            <div className="relative z-10 flex flex-col items-center">
+                                <div className="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center mb-8 border border-white/10 group-hover:scale-110 transition-transform duration-500">
+                                    <Shield size={32} className="text-white" />
+                                </div>
+                                
+                                <h3 className="text-3xl md:text-4xl font-black italic text-white uppercase font-poppins mb-4 tracking-tighter leading-none">
+                                    Hero Protocol Complete?
+                                </h3>
+                                <p className="text-slate-400 text-[10px] md:text-xs font-bold uppercase tracking-[0.3em] mb-10 max-w-[320px] mx-auto leading-relaxed italic opacity-70">
+                                    You've played your part in a rescue. Now, ensure your own safety with a ResQR Identity.
+                                </p>
+                                
+                                <button 
+                                    onClick={() => window.location.href = '/login?redirect_to=/create-profile'}
+                                    className="w-full py-6 bg-white text-slate-950 rounded-[24px] font-black uppercase tracking-[0.2em] text-[10px] md:text-xs hover:bg-emerald-500 hover:text-white transition-all transform hover:translate-y-[-4px] active:translate-y-[0px] shadow-2xl flex items-center justify-center gap-3 group/btn"
+                                >
+                                    Activate My Protection
+                                    <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <footer className="text-center py-20 opacity-30">
