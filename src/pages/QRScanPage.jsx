@@ -321,23 +321,6 @@ export default function QRScanPage() {
                                 <Activity size={200} className="absolute right-[-40px] bottom-[-40px] text-white opacity-5 pointer-events-none" />
                             </div>
 
-                            <div className="bg-[#11192A] rounded-[40px] border border-white/5 p-10 flex flex-col gap-6 shadow-xl">
-                                <div className="flex items-center gap-4">
-                                    <div className="p-3 bg-white text-slate-950 rounded-2xl shadow-lg">
-                                        <Activity size={24} />
-                                    </div>
-                                    <p className="text-[11px] font-black text-slate-500 uppercase tracking-widest italic">Clinical State</p>
-                                </div>
-                                <h2 className="text-3xl font-black italic text-white uppercase font-poppins leading-tight">{data.healthIssues || 'NO CHRONIC CONDITIONS'}</h2>
-                            </div>
-
-                            <div className="bg-red-600/5 rounded-[40px] border border-red-600/10 p-10 flex flex-col gap-6 shadow-xl">
-                                <div className="flex items-center gap-4 text-red-600">
-                                    <AlertCircle size={24} />
-                                    <p className="text-[11px] font-black uppercase tracking-widest italic">Critical Alerts</p>
-                                </div>
-                                <h2 className="text-3xl font-black italic text-red-600 uppercase font-poppins leading-tight">{data.allergies || 'NO KNOWN ALLERGIES'}</h2>
-                            </div>
                         </div>
 
                         {/* SENSITIVE DETAILS - OTP PROTECTED */}
@@ -356,15 +339,32 @@ export default function QRScanPage() {
 
                             <div id="recaptcha-container"></div>
 
-                            <div className={`space-y-4 px-1 ${!otpVerified ? 'blur-xl opacity-30' : 'opacity-100'}`}>
-                                <div className="space-y-6 text-white/50">
+                            <div className={`space-y-8 px-1 ${!otpVerified ? 'blur-xl opacity-30 pointer-events-none' : 'opacity-100'}`}>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="bg-white/5 p-6 rounded-3xl border border-white/10">
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <Activity size={16} className="text-red-500" />
+                                            <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest italic">Clinical State</span>
+                                        </div>
+                                        <p className="text-xl font-black italic uppercase text-white leading-tight">{data.healthIssues || 'DIABETIC'}</p>
+                                    </div>
+                                    <div className="bg-red-600/5 p-6 rounded-3xl border border-red-600/10">
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <AlertCircle size={16} className="text-red-500" />
+                                            <span className="text-[9px] font-black text-red-500 uppercase tracking-widest italic">Critical Alerts</span>
+                                        </div>
+                                        <p className="text-xl font-black italic uppercase text-red-500 leading-tight">{data.allergies || 'NONE'}</p>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4 pt-4 border-t border-white/5 text-white/50">
                                     <div className="flex justify-between border-b border-white/5 pb-4">
                                         <span className="text-[10px] font-bold uppercase tracking-widest italic">Primary Base</span>
-                                        <span className="text-white font-black italic uppercase">Sector 4, Urban Habitat</span>
+                                        <span className="text-white font-black italic uppercase leading-none">Sector 4, Urban Habitat</span>
                                     </div>
                                     <div className="flex justify-between border-b border-white/5 pb-4">
                                         <span className="text-[10px] font-bold uppercase tracking-widest italic">Medication Log</span>
-                                        <span className="text-white font-black italic uppercase">Protocol Alpha (TID)</span>
+                                        <span className="text-white font-black italic uppercase leading-none">Protocol Alpha (TID)</span>
                                     </div>
                                 </div>
                             </div>

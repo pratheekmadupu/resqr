@@ -364,29 +364,6 @@ export default function EmergencyPage() {
                         <Activity size={200} className="absolute right-[-40px] bottom-[-40px] text-white opacity-5 pointer-events-none" />
                     </div>
 
-                    <div className="bg-[#11192A] p-10 rounded-[40px] shadow-xl border border-white/5 space-y-6">
-                        <div className="flex items-center gap-4">
-                            <div className="p-3 bg-red-600/10 rounded-2xl text-red-600 border border-red-600/20">
-                                <Activity size={24} />
-                            </div>
-                            <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest italic">Medical Conditions</span>
-                        </div>
-                        <p className="text-3xl font-black italic uppercase tracking-tight text-white leading-tight">
-                            {user.conditions}
-                        </p>
-                    </div>
-
-                    <div className="bg-[#11192A] p-10 rounded-[40px] shadow-xl border border-white/5 space-y-6">
-                        <div className="flex items-center gap-4 text-red-600">
-                            <div className="p-3 bg-red-600/10 rounded-2xl border border-red-600/20">
-                                <AlertCircle size={24} />
-                            </div>
-                            <span className="text-[11px] font-black uppercase tracking-widest italic">Critical Allergies</span>
-                        </div>
-                        <p className="text-3xl font-black italic uppercase tracking-tight text-red-600 leading-tight bg-red-600/5 p-6 rounded-3xl border border-red-600/10">
-                            {user.allergies}
-                        </p>
-                    </div>
                 </div>
 
                 {/* SENSITIVE DETAILS - OTP PROTECTED */}
@@ -406,14 +383,33 @@ export default function EmergencyPage() {
                     <div id="recaptcha-container"></div>
 
                     <div className={`relative transition-all duration-700 ${!otpVerified ? 'blur-xl' : 'blur-0'}`}>
-                        <div className="space-y-6">
-                            <div className="flex justify-between border-b border-white/5 pb-4">
-                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest italic">Home Address</span>
-                                <span className="text-white font-black italic uppercase">Residential Area, Hyderabad</span>
+                        <div className="space-y-8">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="bg-white/5 p-6 rounded-3xl border border-white/5">
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <Activity size={18} className="text-red-500" />
+                                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Clinical State</span>
+                                    </div>
+                                    <p className="text-2xl font-black italic uppercase text-white leading-tight">{user.conditions}</p>
+                                </div>
+                                <div className="bg-red-600/5 p-6 rounded-3xl border border-red-600/10">
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <AlertCircle size={18} className="text-red-500" />
+                                        <span className="text-[10px] font-black text-red-500 uppercase tracking-widest italic">Critical Alerts</span>
+                                    </div>
+                                    <p className="text-2xl font-black italic uppercase text-red-500 leading-tight">{user.allergies}</p>
+                                </div>
                             </div>
-                            <div className="flex justify-between border-b border-white/5 pb-4">
-                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest italic">Medication Log</span>
-                                <span className="text-white font-black italic uppercase">Insulin Type B (Daily)</span>
+
+                            <div className="space-y-6 pt-4 border-t border-white/5">
+                                <div className="flex justify-between border-b border-white/5 pb-4">
+                                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest italic">Home Address</span>
+                                    <span className="text-white font-black italic uppercase">Residential Area, Hyderabad</span>
+                                </div>
+                                <div className="flex justify-between border-b border-white/5 pb-4">
+                                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest italic">Medication Log</span>
+                                    <span className="text-white font-black italic uppercase">Insulin Type B (Daily)</span>
+                                </div>
                             </div>
                         </div>
                     </div>
