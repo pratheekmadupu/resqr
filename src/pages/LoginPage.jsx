@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, Mail, Lock, ChevronRight, Github } from 'lucide-react';
+import { Shield, Mail, Lock, ChevronRight } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
@@ -199,15 +199,16 @@ export default function LoginPage() {
                         <span className="relative px-6 bg-medical-card text-[10px] font-black uppercase tracking-[0.4em] text-slate-600 italic">Global Identity Gate</span>
                     </div>
 
-                    <div className="mt-8 grid grid-cols-2 gap-4">
+                    <div className="mt-10">
                         <button
                             onClick={handleGoogleSignIn}
-                            className="flex items-center justify-center gap-3 px-6 py-4 bg-white/5 border border-white/5 rounded-2xl hover:bg-white/10 transition-all font-black italic uppercase tracking-widest text-[10px] text-white"
+                            className="w-full flex items-center justify-center gap-4 px-6 py-6 bg-slate-950/50 border border-white/5 rounded-[25px] hover:bg-white/5 hover:border-primary/30 transition-all font-black italic uppercase tracking-[0.2em] text-[10px] text-white group/google relative overflow-hidden"
                         >
-                            <img src="https://www.google.com/favicon.ico" alt="Google" className="w-4 h-4" /> Google
-                        </button>
-                        <button className="flex items-center justify-center gap-3 px-6 py-4 bg-white/5 border border-white/5 rounded-2xl hover:bg-white/10 transition-all font-black italic uppercase tracking-widest text-[10px] text-white">
-                            <Github size={18} className="text-primary" /> Github
+                            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 opacity-0 group-hover/google:opacity-100 transition-opacity" />
+                            <div className="p-2 bg-white rounded-xl shadow-lg relative z-10 group-hover/google:scale-110 transition-transform">
+                                <img src="https://www.google.com/favicon.ico" alt="Google" className="w-4 h-4" />
+                            </div>
+                            <span className="relative z-10">Continue with Google Account</span>
                         </button>
                     </div>
                 </Card>
