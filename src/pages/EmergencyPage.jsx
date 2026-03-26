@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Phone, MapPin, AlertCircle, Heart, Activity, Info, Loader2, Lock, Navigation, Building2, Shield, ChevronRight, MessageSquare, ShieldAlert, CheckCircle2, XCircle, Key } from 'lucide-react';
+import { Phone, MapPin, AlertCircle, Heart, Activity as ActivityIcon, Info, Loader2, Lock, Navigation, Building2, Shield, ChevronRight, MessageSquare, ShieldAlert, CheckCircle2, XCircle, Key } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -483,7 +483,7 @@ export default function EmergencyPage() {
                                 <h3 className="text-7xl font-black text-white leading-none font-poppins tracking-tighter italic">{user?.bloodGroup || "B-POS"}</h3>
                             </div>
                         </div>
-                        <Activity size={200} className="absolute right-[-40px] bottom-[-40px] text-white opacity-5 pointer-events-none" />
+                        <ActivityIcon size={200} className="absolute right-[-40px] bottom-[-40px] text-white opacity-5 pointer-events-none" />
                     </div>
 
                 </div>
@@ -509,17 +509,17 @@ export default function EmergencyPage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="bg-white/5 p-6 rounded-3xl border border-white/5">
                                     <div className="flex items-center gap-3 mb-4">
-                                        <Activity size={18} className="text-red-500" />
+                                        <ActivityIcon size={18} className="text-red-500" />
                                         <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Clinical State</span>
                                     </div>
-                                    <p className="text-2xl font-black italic uppercase text-white leading-tight">{user.conditions}</p>
+                                    <p className="text-2xl font-black italic uppercase text-white leading-tight">{user?.conditions || 'STABLE'}</p>
                                 </div>
                                 <div className="bg-red-600/5 p-6 rounded-3xl border border-red-600/10">
                                     <div className="flex items-center gap-3 mb-4">
                                         <AlertCircle size={18} className="text-red-500" />
                                         <span className="text-[10px] font-black text-red-500 uppercase tracking-widest italic">Critical Alerts</span>
                                     </div>
-                                    <p className="text-2xl font-black italic uppercase text-red-500 leading-tight">{user.allergies}</p>
+                                    <p className="text-2xl font-black italic uppercase text-red-500 leading-tight">{user?.allergies || 'NONE'}</p>
                                 </div>
                             </div>
 

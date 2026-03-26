@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Phone, MapPin, AlertCircle, Heart, Activity, Loader2, Info, Lock, Shield, Share2, Activity as HeartPulse, Navigation, Siren, Users, ChevronRight, MessageSquare, ShieldAlert, CheckCircle2, XCircle, Key } from 'lucide-react';
+import { Phone, MapPin, AlertCircle, Heart, Activity as ActivityIcon, Loader2, Info, Lock, Shield, Share2, Activity as HeartPulse, Navigation, Siren, Users, ChevronRight, MessageSquare, ShieldAlert, CheckCircle2, XCircle, Key } from 'lucide-react';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -50,14 +50,25 @@ export default function QRScanPage() {
                 if (username) {
                     const registrySnap = await get(ref(db, `usernames/${username.toLowerCase()}`));
                     if (registrySnap.exists()) {
-                        const path = registrySnap.val(); 
-                        uid = path.split('/')[0];
-                        pid = path.split('/')[1];
+                        const path = registrySnap.val();
+                        if (typeof path === 'string') {
+                            if (path.includes('/')) {
+                                uid = path.split('/')[0];
+                                pid = path.split('/')[1];
+                            } else {
+                                // Assume it's a PID and find associated UID in legacy map
+                                pid = path;
+                                const legacy = await get(ref(db, `profiles/${pid}`));
+                                if (legacy.exists()) uid = legacy.val().uid || null;
+                            }
+                        }
                     } else {
-                         const legacy = await get(ref(db, `profiles/${username}`));
+                        // Direct lookup as legacy ID
+                         pid = username;
+                         const legacy = await get(ref(db, `profiles/${pid}`));
                          if (legacy.exists()) { 
                             const val = legacy.val();
-                            setProfile({ category: 'people', data: val, id: username, uid: val.uid || null }); 
+                            setProfile({ category: 'people', data: val, id: pid, uid: val.uid || null }); 
                             setLoading(false); 
                             return; 
                          }
@@ -65,7 +76,7 @@ export default function QRScanPage() {
                 }
 
                 if (!uid && pid) {
-                    if (pid.includes('_')) uid = pid.split('_')[0];
+                    if (pid?.includes('_')) uid = pid.split('_')[0];
                 }
 
                 if (uid && pid) {
@@ -76,10 +87,11 @@ export default function QRScanPage() {
                         setProfile(normalized);
                         recordScan(uid, pid);
                     } else {
-                        const legacy = await get(ref(db, `profiles/${pid}`));
-                        if (legacy.exists()) {
-                            const val = legacy.val();
-                            setProfile({ category: 'people', data: val, id: pid, uid: val.uid || null });
+                        // Search in root profiles as last resort
+                        const rootSnap = await get(ref(db, `profiles/${pid}`));
+                        if (rootSnap.exists()) {
+                             const val = rootSnap.val();
+                             setProfile({ category: 'people', data: val, id: pid, uid: val.uid || null });
                         }
                     }
                 } else if (pid) {
@@ -90,7 +102,7 @@ export default function QRScanPage() {
                     }
                 }
             } catch (error) {
-                console.error("Profile Fetch Error:", error);
+                console.error("Critical Profile Load Failure:", error);
             } finally { setLoading(false); }
         };
         fetchProfile();
@@ -451,7 +463,7 @@ export default function QRScanPage() {
                                         <p className="text-7xl font-black italic text-white font-poppins tracking-tighter leading-none">{data.bloodGroup || 'B-'}</p>
                                     </div>
                                 </div>
-                                <Activity size={200} className="absolute right-[-40px] bottom-[-40px] text-white opacity-5 pointer-events-none" />
+                                <ActivityIcon size={200} className="absolute right-[-40px] bottom-[-40px] text-white opacity-5 pointer-events-none" />
                             </div>
 
                         </div>
@@ -476,7 +488,7 @@ export default function QRScanPage() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="bg-white/5 p-6 rounded-3xl border border-white/10">
                                         <div className="flex items-center gap-2 mb-3">
-                                            <Activity size={16} className="text-red-500" />
+                                            <ActivityIcon size={16} className="text-red-500" />
                                             <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest italic">Clinical State</span>
                                         </div>
                                         <p className="text-xl font-black italic uppercase text-white leading-tight">{data?.healthIssues || 'STABLE'}</p>
