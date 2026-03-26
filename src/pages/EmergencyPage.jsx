@@ -227,16 +227,16 @@ export default function EmergencyPage() {
                     
                     if (decodedUser) {
                         setUser({
-                            name: (decodedUser.name || "UNIDENTIFIED").toString().toUpperCase(),
-                            bloodGroup: decodedUser.bloodGroup || "B-POS",
-                            payment_status: decodedUser.payment_status || 'paid',
-                            allergies: decodedUser.allergies || "None reported",
-                            conditions: decodedUser.medicalConditions || decodedUser.healthIssues || "No chronic conditions reported",
-                            doctorContact: decodedUser.doctorContact || "",
+                            name: String(decodedUser?.name || "UNIDENTIFIED").toUpperCase(),
+                            bloodGroup: decodedUser?.bloodGroup || "B-POS",
+                            payment_status: decodedUser?.payment_status || 'paid',
+                            allergies: decodedUser?.allergies || "None reported",
+                            conditions: decodedUser?.medicalConditions || decodedUser?.healthIssues || "No chronic conditions reported",
+                            doctorContact: decodedUser?.doctorContact || "",
                             emergencyContact: {
-                                name: decodedUser.emergencyContactName || decodedUser.emergencyContact?.name || "Guardian Node",
-                                relation: decodedUser.emergencyContactRelation || decodedUser.emergencyContact?.relation || "Emergency Liaison",
-                                phone: decodedUser.emergencyContactPhone || decodedUser.emergencyContact?.phone || ""
+                                name: decodedUser?.emergencyContactName || decodedUser?.emergencyContact?.name || "Guardian Node",
+                                relation: decodedUser?.emergencyContactRelation || decodedUser?.emergencyContact?.relation || "Emergency Liaison",
+                                phone: decodedUser?.emergencyContactPhone || decodedUser?.emergencyContact?.phone || ""
                             }
                         });
                         recordScan();

@@ -446,7 +446,7 @@ export default function QRScanPage() {
                             <div className="p-10 pt-12 text-center">
                                 <span className="text-[11px] font-black text-slate-500 uppercase tracking-[0.4em] block mb-4 italic">Individual Identity</span>
                                 <h1 className="text-5xl sm:text-7xl font-black uppercase text-white tracking-tighter italic font-poppins break-words leading-none w-full">
-                                    {data.name}
+                                    {data?.name || "IDENTITY LOADED"}
                                 </h1>
                             </div>
                         </div>
@@ -460,7 +460,7 @@ export default function QRScanPage() {
                                     </div>
                                     <div>
                                         <p className="text-[11px] font-black text-white/70 uppercase tracking-[0.4em] mb-2 italic">Blood Group</p>
-                                        <p className="text-7xl font-black italic text-white font-poppins tracking-tighter leading-none">{data.bloodGroup || 'B-'}</p>
+                                        <p className="text-7xl font-black italic text-white font-poppins tracking-tighter leading-none">{data?.bloodGroup || 'B-'}</p>
                                     </div>
                                 </div>
                                 <ActivityIcon size={200} className="absolute right-[-40px] bottom-[-40px] text-white opacity-5 pointer-events-none" />
