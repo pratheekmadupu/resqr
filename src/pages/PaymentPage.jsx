@@ -16,7 +16,7 @@ export default function PaymentPage() {
     const [loading, setLoading] = useState(true);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const DEFAULT_PRODUCTS = [
-        { id: 'digital', title: 'Digital QR', price: 50, best: true },
+        { id: 'digital', title: 'Digital QR', price: 99, best: true },
         { id: 'band', title: 'QR Band', price: 299, best: false },
         { id: 'bracelet', title: 'QR Bracelet', price: 399, best: false },
         { id: 'keychain', title: 'Key Chain', price: 199, base: false }
@@ -300,12 +300,12 @@ export default function PaymentPage() {
                             <div className="flex flex-col md:flex-row items-center gap-10">
                                 <div className="bg-white p-4 rounded-3xl shadow-xl">
                                     <div className="text-center mb-2">
-                                        <p className="text-[10px] font-black text-primary uppercase italic">Scan to Pay ₹50</p>
+                                        <p className="text-[10px] font-black text-primary uppercase italic">Scan to Pay ₹99</p>
                                     </div>
                                     <div className="w-48 h-48 bg-slate-100 flex items-center justify-center rounded-xl overflow-hidden">
-                                        {/* Dynamic UPI QR for ₹50 */}
+                                        {/* Dynamic UPI QR for ₹99 */}
                                         <img 
-                                            src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent('upi://pay?pa=resqr.official@okicici&pn=RESQR&am=50&cu=INR')}`}
+                                            src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent('upi://pay?pa=resqr.official@okicici&pn=RESQR&am=99&cu=INR')}`}
                                             alt="UPI QR Code"
                                             className="w-full h-full p-2"
                                         />
@@ -316,10 +316,10 @@ export default function PaymentPage() {
                                 </div>
                                 <div className="flex-1 space-y-6">
                                     <div className="inline-block px-4 py-1.5 bg-primary/20 rounded-full text-primary font-black uppercase italic text-[10px] tracking-widest">Manual Activation</div>
-                                    <h2 className="text-3xl font-black italic uppercase tracking-tighter text-white leading-tight">Pay ₹50 directly via any UPI App</h2>
+                                    <h2 className="text-3xl font-black italic uppercase tracking-tighter text-white leading-tight">Pay ₹99 directly via any UPI App</h2>
                                     <p className="text-slate-400 text-sm font-medium leading-relaxed">
                                         1. Scan the QR or pay to <span className="text-white font-bold">resqr.official@okicici</span><br />
-                                        2. Pay exactly <span className="text-white font-bold italic underline">₹50</span><br />
+                                        2. Pay exactly <span className="text-white font-bold italic underline">₹99</span><br />
                                         3. Your profile activates automatically within 1 hour after verification.
                                     </p>
                                     <div className="pt-2">
