@@ -223,20 +223,38 @@ export default function EmergencyPage() {
         
         setSendingOtp(true);
         setupRecaptcha();
+         // Sanitize phone number: remove spaces, dashes, parentheses
+        const sanitized = user.emergencyContact.phone.replace(/[^0-9+]/g, '');
         
-        const phoneNumber = user.emergencyContact.phone.startsWith('+') 
-            ? user.emergencyContact.phone 
-            : `+91${user.emergencyContact.phone}`;
+        let phoneNumber = sanitized;
+        if (!phoneNumber.startsWith('+')) {
+            // Assume Indian number if no plus prefix
+            phoneNumber = `+91${phoneNumber}`;
+        }
+        
+        // Final sanity check for E.164 (min 7 digits)
+        if (phoneNumber.length < 10) return toast.error("Invalid phone number format");
 
         try {
+            console.log("Initiating Security Handshake with:", phoneNumber);
             const appVerifier = window.recaptchaVerifier;
             const result = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
             setConfirmationResult(result);
             setShowOtpModal(true);
-            toast.success(`OTP Sent to ${user.emergencyContact.name}'s phone!`);
+            toast.success(`Security code dispatched to ${user.emergencyContact.name}`);
         } catch (error) {
-            console.error("OTP send failed:", error);
-            toast.error("Security handshake failed. Please check network.");
+            console.error("Firebase Auth Error:", error.code, error.message);
+            
+            if (error.code === 'auth/invalid-phone-number') {
+                toast.error("The stored phone number is invalid for SMS.");
+            } else if (error.code === 'auth/captcha-check-failed') {
+                toast.error("Security challenge failed. Please refresh.");
+            } else if (error.code === 'auth/quota-exceeded') {
+                toast.error("SMS quota exceeded for today.");
+            } else {
+                toast.error("Handshake failed. Ensure Phone Auth is enabled in Firebase.");
+            }
+            
             if (window.recaptchaVerifier) {
                 window.recaptchaVerifier.clear();
                 window.recaptchaVerifier = null;

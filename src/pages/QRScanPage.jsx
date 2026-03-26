@@ -200,19 +200,34 @@ export default function QRScanPage() {
         
         setSendingOtp(true);
         setupRecaptcha();
+         const rawPhone = profile.data.emergencyContactPhone || profile.data.ownerContact || profile.data.contactNumber;
+        const sanitized = rawPhone.replace(/[^0-9+]/g, '');
+        let phoneNumber = sanitized;
+        if (!phoneNumber.startsWith('+')) {
+            phoneNumber = `+91${phoneNumber}`;
+        }
         
-        const rawPhone = profile.data.emergencyContactPhone || profile.data.ownerContact || profile.data.contactNumber;
-        const phoneNumber = rawPhone.startsWith('+') ? rawPhone : `+91${rawPhone}`;
+        if (phoneNumber.length < 10) return toast.error("Invalid phone format in data registry");
 
         try {
+            console.log("Initiating Security Handshake with:", phoneNumber);
             const appVerifier = window.recaptchaVerifier;
             const result = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
             setConfirmationResult(result);
             setShowOtpModal(true);
-            toast.success(`Security code dispatched to family!`);
+            toast.success(`Security code dispatched to family node`);
         } catch (error) {
-            console.error("OTP send failed:", error);
-            toast.error("Security handshake failed. Please refresh Node.");
+            console.error("Firebase Auth Error:", error.code, error.message);
+            if (error.code === 'auth/invalid-phone-number') {
+                toast.error("The stored phone number is invalid for SMS.");
+            } else if (error.code === 'auth/captcha-check-failed') {
+                toast.error("Security challenge failed. Please refresh the scan.");
+            } else if (error.code === 'auth/quota-exceeded') {
+                toast.error("SMS quota exceeded for today.");
+            } else {
+                toast.error("Handshake failed. Ensure Phone Auth is active in Console.");
+            }
+            
             if (window.recaptchaVerifier) {
                 window.recaptchaVerifier.clear();
                 window.recaptchaVerifier = null;
