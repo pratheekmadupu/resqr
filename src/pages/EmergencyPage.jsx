@@ -585,7 +585,8 @@ export default function EmergencyPage() {
                                 <XCircle size={28} />
                             </button>
                             
-                            <div className="tex                                 <div className="w-16 h-16 bg-red-600/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-red-600">
+                            <div className="text-center">
+                                <div className="w-16 h-16 bg-red-600/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-red-600">
                                     <Key size={32} />
                                 </div>
                                 <h3 className="text-2xl font-black text-white uppercase italic tracking-tighter mb-2">Verification Inbound</h3>
@@ -617,7 +618,6 @@ export default function EmergencyPage() {
                                     </div>
                                 </div>
                             </div>
-    </div>
                         </motion.div>
                         <motion.div 
                             initial={{ opacity: 0 }}
