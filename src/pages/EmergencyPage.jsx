@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Phone, MapPin, AlertCircle, Heart, Activity as ActivityIcon, Info, Loader2, Lock, Navigation, Building2, Shield, ChevronRight, MessageSquare, ShieldAlert, CheckCircle2, XCircle, Key } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useParams } from 'react-router-dom';
 import { db, auth } from '../lib/firebase';
 import { ref, get, push, serverTimestamp } from 'firebase/database';
@@ -26,6 +26,7 @@ export default function EmergencyPage() {
     const [visitCount, setVisitCount] = useState(0);
     const [confirmationResult, setConfirmationResult] = useState(null);
     const [sendingOtp, setSendingOtp] = useState(false);
+    const [showOtpModal, setShowOtpModal] = useState(false);
     
     useEffect(() => {
         if (id) {
@@ -50,7 +51,7 @@ export default function EmergencyPage() {
         }
     });
 
-    const recordScan = async () => {
+    const recordScan = async (profileData) => {
         if (scanRecorded) return;
         setIsTransmitting(true);
         try {
@@ -89,11 +90,11 @@ export default function EmergencyPage() {
             }
             // WhatsApp Bridge Initialization
             if (coords) {
-                const rawPh = user.emergencyContact?.phone || user.doctorContact;
+                const rawPh = profileData?.emergencyContact?.phone || profileData?.doctorContact;
                 const sanPh = rawPh?.replace(/[^0-9+]/g, '');
                 if (sanPh) {
                     const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${coords.lat},${coords.lng}`;
-                    const waMessage = encodeURIComponent(`🚨 *RESQR EMERGENCY ALERT* 🚨\n\nI have just scanned the medical profile ID of *${(user.name || "A Patient").toUpperCase()}*.\n\n📍 *CURRENT LOCATION:* ${mapsUrl}\n\n⚕️ *PROTOCOL:* High Priority Rescue Dispatch Requested.`);
+                    const waMessage = encodeURIComponent(`🚨 *RESQR EMERGENCY ALERT* 🚨\n\nI have just scanned the medical profile ID of *${(profileData?.name || "A Patient").toUpperCase()}*.\n\n📍 *CURRENT LOCATION:* ${mapsUrl}\n\n⚕️ *PROTOCOL:* High Priority Rescue Dispatch Requested.`);
                     const waPhone = sanPh.startsWith('+') ? sanPh.substring(1) : sanPh;
                     const waUrl = `https://wa.me/${waPhone}?text=${waMessage}`;
 
@@ -216,7 +217,7 @@ export default function EmergencyPage() {
                     const raw = snap.val();
                     const decoded = raw.data || raw;
                     
-                    setUser({
+                    const userData = {
                         name: (decoded.name || "UNIDENTIFIED").toString().toUpperCase(),
                         bloodGroup: decoded.bloodGroup || "B-POS",
                         payment_status: decoded.payment_status || 'paid',
@@ -228,8 +229,9 @@ export default function EmergencyPage() {
                             relation: decoded.emergencyContactRelation || decoded.emergencyContact?.relation || "Emergency Liaison",
                             phone: decoded.emergencyContactPhone || decoded.emergencyContact?.phone || ""
                         }
-                    });
-                    recordScan();
+                    };
+                    setUser(userData);
+                    recordScan(userData);
                 } else {
                     toast.error("Profile Node Offline");
                 }
@@ -413,16 +415,12 @@ export default function EmergencyPage() {
             </div>
 
                 {isTransmitting && (
-                    <motion.div 
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        className="bg-emerald-500 text-white px-6 py-2 flex items-center justify-center gap-3 text-[9px] font-black uppercase tracking-[0.2em] sticky top-[34px] z-40 border-b border-emerald-400/20 shadow-lg cursor-pointer hover:bg-emerald-400 transition-colors"
+                    <div className="bg-emerald-500 text-white px-6 py-2 flex items-center justify-center gap-3 text-[9px] font-black uppercase tracking-[0.2em] sticky top-[34px] z-40 border-b border-emerald-400/20 shadow-lg cursor-pointer hover:bg-emerald-400 transition-colors"
                         onClick={handleManualBroadcast}
                     >
                         <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
                         📡 Automated Protocol: Broadcasting Location... (Click for Manual)
-                    </motion.div>
+                    </div>
                 )}
 
             {/* Header */}

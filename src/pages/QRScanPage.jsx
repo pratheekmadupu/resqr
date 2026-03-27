@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useParams } from 'react-router-dom';
 import { Phone, MapPin, AlertCircle, Heart, Activity as ActivityIcon, Loader2, Info, Lock, Shield, Share2, Activity as HeartPulse, Navigation, Siren, Users, ChevronRight, MessageSquare, ShieldAlert, CheckCircle2, XCircle, Key } from 'lucide-react';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
-import { motion, AnimatePresence } from 'framer-motion';
 import { db, auth } from '../lib/firebase';
 import { ref, get, push, serverTimestamp } from 'firebase/database';
 import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
@@ -29,6 +29,7 @@ export default function QRScanPage() {
     const [visitCount, setVisitCount] = useState(0);
     const [confirmationResult, setConfirmationResult] = useState(null);
     const [sendingOtp, setSendingOtp] = useState(false);
+    const [showOtpModal, setShowOtpModal] = useState(false);
 
     useEffect(() => {
         const id = profileId || username;
@@ -70,7 +71,7 @@ export default function QRScanPage() {
                     const data = raw.data || raw;
                     const uid = raw.uid || (id.includes('_') ? id.split('_')[0] : null);
                     setProfile({ category: 'people', data, id, uid });
-                    if (uid) recordScan(uid, id);
+                    if (uid) recordScan(uid, id, data);
                 }
              } catch (err) {
                 console.error("Fetch Error:", err);
@@ -81,7 +82,7 @@ export default function QRScanPage() {
         fetchProfile();
     }, [profileId, username]);
 
-    const recordScan = async (userId, pid) => {
+    const recordScan = async (userId, pid, profileData) => {
         if (scanRecorded) return;
         setIsTransmitting(true);
         
@@ -134,12 +135,12 @@ export default function QRScanPage() {
 
             // WhatsApp Redirect Logic (Auto-Construct Payload)
             if (lat && lng) {
-                const rawPh = profile.data.emergencyContactPhone || profile.data.ownerContact || profile.data.contactNumber;
+                const rawPh = profileData?.emergencyContactPhone || profileData?.ownerContact || profileData?.contactNumber;
                 const sanPh = rawPh?.replace(/[^0-9+]/g, '');
                 
                 if (sanPh) {
                     const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
-                    const waMessage = encodeURIComponent(`🚨 *RESQR EMERGENCY ALERT* 🚨\n\nI have just scanned the medical ID of *${(data.name || "A Patient").toUpperCase()}*.\n\n📍 *CURRENT LOCATION:* ${mapsUrl}\n\n⚠️ *RESPONSE TYPE:* Critical Extraction Request.`);
+                    const waMessage = encodeURIComponent(`🚨 *RESQR EMERGENCY ALERT* 🚨\n\nI have just scanned the medical ID of *${(profileData?.name || "A Patient").toUpperCase()}*.\n\n📍 *CURRENT LOCATION:* ${mapsUrl}\n\n⚠️ *RESPONSE TYPE:* Critical Extraction Request.`);
                     const waPhone = sanPh.startsWith('+') ? sanPh.substring(1) : sanPh;
                     const waUrl = `https://wa.me/${waPhone}?text=${waMessage}`;
                     
@@ -381,20 +382,14 @@ export default function QRScanPage() {
             </div>
 
             {/* AUTOMATED LOCATION STATUS */}
-            <AnimatePresence>
-                {isTransmitting && (
-                    <motion.div 
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        className="bg-emerald-500 text-white px-6 py-2 flex items-center justify-center gap-3 text-[9px] font-black uppercase tracking-[0.2em] sticky top-[34px] z-40 border-b border-emerald-400/20 shadow-lg cursor-pointer hover:bg-emerald-400 transition-colors"
-                        onClick={handleManualBroadcast}
-                    >
-                        <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
-                        📡 Automated Protocol: Sending Location to Family... (Click for Manual)
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            {isTransmitting && (
+                <div className="bg-emerald-500 text-white px-6 py-2 flex items-center justify-center gap-3 text-[9px] font-black uppercase tracking-[0.2em] sticky top-[34px] z-40 border-b border-emerald-400/20 shadow-lg cursor-pointer hover:bg-emerald-400 transition-colors"
+                    onClick={handleManualBroadcast}
+                >
+                    <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                    📡 Automated Protocol: Sending Location to Family... (Click for Manual)
+                </div>
+            )}
 
             <div className="max-w-xl mx-auto space-y-8 pb-40 px-5 pt-8">
                 
