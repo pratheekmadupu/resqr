@@ -215,14 +215,14 @@ export default function EmergencyPage() {
 
                 if (snap.exists()) {
                     const raw = snap.val();
-                    const decoded = raw.data || raw;
+                    const decoded = { ...raw, ...(raw.data || {}) };
                     
                     const userData = {
                         name: (decoded.name || "UNIDENTIFIED").toString().toUpperCase(),
                         bloodGroup: decoded.bloodGroup || "B-POS",
                         payment_status: decoded.payment_status || 'paid',
                         allergies: decoded.allergies || "None reported",
-                        conditions: decoded.medicalConditions || decoded.healthIssues || "No chronic conditions reported",
+                        conditions: (decoded.healthIssues || decoded.conditions || decoded.medicalConditions || "No chronic conditions reported"),
                         doctorContact: decoded.doctorContact || "",
                         emergencyContact: {
                             name: decoded.emergencyContactName || decoded.emergencyContact?.name || "Guardian Node",

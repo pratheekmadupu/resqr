@@ -56,7 +56,11 @@ export default function QRScanPage() {
                     const regSnap = await get(ref(db, `usernames/${id.toLowerCase()}`));
                     if (regSnap.exists()) {
                         const path = regSnap.val();
-                        snap = await get(ref(db, `users/${path}`));
+                        // Robust Path Handling: Ensures legacy uid/pid paths are corrected to users/uid/profiles/pid
+                        const robustPath = (path.includes('/profiles/') || path.includes('profiles/')) 
+                            ? path 
+                            : path.replace('/', '/profiles/');
+                        snap = await get(ref(db, `users/${robustPath}`));
                     }
                 }
                 
@@ -68,10 +72,18 @@ export default function QRScanPage() {
 
                 if (snap.exists()) {
                     const raw = snap.val();
-                    const data = raw.data || raw;
-                    const uid = raw.uid || (id.includes('_') ? id.split('_')[0] : null);
-                    setProfile({ category: 'people', data, id, uid });
-                    if (uid) recordScan(uid, id, data);
+                    const profileData = { ...raw, ...(raw.data || {}) }; 
+                    const uid = raw.uid || (id.includes('_') ? id.split('_')[0] : (snap.ref.parent?.parent?.key));
+                    const profileCategory = raw.category || 'people';
+                    
+                    setProfile({ 
+                        category: profileCategory, 
+                        data: profileData, 
+                        id, 
+                        uid 
+                    });
+                    
+                    if (uid) recordScan(uid, id, profileData);
                 }
              } catch (err) {
                 console.error("Fetch Error:", err);
@@ -414,7 +426,7 @@ export default function QRScanPage() {
                             <div className="p-10 pt-12 text-center">
                                 <span className="text-[11px] font-black text-slate-500 uppercase tracking-[0.4em] block mb-4 italic">Individual Identity</span>
                                 <h1 className="text-5xl sm:text-7xl font-black uppercase text-white tracking-tighter italic font-poppins break-words leading-none w-full">
-                                    {data?.name || "IDENTITY LOADED"}
+                                    {data?.name || data?.petName || data?.itemName || data?.vehicleNumber || "IDENTITY LOADED"}
                                 </h1>
                             </div>
                         </div>
@@ -433,7 +445,6 @@ export default function QRScanPage() {
                                 </div>
                                 <ActivityIcon size={200} className="absolute right-[-40px] bottom-[-40px] text-white opacity-5 pointer-events-none" />
                             </div>
-
                         </div>
 
                         {/* SENSITIVE DETAILS - OTP PROTECTED */}
@@ -494,14 +505,69 @@ export default function QRScanPage() {
                                             {sendingOtp ? <Loader2 className="animate-spin" size={16} /> : <Key size={16} />}
                                             {sendingOtp ? 'Verifying...' : 'Unlock Identity Vault'}
                                         </Button>
-                                        <div className="flex flex-col gap-2 pt-4 border-t border-white/5 opacity-40">
-                                            <div className="h-4 w-40 bg-white/10 rounded-full mx-auto" />
-                                            <div className="h-4 w-32 bg-white/10 rounded-full mx-auto" />
-                                        </div>
                                     </div>
                                 </div>
                             )}
                         </section>
+                    </div>
+                )}
+
+                {category === 'pets' && (
+                    <div className="space-y-6 animate-in fade-in duration-700">
+                        <div className="bg-[#11192A] p-10 rounded-[40px] border border-white/5 text-center">
+                            <div className="w-24 h-24 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-6 text-emerald-500">
+                                <Dog size={48} />
+                            </div>
+                            <h2 className="text-5xl font-black uppercase italic tracking-tighter text-white mb-2">{data?.petName || 'PET IDENTITY'}</h2>
+                            <p className="text-emerald-500 font-black uppercase tracking-widest text-xs italic">{data?.petType || 'COMPANION'}</p>
+                        </div>
+                        <div className="bg-slate-900 p-8 rounded-[40px] border border-white/5 space-y-6">
+                            <div className="flex justify-between items-center border-b border-white/5 pb-4">
+                                <span className="text-[10px] font-black text-slate-500 uppercase">Vaccination</span>
+                                <span className="text-white font-black italic">{data?.vaccinationInfo || 'Up to date'}</span>
+                            </div>
+                            {data?.reward && (
+                                <div className="p-6 bg-emerald-500/10 border border-emerald-500/20 rounded-3xl text-center">
+                                    <p className="text-emerald-500 font-black uppercase italic tracking-widest text-[10px] mb-2">REWARD OFFERED</p>
+                                    <p className="text-xl font-black text-white italic">{data.reward}</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {category === 'vehicles' && (
+                    <div className="space-y-6 animate-in fade-in duration-700">
+                        <div className="bg-[#11192A] p-10 rounded-[40px] border border-white/5 text-center">
+                            <div className="w-24 h-24 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-6 text-yellow-500">
+                                <Car size={48} />
+                            </div>
+                            <h2 className="text-5xl font-black uppercase italic tracking-tighter text-white mb-2">{data?.vehicleNumber || 'PLATE ID'}</h2>
+                            <p className="text-yellow-500 font-black uppercase tracking-widest text-xs italic">{data?.ownerName || 'AUTHORIZED OWNER'}</p>
+                        </div>
+                        <div className="bg-slate-900 p-8 rounded-[40px] border border-white/5">
+                            <div className="flex justify-between items-center text-[10px] font-black font-poppins text-slate-500 uppercase italic">
+                                <span>Registry Status</span>
+                                <span className="text-emerald-500">VERIFIED</span>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {category === 'valuables' && (
+                    <div className="space-y-6 animate-in fade-in duration-700">
+                        <div className="bg-[#11192A] p-10 rounded-[40px] border border-white/5 text-center">
+                            <div className="w-24 h-24 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-6 text-blue-500">
+                                <Briefcase size={48} />
+                            </div>
+                            <h2 className="text-4xl font-black uppercase italic tracking-tighter text-white mb-2">{data?.itemName || 'SECURED ITEM'}</h2>
+                            <p className="text-blue-500 font-black uppercase tracking-widest text-xs italic">Recovery Enabled</p>
+                        </div>
+                        <div className="bg-white/5 p-8 rounded-[40px] border border-white/5 text-center italic">
+                            <p className="text-slate-400 font-bold">{data?.message || 'Please return if found.'}</p>
+                        </div>
+                    </div>
+                )}
 
                         {/* NEAREST HOSPITALS (EXTRACTION NODES) - REPOSITIONED BELOW VAULT */}
                         <div className="bg-[#11192A]/40 rounded-[40px] border border-white/5 p-10 shadow-xl overflow-hidden relative">
@@ -652,11 +718,9 @@ export default function QRScanPage() {
                                             <ChevronRight size={20} className="group-hover:translate-x-2 transition-transform" />
                                         </button>
                                     </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
-                )}
+                </div>
             </div>
 
             {/* SECURE CALL OVERLAY */}
