@@ -426,7 +426,7 @@ export default function QRScanPage() {
                             <div className="p-10 pt-12 text-center">
                                 <span className="text-[11px] font-black text-slate-500 uppercase tracking-[0.4em] block mb-4 italic">Individual Identity</span>
                                 <h1 className="text-5xl sm:text-7xl font-black uppercase text-white tracking-tighter italic font-poppins break-words leading-none w-full">
-                                    {data?.name || data?.petName || data?.itemName || data?.vehicleNumber || "IDENTITY LOADED"}
+                                    {(data?.name || data?.fullName || data?.petName || data?.itemName || data?.vehicleNumber || data?.ownerName || "DATA SYNCED").toUpperCase()}
                                 </h1>
                             </div>
                         </div>
