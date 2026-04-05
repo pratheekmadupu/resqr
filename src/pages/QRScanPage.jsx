@@ -48,38 +48,40 @@ export default function QRScanPage() {
              if (!id) return setLoading(false);
              
              try {
-                let snap = await get(ref(db, `profiles/${id}`));
-                
-                if (!snap.exists()) {
-                    const regSnap = await get(ref(db, `usernames/${id.toLowerCase()}`));
-                    if (regSnap.exists()) {
-                        const path = regSnap.val();
-                        const robustPath = (path.includes('/profiles/') || path.includes('profiles/')) 
-                            ? path 
-                            : path.replace('/', '/profiles/');
-                        snap = await get(ref(db, `users/${robustPath}`));
+                if (id) {
+                    const cleanId = id.trim();
+                    // 1. Try public registry first
+                    let snap = await get(ref(db, `profiles/${cleanId}`));
+                    
+                    if (!snap.exists()) {
+                        // 2. Try username registry
+                        const regSnap = await get(ref(db, `usernames/${cleanId.toLowerCase()}`));
+                        if (regSnap.exists()) {
+                            const path = regSnap.val();
+                            const fullPath = path.startsWith('users/') ? path : `users/${path}`;
+                            snap = await get(ref(db, fullPath));
+                        }
                     }
-                }
-                
-                if (!snap.exists() && id.includes('_')) {
-                    const [uid, pid] = id.split('_');
-                    snap = await get(ref(db, `users/${uid}/profiles/${id}`));
-                }
+                    
+                    if (!snap.exists() && cleanId.includes('_')) {
+                        // 3. Try direct user profile path (Matches Dashboard structure)
+                        const uid = cleanId.split('_')[0];
+                        snap = await get(ref(db, `users/${uid}/profiles/${cleanId}`));
+                    }
 
-                if (snap.exists()) {
-                    const raw = snap.val();
-                    const profileData = { ...raw, ...(raw.data || {}) }; 
-                    const uid = raw.uid || (id.includes('_') ? id.split('_')[0] : (snap.ref.parent?.parent?.key));
-                    const profileCategory = raw.category || 'people';
-                    
-                    setProfile({ 
-                        category: profileCategory, 
-                        data: profileData, 
-                        id, 
-                        uid 
-                    });
-                    
-                    if (uid) recordScan(uid, id, profileData);
+                    if (snap.exists()) {
+                        const raw = snap.val();
+                        // Flatten data to ensure name is easily accessible as in Dashboard
+                        const mergedData = { ...raw, ...(raw.data || {}) }; 
+                        setProfile({ 
+                            category: raw.category || 'people', 
+                            data: mergedData, 
+                            id: cleanId, 
+                            uid: raw.uid || (cleanId.includes('_') ? cleanId.split('_')[0] : null)
+                        });
+                        
+                        if (mergedData.uid) recordScan(mergedData.uid, cleanId, mergedData);
+                    }
                 }
              } catch (err) {
                 console.error("Fetch Error:", err);
@@ -193,9 +195,9 @@ export default function QRScanPage() {
                         {/* 1. Name of the user */}
                         <div className="bg-[#11192A] rounded-[48px] border border-white/5 p-16 text-center shadow-2xl relative overflow-hidden">
                             <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-red-600/20 to-transparent" />
-                            <span className="text-[12px] font-black text-slate-500 uppercase tracking-[0.5em] block mb-6 italic">Individual Identity Node</span>
+                            <span className="text-[12px] font-black text-slate-500 uppercase tracking-[0.5em] block mb-6 italic">Identity Node</span>
                             <h1 className="text-6xl sm:text-8xl font-black uppercase text-white tracking-tighter italic font-poppins break-words leading-none w-full">
-                                {(data?.name || data?.fullName || "IDENTITY NODE").toUpperCase()}
+                                {(data?.name || data?.fullName || data?.ownerName || data?.petName || "USER NAME").toUpperCase()}
                             </h1>
                         </div>
 
