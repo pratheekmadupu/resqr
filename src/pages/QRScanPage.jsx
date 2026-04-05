@@ -460,7 +460,7 @@ export default function QRScanPage() {
                             <div className="p-10 pt-12 text-center">
                                 <span className="text-[11px] font-black text-slate-500 uppercase tracking-[0.4em] block mb-4 italic">Individual Identity</span>
                                 <h1 className="text-5xl sm:text-7xl font-black uppercase text-white tracking-tighter italic font-poppins break-words leading-none w-full">
-                                    {(data?.name || data?.fullName || data?.petName || data?.itemName || data?.vehicleNumber || data?.ownerName || "UNIDENTIFIED USER").toUpperCase()}
+                                    {(data?.name || data?.fullName || data?.petName || data?.itemName || data?.vehicleNumber || data?.ownerName || "IDENTITY NODE").toUpperCase()}
                                 </h1>
                             </div>
                         </div>
@@ -650,8 +650,8 @@ export default function QRScanPage() {
                                 <div className="space-y-10">
                                     <div className="flex justify-between items-start">
                                         <div className="min-w-0 flex-1">
-                                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 italic">Family / Emergency Contact</p>
-                                            <h4 className="text-3xl font-black italic text-white uppercase font-poppins leading-none break-words">{data?.emergencyContactName || 'FAMILY CONTACT'}</h4>
+                                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 italic">Family Liaison</p>
+                                            <h4 className="text-3xl font-black italic text-white uppercase font-poppins leading-none break-words">{data?.emergencyContactName || 'GUARDIAN'}</h4>
                                             <Badge className="bg-white/5 text-slate-300 border border-white/10 px-4 py-1.5 font-black uppercase italic text-[9px] mt-4 tracking-widest">{data?.emergencyContactRelation || 'PARENT'}</Badge>
                                         </div>
                                     </div>
@@ -659,10 +659,13 @@ export default function QRScanPage() {
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <button 
                                             onClick={() => window.location.href = `tel:${data?.emergencyContactPhone || data?.ownerContact || data?.contactNumber}`}
-                                            className="h-20 bg-red-600 text-white rounded-[30px] flex items-center justify-center gap-3 shadow-xl shadow-red-600/20 active:scale-95 transition-all group overflow-hidden relative"
+                                            className="h-20 bg-red-600 text-white rounded-[30px] flex flex-col items-center justify-center gap-1 shadow-xl shadow-red-600/20 active:scale-95 transition-all group overflow-hidden relative"
                                         >
-                                            <Phone size={24} fill="white" />
-                                            <span className="font-black uppercase italic tracking-widest text-lg">Connect Call: {data?.emergencyContactPhone || data?.ownerContact || data?.contactNumber}</span>
+                                            <div className="flex items-center gap-2">
+                                                <Phone size={20} fill="white" />
+                                                <span className="font-black uppercase italic tracking-widest text-lg">Connect Call</span>
+                                            </div>
+                                            <span className="text-[10px] opacity-70 font-bold">{data?.emergencyContactPhone || data?.ownerContact || data?.contactNumber}</span>
                                         </button>
                                         <button 
                                             onClick={handleRequestCall}
@@ -674,10 +677,10 @@ export default function QRScanPage() {
                                         </button>
                                         <button 
                                             onClick={handleSendLocation}
-                                            className="sm:col-span-2 h-20 bg-emerald-600 text-white rounded-[30px] flex items-center justify-center gap-3 shadow-xl shadow-emerald-500/20 active:scale-95 transition-all group overflow-hidden relative"
+                                            className="sm:col-span-2 h-16 bg-emerald-600 text-white rounded-[24px] flex items-center justify-center gap-3 shadow-xl shadow-emerald-500/20 active:scale-95 transition-all group overflow-hidden relative"
                                         >
-                                            <MapPin size={24} fill="white" />
-                                            <span className="font-black uppercase italic tracking-widest text-lg">Send Location</span>
+                                            <MapPin size={20} fill="white" />
+                                            <span className="font-black uppercase italic tracking-widest text-sm">Send Location To Family</span>
                                         </button>
                                     </div>
 

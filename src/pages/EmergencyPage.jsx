@@ -486,7 +486,7 @@ export default function EmergencyPage() {
                     <div className="p-10 pt-14 text-center">
                         <span className="text-[11px] font-black text-slate-500 uppercase tracking-[0.4em] block mb-4 italic">Individual Name</span>
                         <h2 className="text-5xl sm:text-7xl font-black text-white uppercase italic tracking-tighter break-words font-poppins leading-none">
-                            {user?.name || "UNIDENTIFIED USER"}
+                            {user?.name || "IDENTITY NODE"}
                         </h2>
                     </div>
                 </section>
@@ -624,38 +624,41 @@ export default function EmergencyPage() {
                         <div className="space-y-8">
                             <div className="flex justify-between items-center">
                                 <div>
-                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-2 italic">Family / Emergency Contact</span>
-                                    <h4 className="text-3xl font-black text-white uppercase italic tracking-tight">{user?.emergencyContact?.name || "FAMILY CONTACT"}</h4>
+                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-2 italic">Family Liaison</span>
+                                    <h4 className="text-3xl font-black text-white uppercase italic tracking-tight">{user?.emergencyContact?.name || "GUARDIAN"}</h4>
                                 </div>
-                                <Badge className="bg-white/5 text-slate-300 border border-white/10 font-black uppercase py-2 px-6 italic tracking-widest">{user?.emergencyContact?.relation || "Emergency Liaison"}</Badge>
+                                <Badge className="bg-white/5 text-slate-300 border border-white/10 font-black uppercase py-2 px-6 italic tracking-widest">{user?.emergencyContact?.relation || "PARENT"}</Badge>
                             </div>
 
                             <div className="pt-4 flex flex-col gap-4">
                                 <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block italic">Secure Contact Protocol</span>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <button 
-                                        onClick={() => window.location.href = `tel:${user.emergencyContact.phone}`}
-                                        className="bg-red-600 hover:bg-red-700 text-white p-6 rounded-[24px] flex items-center justify-center gap-3 transition-all active:scale-95 shadow-xl shadow-red-600/20 group"
-                                    >
-                                        <Phone size={22} fill="white" />
-                                        <span className="font-black uppercase italic tracking-tighter text-lg">Connect Call: {user.emergencyContact.phone}</span>
-                                    </button>
-                                    <button 
-                                        onClick={handleRequestCall}
-                                        disabled={callRequested}
-                                        className={`p-6 rounded-[24px] flex items-center justify-center gap-3 transition-all active:scale-95 border-2 ${callRequested ? 'bg-white/5 border-white/10 text-slate-500' : 'bg-[#040812] border-white/10 text-white hover:border-red-600 hover:text-red-600 shadow-lg'}`}
-                                    >
-                                        <MessageSquare size={22} />
-                                        <span className="font-black uppercase italic tracking-tighter text-lg">{callRequested ? 'Request Sent' : 'Request Call'}</span>
-                                    </button>
-                                    <button 
-                                        onClick={handleSendLocation}
-                                        className="sm:col-span-2 p-6 bg-emerald-600 text-white rounded-[24px] flex items-center justify-center gap-3 shadow-xl shadow-emerald-500/20 active:scale-95 transition-all group overflow-hidden relative"
-                                    >
-                                        <MapPin size={22} fill="white" />
-                                        <span className="font-black uppercase italic tracking-tighter text-lg">Send Location</span>
-                                    </button>
-                                </div>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <button 
+                                            onClick={() => window.location.href = `tel:${user.emergencyContact.phone}`}
+                                            className="bg-red-600 hover:bg-red-700 text-white h-20 rounded-[24px] flex flex-col items-center justify-center gap-1 transition-all active:scale-95 shadow-xl shadow-red-600/20 group"
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                <Phone size={20} fill="white" />
+                                                <span className="font-black uppercase italic tracking-widest text-lg">Connect Call</span>
+                                            </div>
+                                            <span className="text-[10px] opacity-70 font-bold">{user.emergencyContact.phone}</span>
+                                        </button>
+                                        <button 
+                                            onClick={handleRequestCall}
+                                            disabled={callRequested}
+                                            className={`h-20 rounded-[24px] flex items-center justify-center gap-3 transition-all active:scale-95 border-2 ${callRequested ? 'bg-white/5 border-white/10 text-slate-500' : 'bg-[#040812] border-white/10 text-white hover:border-red-600 hover:text-red-600 shadow-lg'}`}
+                                        >
+                                            <MessageSquare size={22} />
+                                            <span className="font-black uppercase italic tracking-tighter text-lg">{callRequested ? 'Request Sent' : 'Request Call'}</span>
+                                        </button>
+                                        <button 
+                                            onClick={handleSendLocation}
+                                            className="sm:col-span-2 h-16 bg-emerald-600 text-white rounded-[24px] flex items-center justify-center gap-3 shadow-xl shadow-emerald-500/20 active:scale-95 transition-all group overflow-hidden relative"
+                                        >
+                                            <MapPin size={22} fill="white" />
+                                            <span className="font-black uppercase italic tracking-tighter text-sm">Send Location To Family</span>
+                                        </button>
+                                    </div>
 
                             </div>
                         </div>
