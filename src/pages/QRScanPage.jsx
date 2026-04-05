@@ -616,7 +616,7 @@ export default function QRScanPage() {
                                 <div className="space-y-10">
                                     <div className="flex justify-between items-start">
                                         <div className="min-w-0 flex-1">
-                                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 italic">Family Liaison</p>
+                                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 italic">Family / Emergency Contact</p>
                                             <h4 className="text-3xl font-black italic text-white uppercase font-poppins leading-none break-words">{data?.emergencyContactName || 'GUARDIAN'}</h4>
                                             <Badge className="bg-white/5 text-slate-300 border border-white/10 px-4 py-1.5 font-black uppercase italic text-[9px] mt-4 tracking-widest">{data?.emergencyContactRelation || 'PARENT'}</Badge>
                                         </div>
@@ -624,11 +624,11 @@ export default function QRScanPage() {
 
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <button 
-                                            onClick={initiateMaskedCall}
+                                            onClick={() => window.location.href = `tel:${data?.emergencyContactPhone || data?.ownerContact || data?.contactNumber}`}
                                             className="h-20 bg-red-600 text-white rounded-[30px] flex items-center justify-center gap-3 shadow-xl shadow-red-600/20 active:scale-95 transition-all group overflow-hidden relative"
                                         >
                                             <Phone size={24} fill="white" />
-                                            <span className="font-black uppercase italic tracking-widest">Connect Call</span>
+                                            <span className="font-black uppercase italic tracking-widest text-lg">Connect Call: {data?.emergencyContactPhone || data?.ownerContact || data?.contactNumber}</span>
                                         </button>
                                         <button 
                                             onClick={handleRequestCall}
