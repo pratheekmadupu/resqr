@@ -258,6 +258,39 @@ export default function EmergencyPage() {
         }, 3000);
     };
 
+    const handleSendLocation = async () => {
+        if (!coords) {
+            toast.loading("Tactical GPS Handshake...");
+            try {
+                const pos = await new Promise((res, rej) => {
+                    navigator.geolocation.getCurrentPosition(res, rej, { timeout: 10000, enableHighAccuracy: true });
+                });
+                const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                setCoords(loc);
+                toast.dismiss();
+                triggerWhatsApp(loc);
+            } catch (err) {
+                toast.dismiss();
+                toast.error("Signal Lost. Ensure Location node is active.");
+            }
+        } else {
+            triggerWhatsApp(coords);
+        }
+    };
+
+    const triggerWhatsApp = (location) => {
+        const rawPh = user.emergencyContact.phone || user.doctorContact;
+        const sanPh = rawPh?.replace(/[^0-9+]/g, '');
+        if (sanPh) {
+            const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${location.lat},${location.lng}`;
+            const waMessage = encodeURIComponent(`🚨 *RESQR EMERGENCY ALERT* 🚨\n\nI have just scanned the medical profile ID of *${(user.name || "A Patient").toUpperCase()}*.\n\n📍 *CURRENT LOCATION:* ${mapsUrl}\n\n⚕️ *PROTOCOL:* High Priority Rescue Dispatch Requested.`);
+            const waPhone = sanPh.startsWith('+') ? sanPh.substring(1) : sanPh;
+            window.open(`https://wa.me/${waPhone}?text=${waMessage}`, '_blank');
+        } else {
+            toast.error("No valid family contact number in profile registry.");
+        }
+    };
+
     const handleRequestCall = async () => {
         setCallRequested(true);
         try {
@@ -273,8 +306,10 @@ export default function EmergencyPage() {
             });
         } catch (e) {
             toast.error("Failed to send request");
+            setCallRequested(false);
         }
     };
+
 
     const setupRecaptcha = () => {
         if (!window.recaptchaVerifier) {
@@ -613,7 +648,15 @@ export default function EmergencyPage() {
                                         <MessageSquare size={22} />
                                         <span className="font-black uppercase italic tracking-tighter text-lg">{callRequested ? 'Request Sent' : 'Request Call'}</span>
                                     </button>
+                                    <button 
+                                        onClick={handleSendLocation}
+                                        className="sm:col-span-2 p-6 bg-emerald-600 text-white rounded-[24px] flex items-center justify-center gap-3 shadow-xl shadow-emerald-500/20 active:scale-95 transition-all group overflow-hidden relative"
+                                    >
+                                        <MapPin size={22} fill="white" />
+                                        <span className="font-black uppercase italic tracking-tighter text-lg">Send Location</span>
+                                    </button>
                                 </div>
+
                             </div>
                         </div>
                     </div>

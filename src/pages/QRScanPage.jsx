@@ -246,6 +246,39 @@ export default function QRScanPage() {
         }, 3500);
     };
 
+    const handleSendLocation = async () => {
+        if (!coords) {
+            toast.loading("Handshaking with satellites...");
+            try {
+                const pos = await new Promise((res, rej) => {
+                    navigator.geolocation.getCurrentPosition(res, rej, { timeout: 10000, enableHighAccuracy: true });
+                });
+                const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                setCoords(loc);
+                toast.dismiss();
+                triggerWhatsApp(loc);
+            } catch (err) {
+                toast.dismiss();
+                toast.error("GPS Signal Offline. Please ensure location services are active.");
+            }
+        } else {
+            triggerWhatsApp(coords);
+        }
+    };
+
+    const triggerWhatsApp = (location) => {
+        const rawPh = profile.data.emergencyContactPhone || profile.data.ownerContact || profile.data.contactNumber;
+        const sanPh = rawPh?.replace(/[^0-9+]/g, '');
+        if (sanPh) {
+            const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${location.lat},${location.lng}`;
+            const waMessage = encodeURIComponent(`🚨 *RESQR EMERGENCY ALERT* 🚨\n\nI have just scanned the medical profile ID of *${(profile.data?.name || "A Patient").toUpperCase()}*.\n\n📍 *CURRENT LOCATION:* ${mapsUrl}\n\n⚕️ *PROTOCOL:* High Priority Rescue Dispatch Requested.`);
+            const waPhone = sanPh.startsWith('+') ? sanPh.substring(1) : sanPh;
+            window.open(`https://wa.me/${waPhone}?text=${waMessage}`, '_blank');
+        } else {
+            toast.error("Emergency contact number missing from registry node.");
+        }
+    };
+
     const handleRequestCall = async () => {
         setCallRequested(true);
         try {
@@ -270,6 +303,7 @@ export default function QRScanPage() {
             setCallRequested(false);
         }
     };
+
 
     const setupRecaptcha = () => {
         if (!window.recaptchaVerifier) {
@@ -638,7 +672,16 @@ export default function QRScanPage() {
                                             <MessageSquare size={24} />
                                             <span className="font-black uppercase italic tracking-widest">{callRequested ? 'Alert Dispatched' : 'Request Call'}</span>
                                         </button>
+                                        <button 
+                                            onClick={handleSendLocation}
+                                            className="sm:col-span-2 h-20 bg-emerald-600 text-white rounded-[30px] flex items-center justify-center gap-3 shadow-xl shadow-emerald-500/20 active:scale-95 transition-all group overflow-hidden relative"
+                                        >
+                                            <MapPin size={24} fill="white" />
+                                            <span className="font-black uppercase italic tracking-widest text-lg">Send Location</span>
+                                        </button>
                                     </div>
+
+
                                 </div>
                             </div>
                             <div className="bg-black/20 p-4 text-center">
