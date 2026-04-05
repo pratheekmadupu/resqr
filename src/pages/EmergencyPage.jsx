@@ -589,7 +589,7 @@ export default function EmergencyPage() {
                         <div className="space-y-8">
                             <div className="flex justify-between items-center">
                                 <div>
-                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-2 italic">Guardian One</span>
+                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-2 italic">Family / Emergency Contact</span>
                                     <h4 className="text-3xl font-black text-white uppercase italic tracking-tight">{user?.emergencyContact?.name || "Guardian Node"}</h4>
                                 </div>
                                 <Badge className="bg-white/5 text-slate-300 border border-white/10 font-black uppercase py-2 px-6 italic tracking-widest">{user?.emergencyContact?.relation || "Emergency Liaison"}</Badge>
@@ -599,11 +599,11 @@ export default function EmergencyPage() {
                                 <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block italic">Secure Contact Protocol</span>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <button 
-                                        onClick={initiateMaskedCall}
+                                        onClick={() => window.location.href = `tel:${user.emergencyContact.phone}`}
                                         className="bg-red-600 hover:bg-red-700 text-white p-6 rounded-[24px] flex items-center justify-center gap-3 transition-all active:scale-95 shadow-xl shadow-red-600/20 group"
                                     >
                                         <Phone size={22} fill="white" />
-                                        <span className="font-black uppercase italic tracking-tighter text-lg">Call Family</span>
+                                        <span className="font-black uppercase italic tracking-tighter text-lg">Connect Call: {user.emergencyContact.phone}</span>
                                     </button>
                                     <button 
                                         onClick={handleRequestCall}

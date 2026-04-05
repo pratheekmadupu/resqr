@@ -91,7 +91,7 @@ export default function Dashboard() {
                     return;
                 }
                 if (activeProfile.username) await remove(ref(db, `usernames/${activeProfile.username.toLowerCase()}`));
-                await set(regRef, `${uid}/${pid}`);
+                await set(regRef, `${uid}/profiles/${pid}`);
                 await update(ref(db, `users/${uid}/profiles/${pid}`), { username: cleanUser });
             }
 
