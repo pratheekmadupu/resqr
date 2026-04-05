@@ -44,8 +44,11 @@ export default function EmergencyPage() {
                         name: (decoded.name || decoded.fullName || decoded.ownerName || decoded.petName || "USER NAME").toString().toUpperCase(),
                         bloodGroup: decoded.bloodGroup || "B+",
                         payment_status: decoded.payment_status || 'paid',
+                        healthIssues: decoded.healthIssues || decoded.conditions || decoded.medicalConditions || "STABLE",
+                        allergies: decoded.allergies || "NONE REPORTED",
                         emergencyContact: {
                             name: decoded.emergencyContactName || decoded.emergencyContact?.name || "GUARDIAN",
+                            relation: decoded.emergencyContactRelation || decoded.emergencyContact?.relation || "AUTHORIZED CONTACT",
                             phone: decoded.emergencyContactPhone || decoded.emergencyContact?.phone || ""
                         }
                     };
@@ -169,10 +172,17 @@ export default function EmergencyPage() {
                     </div>
 
                     {/* Emergency Contact & Location */}
-                    <div className="bg-[#11192A] rounded-[48px] border border-white/10 p-12 space-y-8 shadow-2xl relative group">
+                    <div className="bg-[#11192A] rounded-[48px] border border-white/10 p-12 space-y-10 shadow-2xl relative group">
                         <div className="text-center">
-                            <p className="text-[11px] font-black text-slate-500 uppercase tracking-[0.4em] italic mb-4">Rescue Network Protocol</p>
-                            <h4 className="text-4xl font-black italic text-white uppercase font-poppins leading-none">{user?.emergencyContact?.name || 'GUARDIAN'}</h4>
+                            <p className="text-[11px] font-black text-slate-500 uppercase tracking-[0.4em] italic mb-4">Guardian Liaison Node</p>
+                            <h4 className="text-4xl font-black italic text-white uppercase font-poppins leading-none">
+                                {(user?.emergencyContact?.name || "GUARDIAN").toUpperCase()}
+                            </h4>
+                            <div className="mt-2 flex items-center justify-center gap-2">
+                                <Badge className="bg-white/5 text-slate-400 border border-white/10 font-bold uppercase text-[9px] px-3 py-1">
+                                    {user?.emergencyContact?.relation || "AUTHORIZED CONTACT"}
+                                </Badge>
+                            </div>
                         </div>
 
                         <div className="grid grid-cols-1 gap-5">
@@ -201,6 +211,31 @@ export default function EmergencyPage() {
                                 <span className="font-black uppercase italic tracking-widest text-xl">Send Location To Family</span>
                             </button>
                         </div>
+                    </div>
+
+                    {/* MEDICAL VAULT DETAILS */}
+                    <div className="bg-slate-900/40 rounded-[48px] border border-white/5 p-12 space-y-10 shadow-2xl">
+                            <div className="flex items-center gap-4 border-b border-white/5 pb-8">
+                            <div className="p-3 bg-white/5 rounded-2xl text-red-600">
+                                <ActivityIcon size={24} />
+                            </div>
+                            <h3 className="text-2xl font-black text-white italic uppercase tracking-tighter">Medical Vault</h3>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="bg-black/20 p-8 rounded-[36px] border border-white/5">
+                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-4 italic">Health History / Issues</span>
+                                <p className="text-2xl font-black italic uppercase text-white leading-tight">
+                                    {user?.healthIssues || user?.conditions || 'STABLE'}
+                                </p>
+                            </div>
+                            <div className="bg-red-600/5 p-8 rounded-[36px] border border-red-600/10">
+                                <span className="text-[10px] font-black text-red-500 uppercase tracking-widest block mb-4 italic">Critical Allergies</span>
+                                <p className="text-2xl font-black italic uppercase text-red-500 leading-tight">
+                                    {user?.allergies || 'NONE REPORTED'}
+                                </p>
+                            </div>
+                            </div>
                     </div>
 
                     {/* Recovery Actions */}

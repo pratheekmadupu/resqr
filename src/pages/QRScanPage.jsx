@@ -211,17 +211,24 @@ export default function QRScanPage() {
                         </div>
 
                         {/* Emergency Contact & Location */}
-                        <div className="bg-[#11192A] rounded-[48px] border border-white/10 p-12 space-y-8 shadow-2xl relative group">
+                        <div className="bg-[#11192A] rounded-[48px] border border-white/10 p-12 space-y-10 shadow-2xl relative group">
                             <div className="text-center">
-                                <p className="text-[11px] font-black text-slate-500 uppercase tracking-[0.4em] italic mb-4">Rescue Network Protocol</p>
-                                <h4 className="text-4xl font-black italic text-white uppercase font-poppins leading-none">{data?.emergencyContactName || 'GUARDIAN'}</h4>
+                                <p className="text-[11px] font-black text-slate-500 uppercase tracking-[0.4em] italic mb-4">Guardian Liaison Node</p>
+                                <h4 className="text-4xl font-black italic text-white uppercase font-poppins leading-none">
+                                    {(data?.emergencyContactName || data?.parentName || "GUARDIAN").toUpperCase()}
+                                </h4>
+                                <div className="mt-2 flex items-center justify-center gap-2">
+                                    <Badge className="bg-white/5 text-slate-400 border border-white/10 font-bold uppercase text-[9px] px-3 py-1">
+                                        {data?.emergencyContactRelation || data?.relation || "AUTHORIZED CONTACT"}
+                                    </Badge>
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-1 gap-5">
                                 {/* 4. Contact family */}
                                 <button 
                                     onClick={() => {
-                                        const rawPh = data?.emergencyContactPhone || data?.ownerContact || data?.contactNumber;
+                                        const rawPh = data?.emergencyContactPhone || data?.parentPhone || data?.ownerContact || data?.contactNumber;
                                         const sanPh = rawPh?.replace(/[^0-9+]/g, '');
                                         if (sanPh) window.location.href = `tel:${sanPh}`;
                                     }}
@@ -231,7 +238,9 @@ export default function QRScanPage() {
                                         <Phone size={32} fill="white" />
                                         <span className="font-black uppercase italic tracking-widest text-3xl">Connect Call</span>
                                     </div>
-                                    <span className="text-base opacity-70 font-black tracking-widest">{data?.emergencyContactPhone || data?.ownerContact || data?.contactNumber}</span>
+                                    <span className="text-base opacity-70 font-black tracking-widest">
+                                        {data?.emergencyContactPhone || data?.parentPhone || data?.ownerContact || data?.contactNumber}
+                                    </span>
                                 </button>
 
                                 {/* 3. Send location to family */}
@@ -243,6 +252,48 @@ export default function QRScanPage() {
                                     <span className="font-black uppercase italic tracking-widest text-xl">Send Location To Family</span>
                                 </button>
                             </div>
+                        </div>
+
+                        {/* ALL OTHER DETAILS - MEDICAL VAULT */}
+                        <div className="bg-slate-900/40 rounded-[48px] border border-white/5 p-12 space-y-10 shadow-2xl">
+                             <div className="flex items-center gap-4 border-b border-white/5 pb-8">
+                                <div className="p-3 bg-white/5 rounded-2xl text-red-600">
+                                    <ActivityIcon size={24} />
+                                </div>
+                                <h3 className="text-2xl font-black text-white italic uppercase tracking-tighter">Medical Vault</h3>
+                             </div>
+
+                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="bg-black/20 p-8 rounded-[36px] border border-white/5">
+                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-4 italic">Health History / Issues</span>
+                                    <p className="text-2xl font-black italic uppercase text-white leading-tight">
+                                        {data?.healthIssues || data?.conditions || data?.medicalHistory || 'STABLE'}
+                                    </p>
+                                </div>
+                                <div className="bg-red-600/5 p-8 rounded-[36px] border border-red-600/10">
+                                    <span className="text-[10px] font-black text-red-500 uppercase tracking-widest block mb-4 italic">Critical Allergies</span>
+                                    <p className="text-2xl font-black italic uppercase text-red-500 leading-tight">
+                                        {data?.allergies || 'NONE REPORTED'}
+                                    </p>
+                                </div>
+                             </div>
+
+                             {(data?.doctorContact || data?.medications) && (
+                                <div className="pt-6 space-y-6">
+                                     {data?.doctorContact && (
+                                        <div className="flex justify-between items-center border-t border-white/5 pt-6">
+                                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest italic">Doctor Contact</span>
+                                            <span className="text-white font-black italic uppercase text-lg">{data.doctorContact}</span>
+                                        </div>
+                                     )}
+                                     {data?.medications && (
+                                        <div className="flex justify-between items-center border-t border-white/5 pt-6">
+                                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest italic">Medications</span>
+                                            <span className="text-white font-black italic uppercase">{data.medications}</span>
+                                        </div>
+                                     )}
+                                </div>
+                             )}
                         </div>
 
                         {/* Recovery Actions */}
