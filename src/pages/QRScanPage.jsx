@@ -426,7 +426,7 @@ export default function QRScanPage() {
                             <div className="p-10 pt-12 text-center">
                                 <span className="text-[11px] font-black text-slate-500 uppercase tracking-[0.4em] block mb-4 italic">Individual Identity</span>
                                 <h1 className="text-5xl sm:text-7xl font-black uppercase text-white tracking-tighter italic font-poppins break-words leading-none w-full">
-                                    {(data?.name || data?.fullName || data?.petName || data?.itemName || data?.vehicleNumber || data?.ownerName || "DATA SYNCED").toUpperCase()}
+                                    {(data?.name || data?.fullName || data?.petName || data?.itemName || data?.vehicleNumber || data?.ownerName || "UNIDENTIFIED USER").toUpperCase()}
                                 </h1>
                             </div>
                         </div>
@@ -617,7 +617,7 @@ export default function QRScanPage() {
                                     <div className="flex justify-between items-start">
                                         <div className="min-w-0 flex-1">
                                             <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 italic">Family / Emergency Contact</p>
-                                            <h4 className="text-3xl font-black italic text-white uppercase font-poppins leading-none break-words">{data?.emergencyContactName || 'GUARDIAN'}</h4>
+                                            <h4 className="text-3xl font-black italic text-white uppercase font-poppins leading-none break-words">{data?.emergencyContactName || 'FAMILY CONTACT'}</h4>
                                             <Badge className="bg-white/5 text-slate-300 border border-white/10 px-4 py-1.5 font-black uppercase italic text-[9px] mt-4 tracking-widest">{data?.emergencyContactRelation || 'PARENT'}</Badge>
                                         </div>
                                     </div>
@@ -642,7 +642,7 @@ export default function QRScanPage() {
                                 </div>
                             </div>
                             <div className="bg-black/20 p-4 text-center">
-                                <p className="text-[8px] font-black text-slate-500 uppercase tracking-[0.5em] italic">Private Virtual Node • No Number Exposure</p>
+                                <p className="text-[8px] font-black text-emerald-500 uppercase tracking-[0.5em] italic">Direct Security Protocol • Contact revealed for Rescuers</p>
                             </div>
                         </div>
 

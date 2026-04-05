@@ -451,7 +451,7 @@ export default function EmergencyPage() {
                     <div className="p-10 pt-14 text-center">
                         <span className="text-[11px] font-black text-slate-500 uppercase tracking-[0.4em] block mb-4 italic">Individual Name</span>
                         <h2 className="text-5xl sm:text-7xl font-black text-white uppercase italic tracking-tighter break-words font-poppins leading-none">
-                            {user?.name || "UNIDENTIFIED"}
+                            {user?.name || "UNIDENTIFIED USER"}
                         </h2>
                     </div>
                 </section>
@@ -590,7 +590,7 @@ export default function EmergencyPage() {
                             <div className="flex justify-between items-center">
                                 <div>
                                     <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-2 italic">Family / Emergency Contact</span>
-                                    <h4 className="text-3xl font-black text-white uppercase italic tracking-tight">{user?.emergencyContact?.name || "Guardian Node"}</h4>
+                                    <h4 className="text-3xl font-black text-white uppercase italic tracking-tight">{user?.emergencyContact?.name || "FAMILY CONTACT"}</h4>
                                 </div>
                                 <Badge className="bg-white/5 text-slate-300 border border-white/10 font-black uppercase py-2 px-6 italic tracking-widest">{user?.emergencyContact?.relation || "Emergency Liaison"}</Badge>
                             </div>
