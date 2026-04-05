@@ -658,7 +658,11 @@ export default function QRScanPage() {
 
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <button 
-                                            onClick={() => window.location.href = `tel:${data?.emergencyContactPhone || data?.ownerContact || data?.contactNumber}`}
+                                            onClick={() => {
+                                                const rawPh = data?.emergencyContactPhone || data?.ownerContact || data?.contactNumber;
+                                                const sanPh = rawPh?.replace(/[^0-9+]/g, '');
+                                                if (sanPh) window.location.href = `tel:${sanPh}`;
+                                            }}
                                             className="h-20 bg-red-600 text-white rounded-[30px] flex flex-col items-center justify-center gap-1 shadow-xl shadow-red-600/20 active:scale-95 transition-all group overflow-hidden relative"
                                         >
                                             <div className="flex items-center gap-2">

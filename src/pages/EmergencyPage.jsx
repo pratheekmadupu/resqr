@@ -634,7 +634,11 @@ export default function EmergencyPage() {
                                 <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block italic">Secure Contact Protocol</span>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <button 
-                                            onClick={() => window.location.href = `tel:${user.emergencyContact.phone}`}
+                                            onClick={() => {
+                                                const rawPh = user.emergencyContact.phone;
+                                                const sanPh = rawPh?.replace(/[^0-9+]/g, '');
+                                                if (sanPh) window.location.href = `tel:${sanPh}`;
+                                            }}
                                             className="bg-red-600 hover:bg-red-700 text-white h-20 rounded-[24px] flex flex-col items-center justify-center gap-1 transition-all active:scale-95 shadow-xl shadow-red-600/20 group"
                                         >
                                             <div className="flex items-center gap-2">
